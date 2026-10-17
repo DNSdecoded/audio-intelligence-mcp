@@ -146,3 +146,15 @@ class SearchLibraryRequest(_Req):
 class GetJobRequest(_Req):
     job_id: str = Field(pattern=r"^job_[0-9a-f]{12}$")
     action: Literal["status", "cancel"] = "status"
+
+
+class StreamRequest(_Req):
+    action: Literal["start", "push", "status", "finish", "cancel"]
+    session_id: str | None = Field(None, pattern=r"^str_[0-9a-f]{12}$")
+    chunk_format: Literal["pcm", "file"] | None = None
+    sample_rate_hz: int | None = Field(None, ge=8000, le=192000)
+    channels: int | None = Field(None, ge=1, le=8)
+    sample_format: Literal["s16le", "f32le"] | None = None
+    data: str | None = None
+    path: str | None = None
+    tasks: list[TaskName] | Literal["auto"] = "auto"

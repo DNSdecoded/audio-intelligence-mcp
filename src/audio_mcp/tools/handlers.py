@@ -18,7 +18,7 @@ from audio_mcp.library.index import SUPPORTED_EXTENSIONS
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, GetJobRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, GetJobRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, StreamRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -426,3 +426,29 @@ def get_job(app, req: GetJobRequest) -> dict:
     if job.response is not None:
         result["response"] = job.response
     return build_response(result=result, job_id=job.job_id, status="success" if job.finished else "processing")
+
+
+@tool_handler
+def analyze_audio_stream(app, req: StreamRequest) -> dict:
+    ss = app.streams
+    if req.action == "start":
+        if req.chunk_format is None:
+            raise AudioMCPError(ErrorCode.INVALID_INPUT, "start needs chunk_format")
+        return build_response(result=ss.start(req.chunk_format, req.sample_rate_hz, req.channels, req.sample_format))
+    if req.session_id is None:
+        raise AudioMCPError(ErrorCode.INVALID_INPUT, f"{req.action} needs session_id")
+    if req.action == "push":
+        return build_response(result=ss.push(req.session_id, req.data, req.path))
+    if req.action == "status":
+        return build_response(result=ss.status(req.session_id))
+    if req.action == "cancel":
+        return build_response(result=ss.close(req.session_id))
+    record, session = ss.finish_audio(req.session_id)
+    resp = analyze_audio(app, AnalyzeRequest(source=AudioIdSource(type="audio_id", audio_id=record.audio_id),
+                                             tasks=req.tasks, async_mode="never"))
+    if resp["status"] == "error":
+        return resp
+    result = {"analysis": resp.pop("analysis"), "session_id": session.id}
+    result["reconciliation"] = ss.reconcile(session, result["analysis"])
+    ss.close(req.session_id)
+    return {**resp, "result": result}

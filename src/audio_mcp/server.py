@@ -13,7 +13,7 @@ from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, GetJobRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
-    InspectQualityRequest, LibraryFilters, NodeType, SearchLibraryRequest, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
+    InspectQualityRequest, LibraryFilters, NodeType, SearchLibraryRequest, StreamRequest, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
 _app: AppContext | None = None
@@ -193,6 +193,26 @@ async def search_audio_library(
     "analyses) or cancel it. When finished, the job's full response is included."))
 async def get_job(job_id: str, action: Literal["status", "cancel"] = "status") -> dict:
     return await _run(handlers.get_job, GetJobRequest, dict(job_id=job_id, action=action))
+
+
+@mcp.tool(name="analyze_audio_stream", description=(
+    "Chunked streaming sessions (raw PCM or self-contained audio files per chunk): start a session, push chunks "
+    "for provisional features/events/transcript, then finish for a full analysis plus a reconciliation of "
+    "provisional vs final results. Live socket streaming and split encoded streams are not supported."))
+async def analyze_audio_stream(
+    action: Literal["start", "push", "status", "finish", "cancel"],
+    session_id: str | None = None,
+    chunk_format: Literal["pcm", "file"] | None = None,
+    sample_rate_hz: int | None = None,
+    channels: int | None = None,
+    sample_format: Literal["s16le", "f32le"] | None = None,
+    data: str | None = None,
+    path: str | None = None,
+    tasks: list[TaskName] | Literal["auto"] = "auto",
+) -> dict:
+    return await _run(handlers.analyze_audio_stream, StreamRequest, dict(
+        action=action, session_id=session_id, chunk_format=chunk_format, sample_rate_hz=sample_rate_hz,
+        channels=channels, sample_format=sample_format, data=data, path=path, tasks=tasks))
 
 
 def main() -> None:
