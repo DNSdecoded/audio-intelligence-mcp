@@ -122,10 +122,13 @@ def _importable(module: str) -> bool:
 
 def build_backends(settings) -> Backends:
     from audio_mcp.backends.energy_vad import EnergyVAD
-    from audio_mcp.backends.fake import NoLLM, fake_backends
+    from audio_mcp.backends.fake import fake_backends
+    from audio_mcp.backends.llm import build_llm
 
     if settings.backend_profile == "fake":
-        return fake_backends()
+        fake = fake_backends()
+        fake.llm = build_llm(settings)
+        return fake
 
     hint = "not installed (uv sync --extra models)"
     todo = "not implemented yet"  # later tasks replace these with real adapters
@@ -172,7 +175,7 @@ def build_backends(settings) -> Backends:
         speaker=speaker,
         diarizer=diarizer,
         text=text,
-        llm=NoLLM(),
+        llm=build_llm(settings),
     )
 
 

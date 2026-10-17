@@ -29,6 +29,7 @@ models = [
   "sentence-transformers",
 ]
 pyannote = ["pyannote.audio"]
+llm = ["anthropic>=1.15"]
 dev = ["pytest", "pytest-asyncio", "jiwer", "psutil", "pyttsx3"]
 
 [project.scripts]

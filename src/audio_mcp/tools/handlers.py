@@ -18,6 +18,7 @@ from audio_mcp.ingest.sources import AudioIdSource, FilePathSource, check_path_a
 from audio_mcp.library.index import SUPPORTED_EXTENSIONS
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
+from audio_mcp.reasoning.llm_grounded import build_evidence_pack, llm_answer, llm_interpret, llm_summarize
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, ExportRequest, GetJobRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, StreamRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
 )
@@ -299,10 +300,30 @@ def ask_audio(app, req: AskRequest) -> dict:
     outcome = run_analysis(app, req.source, stages, {"diarize": diarize})
     audio = app.store.load(outcome.record.audio_id)
     results = {**outcome.results, "metadata": {"duration_seconds": round(audio.duration, 3)}}
-    answer = answer_question(req.question, results, audio.duration, text_embedder(app, outcome), audio=audio)
+    text = text_embedder(app, outcome)
+    answer = _with_llm(app, outcome.processing, outcome.warnings, req.use_llm,
+                       lambda llm: llm_answer(req.question, build_evidence_pack(results, req.question, text), llm))
+    if answer is None:
+        answer = answer_question(req.question, results, audio.duration, text, audio=audio)
     if not req.include_evidence:
         answer.pop("evidence")
     return _respond(outcome, answer)
+
+
+def _with_llm(app, processing, warnings, use_llm, call):
+    """Run an LLM step when requested (or configured and not declined); None means use the rule-based path."""
+    llm = app.backends.llm
+    if use_llm is False or not llm.available()[0]:
+        return None
+    processing.models_used.append(llm.info)
+    processing.data_sent_off_machine |= llm.is_remote
+    try:
+        return call(llm)
+    except ValueError:
+        warnings.append(warning("LLM_OUTPUT_INVALID", "LLM output was not valid JSON; used the rule-based result"))
+    except AudioMCPError as e:
+        warnings.append(warning("LLM_FAILED", f"{e.message}; used the rule-based result"))
+    return None
 
 
 def _require_llm(app, use_llm):
@@ -315,7 +336,13 @@ def summarize_audio(app, req: SummarizeRequest) -> dict:
     _require_llm(app, req.use_llm)
     outcome = run_analysis(app, req.source, ["timeline", "summary"],
                            {"summary_length": req.length, "summary_focus": req.focus})
-    return _respond(outcome, outcome.results.get("summary"))
+    summary = outcome.results.get("summary")
+    if summary is not None:
+        query = req.focus or " ".join(s["text"] for s in summary["sentences"]) or "summary"
+        pack = build_evidence_pack(outcome.results, query, text_embedder(app, outcome))
+        summary = _with_llm(app, outcome.processing, outcome.warnings, req.use_llm,
+                            lambda llm: llm_summarize(outcome.results, pack, llm, req.length, req.focus)) or summary
+    return _respond(outcome, summary)
 
 
 def _merge_processing(outcomes) -> ProcessingInfo:
@@ -370,7 +397,11 @@ def compare_audio(app, req: CompareRequest) -> dict:
             comps.append(c)
         result["comparisons"] = comps
         outs_all = outs
-    return build_response(result=result, warnings=warns, errors=errors, processing=_merge_processing(outs_all))
+    processing = _merge_processing(outs_all)
+    for c in result.get("comparisons", []):
+        extra = _with_llm(app, processing, warns, None, lambda llm, d=c["measured_differences"]: llm_interpret(d, llm))
+        c["possible_interpretations"] += extra or []
+    return build_response(result=result, warnings=warns, errors=errors, processing=processing)
 
 
 _INDEX_STAGES = ["transcription", "language", "events", "audio_embedding"]

@@ -7,6 +7,7 @@ import numpy as np
 
 from audio_mcp.backends.base import ASRResult, Backends, TagResult, group_chunks
 from audio_mcp.backends.energy_vad import EnergyVAD
+from audio_mcp.backends.llm import NoLLM
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo
 from audio_mcp.types import Segment, Word
 
@@ -135,19 +136,6 @@ class FakeText(_Fake):
         n = np.linalg.norm(out, axis=1, keepdims=True)
         return out / np.where(n == 0, 1, n)
 
-
-class NoLLM:
-    info = ModelInfo(stage="llm", name="none", version="0")
-    is_remote = False
-
-    def available(self):
-        return False, "llm_provider is none"
-
-    def load(self):
-        raise AudioMCPError(ErrorCode.LLM_DISABLED, "llm_provider is none")
-
-    def complete(self, system, prompt):
-        raise AudioMCPError(ErrorCode.LLM_DISABLED, "llm_provider is none")
 
 
 def fake_backends() -> Backends:
