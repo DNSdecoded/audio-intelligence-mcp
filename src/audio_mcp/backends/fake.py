@@ -5,7 +5,7 @@ from importlib import resources
 
 import numpy as np
 
-from audio_mcp.backends.base import ASRResult, Backends, TagResult
+from audio_mcp.backends.base import ASRResult, Backends, TagResult, group_chunks
 from audio_mcp.backends.energy_vad import EnergyVAD
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo
 from audio_mcp.types import Segment, Word
@@ -40,6 +40,8 @@ class FakeASR(_Fake):
     def transcribe(self, mono16k, *, language=None, word_timestamps=True, task="transcribe",
                    per_chunk_language=False, chunks=None, **decode_kwargs):
         regions = chunks if chunks is not None else self.vad.speech_regions(mono16k)
+        if per_chunk_language:
+            regions = group_chunks(regions)
         segs, langs = [], []
         for i, r in enumerate(regions):
             lang = ["en", "es"][i % 2] if per_chunk_language else (language or "en")
@@ -55,7 +57,10 @@ class FakeASR(_Fake):
             ] if word_timestamps else []
             segs.append(Segment(id=f"seg_{i + 1:04d}", start=r.start, end=r.end, text=text, language=lang,
                                 words=words, confidence=0.85, confidence_kind="model_probability"))
-            langs.append({"language": lang, "start": r.start, "end": r.end, "probability": 0.9})
+            if langs and langs[-1]["language"] == lang:
+                langs[-1]["end"] = r.end
+            else:
+                langs.append({"language": lang, "start": r.start, "end": r.end, "probability": 0.9})
         top = segs[0].language if segs else (language or "en")
         return ASRResult(segments=segs, language=top, language_probability=0.9,
                          languages=langs if per_chunk_language else

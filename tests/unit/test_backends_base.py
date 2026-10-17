@@ -58,8 +58,8 @@ def test_fake_tagger_labels_beep_and_silence(synth):
 
 def test_fake_asr_chunks_language_translate():
     b = fake_backends()
-    r = b.asr.transcribe(np.zeros(16000, dtype=np.float32), per_chunk_language=True, task="translate",
-                         chunks=[Interval(start=0, end=1), Interval(start=1, end=2)])
+    r = b.asr.transcribe(np.zeros(48000, dtype=np.float32), per_chunk_language=True, task="translate",
+                         chunks=[Interval(start=0, end=1), Interval(start=2, end=3)])
     assert [s.language for s in r.segments] == ["en", "es"]
     assert r.segments[0].text.startswith("[en] ")
     assert r.segments[0].id == "seg_0001"

@@ -174,3 +174,35 @@ def build_backends(settings) -> Backends:
         text=text,
         llm=NoLLM(),
     )
+
+
+CHUNK_GAP, CHUNK_MAX = 0.8, 30.0
+
+
+def group_chunks(regions: list[Interval]) -> list[Interval]:
+    """Group speech regions into language-ID chunks: split on gaps >= 0.8 s, cap each chunk at 30 s."""
+    chunks: list[list[float]] = []
+    for r in regions:
+        if chunks and r.start - chunks[-1][1] < CHUNK_GAP and r.end - chunks[-1][0] <= CHUNK_MAX:
+            chunks[-1][1] = r.end
+        else:
+            chunks.append([r.start, r.end])
+    out = []
+    for s, e in chunks:
+        while e - s > CHUNK_MAX:
+            out.append(Interval(start=s, end=s + CHUNK_MAX))
+            s += CHUNK_MAX
+        out.append(Interval(start=s, end=e))
+    return out
+
+
+def translate_segments(asr, mono16k, segments: list[Segment]) -> list[Segment]:
+    """Translate each non-English segment's own audio slice to English, so timestamps stay aligned."""
+    out = []
+    for s in segments:
+        if s.language and s.language != "en":
+            piece = mono16k[int(s.start * 16000):int(s.end * 16000)]
+            r = asr.transcribe(piece, task="translate", language=s.language, word_timestamps=False)
+            s = s.model_copy(update={"translation": " ".join(x.text.strip() for x in r.segments).strip() or None})
+        out.append(s)
+    return out

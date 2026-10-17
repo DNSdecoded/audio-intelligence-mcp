@@ -137,15 +137,22 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
 
 @tool_handler
 def transcribe_audio(app, req: TranscribeRequest) -> dict:
-    stages = ["transcription"] + (["diarization", "speaker_assign"] if req.diarize else [])
+    stages = ["transcription", "language"] + (["diarization", "speaker_assign"] if req.diarize else [])
+    stages += ["translation"] if req.translate_to_en else []
     outcome = run_analysis(app, req.source, stages, {
         "language": req.language, "word_timestamps": req.word_timestamps, "multilingual": req.multilingual})
-    warns = [warning("UNSUPPORTED_FEATURE", "translate_to_en is not implemented yet")] if req.translate_to_en else []
+    warns = [warning("TRANSLATION_TARGET_LIMITED", "only English translation is supported locally")
+             ] if req.translate_to_en else []
     r = outcome.results
     t = r.get("transcription")
     result = {k: t[k] for k in ("text", "segments", "language", "languages")} if t else None
     if result and "speaker_assign" in r:
         result["segments"] = r["speaker_assign"]["segments"]
+    if result and "translation" in r:
+        tr = {s["id"]: s.get("translation") for s in r["translation"]["segments"]}
+        result["segments"] = [{**s, "translation": tr[s["id"]]} if tr.get(s["id"]) else s for s in result["segments"]]
+    if result and "language" in r:
+        result["code_switching"] = r["language"]["code_switching"]
     if result and "diarization" in r:
         result["speakers"] = {k: r["diarization"][k] for k in ("speakers", "turns", "overlaps", "overlap_supported")}
     return _respond(outcome, result, extra_warnings=warns)

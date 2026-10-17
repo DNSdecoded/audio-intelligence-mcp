@@ -3,7 +3,7 @@ import threading
 
 import numpy as np
 
-from audio_mcp.backends.base import ASRResult
+from audio_mcp.backends.base import ASRResult, group_chunks
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo
 from audio_mcp.types import Segment, Word
 
@@ -56,11 +56,11 @@ class FasterWhisperASR:
         chunks=None,
         **decode_kwargs,
     ) -> ASRResult:
-        if per_chunk_language:
-            raise NotImplementedError("per-chunk language detection arrives in Task 22")
         self.load()
         x = np.ascontiguousarray(mono16k, dtype=np.float32)
         duration = len(x) / 16000
+        if per_chunk_language and chunks:
+            return self._per_chunk(x, duration, chunks, word_timestamps, task, decode_kwargs)
         gen, info = self._model.transcribe(
             x,
             language=language,
@@ -105,3 +105,38 @@ class FasterWhisperASR:
             languages=[{"language": lang, "start": 0.0, "end": round(duration, 3), "probability": prob}],
             dropped_low_speech=dropped,
         )
+
+
+    def _detect(self, piece):
+        if hasattr(self._model, "detect_language"):  # faster-whisper >= 1.1
+            lang, prob, _ = self._model.detect_language(piece)
+            return lang, float(prob)
+        _, info = self._model.transcribe(piece[: 30 * 16000], beam_size=1)
+        return info.language, float(info.language_probability)
+
+    def _per_chunk(self, x, duration, chunks, word_timestamps, task, decode_kwargs) -> ASRResult:
+        segments, runs, dropped, seconds = [], [], 0, {}
+        for c in group_chunks(chunks):
+            off = int(c.start * 16000)
+            piece = x[off:int(c.end * 16000)]
+            if piece.size < 1600:  # under 0.1 s: nothing to transcribe
+                continue
+            lang, prob = self._detect(piece)
+            r = self.transcribe(piece, language=lang, word_timestamps=word_timestamps, task=task, **decode_kwargs)
+            dropped += r.dropped_low_speech
+            for s in r.segments:
+                words = [w.model_copy(update={"start": _r(w.start + c.start, duration), "end": _r(w.end + c.start, duration)})
+                         for w in s.words]
+                segments.append(s.model_copy(update={
+                    "id": f"seg_{len(segments) + 1:04d}", "start": _r(s.start + c.start, duration),
+                    "end": _r(s.end + c.start, duration), "language": lang, "words": words}))
+            seconds[lang] = seconds.get(lang, 0.0) + c.end - c.start
+            if runs and runs[-1]["language"] == lang:
+                runs[-1]["end"] = round(c.end, 3)
+            else:
+                runs.append({"language": lang, "start": round(c.start, 3), "end": round(c.end, 3),
+                             "probability": round(prob, 3)})
+        top = max(seconds, key=seconds.get) if seconds else None
+        top_prob = next((r["probability"] for r in runs if r["language"] == top), None)
+        return ASRResult(segments=segments, language=top, language_probability=top_prob, languages=runs,
+                         dropped_low_speech=dropped)

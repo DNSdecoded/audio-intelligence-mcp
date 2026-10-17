@@ -95,7 +95,11 @@ def _transcription(ctx):
 
 def _language(ctx):
     t = ctx.results["transcription"]
-    out = {"primary": t["language"], "segments": t["languages"]}
+    secs: dict = {}
+    for run in t["languages"]:
+        secs[run["language"]] = secs.get(run["language"], 0.0) + run["end"] - run["start"]
+    out = {"primary": t["language"], "segments": t["languages"],
+           "code_switching": sum(v >= 2.0 for v in secs.values()) >= 2}
     if t["language_probability"] is not None:
         out.update(confidence=t["language_probability"], confidence_kind="model_probability")
     return out
@@ -190,6 +194,17 @@ def _audio_embedding(ctx):
     return {"embedding": [round(float(x), 6) for x in emb]}
 
 
+def _translation(ctx):
+    from audio_mcp.backends.base import translate_segments
+
+    asr = ctx.app.backends.asr
+    segs = [Segment(**s) for s in ctx.results["transcription"]["segments"]]
+    out = translate_segments(asr, ctx.audio.mono16k, segs)
+    if any(s.translation for s in out):
+        ctx.models_used.append(asr.info)
+    return {"segments": [s.model_dump(exclude_none=True) for s in out], "target_language": "en"}
+
+
 def _quality(ctx):
     return diagnose_quality(ctx.audio.native, ctx.audio.native_sr, ctx.results["features"]["values"], _regions(ctx))
 
@@ -231,6 +246,7 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
           lambda a, o: {**_asr_cfg(a, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS),
                         "with": [s for s in ("speaker_assign",) if s in o.get("_stages", [])]}),
     Stage("audio_embedding", (), _audio_embedding, lambda a, o: {"tagger": _id(a.backends.tagger)}, "tagger"),
+    Stage("translation", ("transcription",), _translation, lambda a, o: {**_asr_cfg(a, o), "target": "en"}, "asr"),
     Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),
