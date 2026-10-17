@@ -141,11 +141,17 @@ def build_backends(settings) -> Backends:
         asr = FasterWhisperASR(settings)
     else:
         asr = UnavailableBackend("faster-whisper", f"faster_whisper {hint}")
+    if _importable("panns_inference") and _importable("torch"):
+        from audio_mcp.backends.panns import PannsTagger
+
+        tagger = PannsTagger(settings)
+    else:
+        tagger = UnavailableBackend("panns", f"panns_inference {hint}")
     return Backends(
         vad=vad,
         vad_fallback=EnergyVAD(),
         asr=asr,
-        tagger=UnavailableBackend("panns", todo),
+        tagger=tagger,
         speaker=UnavailableBackend("ecapa", todo),
         diarizer=None,
         text=UnavailableBackend("sentence-transformers", todo),
