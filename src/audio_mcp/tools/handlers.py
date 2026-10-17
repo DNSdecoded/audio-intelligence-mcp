@@ -59,7 +59,10 @@ def analysis_payload(outcome, options: AnalyzeOptions) -> dict:
     if "language" in r:
         a["language"] = {k: r["language"][k] for k in ("primary", "confidence", "confidence_kind") if k in r["language"]}
     if "transcription" in r:
-        a["transcription"] = {"text": r["transcription"]["text"], "segments": r["transcription"]["segments"]}
+        segs = r["speaker_assign"]["segments"] if "speaker_assign" in r else r["transcription"]["segments"]
+        a["transcription"] = {"text": r["transcription"]["text"], "segments": segs}
+    if "diarization" in r:
+        a["speakers"] = {k: r["diarization"][k] for k in ("speakers", "turns", "overlaps", "overlap_supported")}
     if "events" in r:
         a["sound_events"] = r["events"]["events"]
     if "features" in r:
@@ -86,19 +89,25 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
     for t in tasks:
         stages += [s for s in TASK_TO_STAGES[t] if s not in stages]
     o = req.options
-    outcome = run_analysis(app, req.source, stages, {"language": o.language, "word_timestamps": o.word_level_timestamps})
+    outcome = run_analysis(app, req.source, stages, {"language": o.language, "word_timestamps": o.word_level_timestamps,
+                                                     "num_speakers": o.num_speakers})
     warns = [warning("UNSUPPORTED_FEATURE", "emotion detection is not implemented")] if o.detect_emotions else []
     return _respond(outcome, analysis_payload(outcome, o), key="analysis", extra_warnings=warns)
 
 
 @tool_handler
 def transcribe_audio(app, req: TranscribeRequest) -> dict:
-    outcome = run_analysis(app, req.source, ["transcription"], {
+    stages = ["transcription"] + (["diarization", "speaker_assign"] if req.diarize else [])
+    outcome = run_analysis(app, req.source, stages, {
         "language": req.language, "word_timestamps": req.word_timestamps, "multilingual": req.multilingual})
-    warns = [warning("UNSUPPORTED_FEATURE", f"{n} is not implemented yet")
-             for n, on in (("diarize", req.diarize), ("translate_to_en", req.translate_to_en)) if on]
-    t = outcome.results.get("transcription")
+    warns = [warning("UNSUPPORTED_FEATURE", "translate_to_en is not implemented yet")] if req.translate_to_en else []
+    r = outcome.results
+    t = r.get("transcription")
     result = {k: t[k] for k in ("text", "segments", "language", "languages")} if t else None
+    if result and "speaker_assign" in r:
+        result["segments"] = r["speaker_assign"]["segments"]
+    if result and "diarization" in r:
+        result["speakers"] = {k: r["diarization"][k] for k in ("speakers", "turns", "overlaps", "overlap_supported")}
     return _respond(outcome, result, extra_warnings=warns)
 
 

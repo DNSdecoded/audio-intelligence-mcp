@@ -147,13 +147,24 @@ def build_backends(settings) -> Backends:
         tagger = PannsTagger(settings)
     else:
         tagger = UnavailableBackend("panns", f"panns_inference {hint}")
+    if _importable("speechbrain") and _importable("torch"):
+        from audio_mcp.backends.ecapa import EcapaEmbedder
+
+        speaker = EcapaEmbedder(settings)
+    else:
+        speaker = UnavailableBackend("ecapa", f"speechbrain {hint}")
+    diarizer = None
+    if settings.diarization_backend == "pyannote":
+        from audio_mcp.backends.pyannote_diar import PyannoteDiarizer
+
+        diarizer = PyannoteDiarizer(settings)
     return Backends(
         vad=vad,
         vad_fallback=EnergyVAD(),
         asr=asr,
         tagger=tagger,
-        speaker=UnavailableBackend("ecapa", todo),
-        diarizer=None,
+        speaker=speaker,
+        diarizer=diarizer,
         text=UnavailableBackend("sentence-transformers", todo),
         llm=NoLLM(),
     )

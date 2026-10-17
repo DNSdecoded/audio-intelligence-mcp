@@ -6,7 +6,7 @@ TASK_TO_STAGES: dict[str, list[str]] = {
     "language_detection": ["language"],
     "sound_event_detection": ["events"],
     "audio_quality": ["quality"],
-    "speaker_diarization": ["diarization"],
+    "speaker_diarization": ["diarization", "speaker_assign"],
     "speech_characteristics": ["speech"],
     "integrity": ["integrity"],
     "timeline": ["timeline"],

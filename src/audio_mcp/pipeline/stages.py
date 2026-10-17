@@ -3,14 +3,15 @@ import threading
 from dataclasses import dataclass, field
 from typing import Callable
 
+from audio_mcp.analysis.diarize import assign_speakers, cluster_speakers, speaker_summary
 from audio_mcp.analysis.events import frames_to_events
 from audio_mcp.context import AppContext
 from audio_mcp.dsp.features import FEATURE_GROUPS, extract_features
 from audio_mcp.dsp.quality import diagnose_quality
-from audio_mcp.envelope import ModelInfo, warning
+from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo, warning
 from audio_mcp.ingest.decode import DecodedAudio
 from audio_mcp.store.audio_store import AudioRecord
-from audio_mcp.types import Interval
+from audio_mcp.types import Interval, Segment
 
 
 @dataclass
@@ -107,6 +108,40 @@ def _events(ctx):
     return {"events": [e.model_dump(exclude_none=True) for e in ev], "threshold": thr}
 
 
+def _diarization(ctx):
+    app, o = ctx.app, ctx.options
+    pyannote = app.backends.diarizer if app.settings.diarization_backend == "pyannote" else None
+    b = pyannote or app.backends.speaker
+    ok, reason = b.available()
+    if not ok:
+        raise AudioMCPError(ErrorCode.MODEL_UNAVAILABLE, reason or "diarization backend unavailable")
+    if pyannote:
+        turns, overlaps = pyannote.diarize(ctx.audio.mono16k, o.get("num_speakers"))
+        overlaps = [i.model_dump(exclude_none=True) for i in overlaps]
+    else:
+        turns = cluster_speakers(ctx.audio.mono16k, _regions(ctx), b, threshold=app.settings.diarization_threshold,
+                                 num_speakers=o.get("num_speakers"), max_speakers=app.settings.max_speakers)
+        overlaps = None
+        ctx.warnings.append(warning("OVERLAP_UNSUPPORTED", "overlapping speech is not detected by the ECAPA backend"))
+    ctx.models_used.append(b.info)
+    return {"turns": [t.model_dump(exclude_none=True) for t in turns], "speakers": speaker_summary(turns),
+            "overlaps": overlaps, "overlap_supported": pyannote is not None, "backend": b.info.name}
+
+
+def _speaker_assign(ctx):
+    from audio_mcp.types import SpeakerTurn
+
+    segs = [Segment(**s) for s in ctx.results["transcription"]["segments"]]
+    turns = [SpeakerTurn(**t) for t in ctx.results["diarization"]["turns"]]
+    return {"segments": [s.model_dump(exclude_none=True) for s in assign_speakers(segs, turns)]}
+
+
+def _diar_cfg(app, o):
+    b = app.backends.diarizer if app.settings.diarization_backend == "pyannote" else app.backends.speaker
+    return {**_vad_cfg(app, o), "backend": _id(b) if b else None, "threshold": app.settings.diarization_threshold,
+            "num_speakers": o.get("num_speakers"), "max_speakers": app.settings.max_speakers}
+
+
 def _quality(ctx):
     return diagnose_quality(ctx.audio.native, ctx.audio.native_sr, ctx.results["features"]["values"], _regions(ctx))
 
@@ -128,6 +163,9 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("metadata", (), _metadata, lambda a, o: {}),
     Stage("vad", (), _vad, _vad_cfg),
     Stage("features", ("vad",), _features, _features_cfg),
+    Stage("diarization", ("vad",), _diarization, _diar_cfg),
+    Stage("speaker_assign", ("transcription", "diarization"), _speaker_assign,
+          lambda a, o: {**_asr_cfg(a, o), **_diar_cfg(a, o)}),
     Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),

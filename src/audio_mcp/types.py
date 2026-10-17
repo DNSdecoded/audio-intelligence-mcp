@@ -37,6 +37,7 @@ class Word(_Scored):
     start: float
     end: float
     text: str
+    speaker_id: str | None = None
 
 
 class Segment(_Scored):
