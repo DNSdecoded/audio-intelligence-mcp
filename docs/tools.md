@@ -1467,7 +1467,7 @@ Detect sound events (alarms, impacts, music, animals, ...) in an audio source, o
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.266,
+    "duration_seconds": 0.281,
     "stages_run": [
       "events"
     ],
@@ -1752,7 +1752,7 @@ Compute acoustic features (level, silence, spectral, pitch, rhythm, bands) for a
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.282,
+    "duration_seconds": 0.281,
     "stages_run": [
       "metadata",
       "vad",
@@ -2034,7 +2034,7 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.39,
+    "duration_seconds": 0.391,
     "stages_run": [
       "vad",
       "features",
@@ -2333,7 +2333,7 @@ Build a chronological event graph of an audio source: speech segments, speaker t
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.156,
+    "duration_seconds": 0.172,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -3363,7 +3363,7 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.453,
+    "duration_seconds": 0.468,
     "stages_run": [
       "aud_8a84c21c384f272e:metadata",
       "aud_8a84c21c384f272e:events",
@@ -3774,7 +3774,7 @@ Index audio files/folders into a persistent local library (transcripts, sound ev
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.967,
+    "duration_seconds": 0.97,
     "stages_run": [
       "aud_2e130551b6f3fd9a:transcription",
       "aud_2e130551b6f3fd9a:language",
@@ -3983,7 +3983,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
 ```json
 {
   "action": "finish",
-  "session_id": "str_9fc9cf996792",
+  "session_id": "str_9ad8eebd0935",
   "tasks": [
     "transcription"
   ]
@@ -3999,7 +3999,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.172,
+    "duration_seconds": 0.171,
     "stages_run": [
       "metadata",
       "vad",
@@ -4106,7 +4106,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
         ]
       }
     },
-    "session_id": "str_9fc9cf996792",
+    "session_id": "str_9ad8eebd0935",
     "reconciliation": {
       "transcript_word_difference_rate": 0.0,
       "events_confirmed": [],
@@ -4240,7 +4240,7 @@ Export the analysis of a previously ingested audio_id to json, markdown, srt, vt
   "status": "success",
   "audio_id": "aud_0fb68437fd577a5c",
   "result": {
-    "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261017T193833.srt",
+    "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261017T195753.srt",
     "format": "srt",
     "size_bytes": 435,
     "sha256": "90947b76cf3d1e2d45609712e5569768ac4a6525aa64a40b0653f941b71e90e4",
@@ -4254,7 +4254,7 @@ Export the analysis of a previously ingested audio_id to json, markdown, srt, vt
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.156,
+    "duration_seconds": 0.157,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -4327,7 +4327,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
 
 ```json
 {
-  "job_id": "job_97ca57c22a91"
+  "job_id": "job_c1f2531d4783"
 }
 ```
 
@@ -4336,7 +4336,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
 ```json
 {
   "status": "success",
-  "job_id": "job_97ca57c22a91",
+  "job_id": "job_c1f2531d4783",
   "result": {
     "job_status": "done",
     "progress": 1.0,
@@ -4426,7 +4426,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
       "warnings": [],
       "errors": [],
       "processing": {
-        "duration_seconds": 0.141,
+        "duration_seconds": 0.172,
         "stages_run": [],
         "stages_skipped": [],
         "cache_hits": [

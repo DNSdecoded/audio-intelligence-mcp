@@ -1,7 +1,7 @@
 {
   "request": {
     "action": "finish",
-    "session_id": "str_9fc9cf996792",
+    "session_id": "str_9ad8eebd0935",
     "tasks": [
       "transcription"
     ]
@@ -12,7 +12,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.172,
+      "duration_seconds": 0.171,
       "stages_run": [
         "metadata",
         "vad",
@@ -119,7 +119,7 @@
           ]
         }
       },
-      "session_id": "str_9fc9cf996792",
+      "session_id": "str_9ad8eebd0935",
       "reconciliation": {
         "transcript_word_difference_rate": 0.0,
         "events_confirmed": [],

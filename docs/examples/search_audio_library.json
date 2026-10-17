@@ -31,7 +31,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.967,
+      "duration_seconds": 0.97,
       "stages_run": [
         "aud_2e130551b6f3fd9a:transcription",
         "aud_2e130551b6f3fd9a:language",

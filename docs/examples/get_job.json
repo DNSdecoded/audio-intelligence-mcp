@@ -1,10 +1,10 @@
 {
   "request": {
-    "job_id": "job_97ca57c22a91"
+    "job_id": "job_c1f2531d4783"
   },
   "success": {
     "status": "success",
-    "job_id": "job_97ca57c22a91",
+    "job_id": "job_c1f2531d4783",
     "result": {
       "job_status": "done",
       "progress": 1.0,
@@ -94,7 +94,7 @@
         "warnings": [],
         "errors": [],
         "processing": {
-          "duration_seconds": 0.141,
+          "duration_seconds": 0.172,
           "stages_run": [],
           "stages_skipped": [],
           "cache_hits": [

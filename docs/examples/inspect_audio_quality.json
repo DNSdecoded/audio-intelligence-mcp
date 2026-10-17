@@ -52,7 +52,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.39,
+      "duration_seconds": 0.391,
       "stages_run": [
         "vad",
         "features",
