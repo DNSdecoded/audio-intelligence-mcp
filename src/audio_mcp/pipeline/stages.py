@@ -10,6 +10,7 @@ from audio_mcp.analysis.events import frames_to_events
 from audio_mcp.analysis.uncertainty import find_uncertainties
 from audio_mcp.context import AppContext
 from audio_mcp.dsp.features import FEATURE_GROUPS, extract_features, frame_rms
+from audio_mcp.dsp.integrity import integrity_indicators
 from audio_mcp.dsp.quality import diagnose_quality
 from audio_mcp.dsp.speech import speech_characteristics
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo, warning
@@ -205,6 +206,10 @@ def _translation(ctx):
     return {"segments": [s.model_dump(exclude_none=True) for s in out], "target_language": "en"}
 
 
+def _integrity(ctx):
+    return integrity_indicators(ctx.audio.native, ctx.audio.native_sr)
+
+
 def _quality(ctx):
     return diagnose_quality(ctx.audio.native, ctx.audio.native_sr, ctx.results["features"]["values"], _regions(ctx))
 
@@ -247,6 +252,7 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
                         "with": [s for s in ("speaker_assign",) if s in o.get("_stages", [])]}),
     Stage("audio_embedding", (), _audio_embedding, lambda a, o: {"tagger": _id(a.backends.tagger)}, "tagger"),
     Stage("translation", ("transcription",), _translation, lambda a, o: {**_asr_cfg(a, o), "target": "en"}, "asr"),
+    Stage("integrity", ("metadata",), _integrity, lambda a, o: {"rules": 1}),
     Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),

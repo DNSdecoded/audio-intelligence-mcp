@@ -79,6 +79,8 @@ def analysis_payload(outcome, options: AnalyzeOptions) -> dict:
         a["uncertainty"] = r["uncertainty"]
     if "summary" in r:
         a["summary"] = r["summary"]
+    if "integrity" in r:
+        a["integrity"] = r["integrity"]
     if "speech" in r:
         a["speech_characteristics"] = r["speech"]
     if not options.word_level_timestamps:
