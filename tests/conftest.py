@@ -37,3 +37,10 @@ def settings(tmp_path, synth):
     )
     s.resolved_temp_dir.mkdir(parents=True, exist_ok=True)
     return s
+
+
+def load(path):
+    import soundfile as sf
+
+    x, sr = sf.read(path, always_2d=True)
+    return x.T.astype("float32"), sr
