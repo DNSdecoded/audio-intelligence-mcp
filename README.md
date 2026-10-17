@@ -1,5 +1,9 @@
 # Audio Intelligence MCP Server
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Python 3.12 | 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
+![Platforms: Windows | macOS | Linux](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
+
 A local-first [Model Context Protocol](https://modelcontextprotocol.io) server that lets AI agents analyze audio:
 transcripts with word timings, speakers, sound events, acoustic measurements, quality diagnosis, timelines,
 evidence-grounded answers, comparisons, library search, streaming, and exports.
@@ -28,7 +32,8 @@ with `confidence_kind` (`model_probability` or `heuristic`; none are calibrated)
 
 ## Requirements
 
-- Python 3.12 and [uv](https://docs.astral.sh/uv/)
+- Windows, macOS or Linux (CI runs the test suite on all three)
+- Python 3.12 or 3.13 and [uv](https://docs.astral.sh/uv/)
 - ffmpeg and ffprobe on `PATH` (or set `ffmpeg_path` / `ffprobe_path`):
   - Windows: `winget install Gyan.FFmpeg`
   - macOS: `brew install ffmpeg`
@@ -38,7 +43,8 @@ with `confidence_kind` (`model_probability` or `heuristic`; none are calibrated)
 ## Install
 
 ```bash
-git clone <this repo> audio_mcp && cd audio_mcp
+git clone https://github.com/DNSdecoded/audio-intelligence-mcp.git
+cd audio-intelligence-mcp
 uv sync --extra models            # local models (faster-whisper, PANNs, SpeechBrain, silero-vad, MiniLM)
 uv sync --extra models --extra llm        # + optional Claude backend (anthropic SDK)
 uv sync --extra models --extra pyannote   # + optional pyannote diarization (needs HF_TOKEN)
@@ -55,7 +61,7 @@ reason, and the DSP tools (features, quality, integrity, comparison) work.
 Claude Code:
 
 ```bash
-claude mcp add audio-intel -- uv --directory /path/to/audio_mcp run audio-mcp
+claude mcp add audio-intel -- uv --directory /path/to/audio-intelligence-mcp run audio-mcp
 ```
 
 Claude Desktop (`claude_desktop_config.json`):
@@ -65,12 +71,14 @@ Claude Desktop (`claude_desktop_config.json`):
   "mcpServers": {
     "audio-intel": {
       "command": "uv",
-      "args": ["--directory", "/path/to/audio_mcp", "run", "audio-mcp"],
+      "args": ["--directory", "/path/to/audio-intelligence-mcp", "run", "audio-mcp"],
       "env": {"AUDIO_MCP_ALLOWED_ROOTS": "[\"/path/to/your/audio\"]"}
     }
   }
 }
 ```
+
+On Windows, use forward slashes or escaped backslashes in JSON paths (`"C:/audio"` or `"C:\audio"`).
 
 Only files under `allowed_roots` can be read (default: your home directory). Paths are resolved, symlinks
 included, before the check.
@@ -187,12 +195,45 @@ uv run pytest -m long                      # 30-minute file / async path
 uv run python scripts/gen_tool_docs.py --write-examples   # refresh docs/tools.md + examples
 ```
 
-Evaluation and benchmarks: [docs/evaluation.md](docs/evaluation.md).
+Evaluation and benchmarks: [docs/evaluation.md](docs/evaluation.md). Design spec, implementation plan, and build
+notes (design rulings and known limits): [docs/superpowers/](docs/superpowers/).
 
-## Licensing
+Project layout:
 
-Code: see repository license. Models and data, each under its own license:
+```
+src/audio_mcp/
+  server.py         MCP entry point (stdio), tool registration, lifespan
+  tools/            request schemas and tool handlers
+  ingest/           source resolution, path/URL guards, ffmpeg probe and decode
+  store/            content-addressed audio store, result cache, retention
+  pipeline/         stage DAG, auto planner, runner
+  backends/         model adapters (Whisper, PANNs, ECAPA, Silero, MiniLM, LLMs) + fake backends for tests
+  dsp/              features, quality, preprocessing, integrity, speech characteristics
+  analysis/ timeline/ reasoning/ compare/ library/ stream/ export/ eval/
+scripts/            benchmark, evaluate, docs generator
+tests/              unit, integration, e2e (stdio)
+```
+
+## Known limitations
+
+- Confidence values are raw model probabilities or heuristics, never calibrated.
+- Default diarization (ECAPA clustering) does not detect overlapping speech; install the `pyannote` extra for that.
+- Translation is to English only (Whisper).
+- Integrity indicators are signal heuristics, not a deepfake or tamper detector.
+- Malformed tool arguments are rejected by the MCP layer before the server sees them, so they come back as MCP
+  tool errors rather than the JSON envelope.
+
+Full list: [docs/capabilities.md](docs/capabilities.md) and
+[docs/superpowers/build-notes.md](docs/superpowers/build-notes.md).
+
+## License
+
+The code in this repository is released under the [MIT License](LICENSE).
+
+Third-party models and data keep their own licenses, which the MIT License does not cover:
 faster-whisper (MIT) and Whisper weights (MIT); PANNs code (MIT) and CNN14 weights (CC BY 4.0, trained on
 AudioSet); SpeechBrain (Apache-2.0) and spkrec-ecapa-voxceleb (Apache-2.0); all-MiniLM-L6-v2 (Apache-2.0);
 silero-vad (MIT); pyannote.audio (MIT) with gated model terms; AudioSet ontology labels (CC BY 4.0). Test
-fixtures: [tests/fixtures/audio/SOURCES.md](tests/fixtures/audio/SOURCES.md).
+fixtures: `speech_es.ogg` is a LibriVox public-domain excerpt; the English fixtures are synthesized locally;
+details in [tests/fixtures/audio/SOURCES.md](tests/fixtures/audio/SOURCES.md). Check each model's terms before
+commercial use.
