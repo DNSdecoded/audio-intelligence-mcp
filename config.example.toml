@@ -1,0 +1,40 @@
+# Audio MCP settings. Env vars (AUDIO_MCP_<NAME>) override this file.
+# allowed_roots = ["/home/me/audio"]  # dirs audio may be read from (default: home dir)
+# data_dir = "/path/to/data"   # state dir (default: platform user data dir)
+# temp_dir = ""                # scratch dir (default: data_dir/tmp)
+# export_dir = ""              # export dir (default: data_dir/exports)
+# models_dir = ""              # model cache (default: data_dir/models)
+max_file_mb = 500              # reject files larger than this
+max_upload_mb = 50             # max size for uploaded/base64 audio
+max_duration_seconds = 14400   # reject audio longer than this
+allow_url_fetch = false        # allow fetching audio from URLs
+url_timeout_seconds = 30       # URL fetch timeout
+# ffmpeg_path = ""             # explicit ffmpeg binary (default: PATH)
+# ffprobe_path = ""            # explicit ffprobe binary (default: PATH)
+backend_profile = "real"       # "real" models or deterministic "fake" backends
+device = "auto"                # auto | cpu | cuda
+asr_model = "small"            # faster-whisper model size
+asr_compute_type = "int8"      # faster-whisper compute type
+diarization_backend = "ecapa"  # ecapa | pyannote
+diarization_threshold = 0.55   # speaker clustering threshold
+max_speakers = 8               # upper bound on speakers
+event_threshold = 0.3          # sound-event score cutoff
+low_confidence_threshold = 0.5 # below this a segment is flagged low confidence
+speech_ratio_threshold = 0.2   # min speech ratio before ASR is considered useful
+auto_preprocess = false        # denoise/normalize automatically
+async_threshold_seconds = 600  # audio longer than this runs as a background job
+max_concurrent_jobs = 1        # parallel background jobs
+stage_timeout_seconds = 1800   # per-stage timeout
+retention = "ttl"              # none | ttl | keep (derived artifacts)
+retention_ttl_hours = 24       # TTL for retention = "ttl"
+library_retention = "keep"     # keep | ttl (library entries)
+log_level = "INFO"             # log verbosity
+log_sensitive = false          # allow transcript text in logs
+# log_file = ""                # log file path (default: stderr)
+llm_provider = "none"          # none | anthropic | openai_compatible | ollama
+# llm_model = ""               # required when llm_provider != none
+# llm_base_url = ""            # ollama defaults to http://localhost:11434/v1
+llm_api_key_env = "AUDIO_MCP_LLM_API_KEY"  # env var holding the LLM API key
+llm_timeout_seconds = 60       # LLM call timeout
+redact_outputs = false         # redact PII-like patterns in outputs
+redact_extra_patterns = []     # extra regex patterns to redact

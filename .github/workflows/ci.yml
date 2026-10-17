@@ -1,0 +1,41 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  fast:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install 3.12
+      - name: Install ffmpeg (windows)
+        if: runner.os == 'Windows'
+        run: choco install ffmpeg -y
+      - name: Install ffmpeg (macos)
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+      - name: Install ffmpeg (linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y ffmpeg
+      - run: uv sync --extra dev
+      - run: uv run pytest -m "not slow and not long"
+
+  slow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install 3.12
+      - run: sudo apt-get install -y ffmpeg
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/audio-mcp/models
+            ~/panns_data
+          key: models-${{ hashFiles('pyproject.toml') }}
+      - run: uv sync --extra dev --extra models
+      - run: uv run pytest -m slow

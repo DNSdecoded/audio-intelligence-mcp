@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "audio-mcp"
+version = "0.1.0"
+description = "Local-first Audio Intelligence MCP server"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "mcp",
+  "pydantic>=2",
+  "pydantic-settings>=2",
+  "numpy",
+  "scipy",
+  "soundfile",
+  "platformdirs",
+  "httpx",
+]
+
+[project.optional-dependencies]
+models = [
+  "faster-whisper",
+  "silero-vad",
+  "panns-inference",
+  "torch",
+  "librosa",
+  "speechbrain",
+  "sentence-transformers",
+]
+pyannote = ["pyannote.audio"]
+dev = ["pytest", "pytest-asyncio", "jiwer", "psutil", "pyttsx3"]
+
+[project.scripts]
+audio-mcp = "audio_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/audio_mcp"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+  "slow: uses real models (downloads on first run)",
+  "long: long-running test",
+]
