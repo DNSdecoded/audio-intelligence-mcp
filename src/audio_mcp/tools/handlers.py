@@ -10,7 +10,7 @@ from audio_mcp.dsp.features import extract_features
 from audio_mcp.dsp.preprocess import apply_preprocessing
 from audio_mcp.ingest.decode import resample
 from audio_mcp.envelope import AudioMCPError, ErrorCode, build_response, error_response, warning
-from audio_mcp.pipeline.planner import TASK_TO_STAGES
+from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, TimelineRequest, TranscribeRequest,
@@ -18,7 +18,6 @@ from audio_mcp.tools.schemas import (
 
 log = logging.getLogger("audio_mcp.tools")
 
-PHASE1_AUTO = ["acoustic_features", "transcription", "language_detection", "sound_event_detection"]  # Task 17 replaces
 
 
 def invalid_input(e: ValidationError) -> dict:
@@ -93,9 +92,18 @@ def _respond(outcome, result, *, key="result", extra_warnings=()):
                           processing=outcome.processing)
 
 
+_RECOVERABLE = {"LOW_LEVEL", "HIGH_NOISE", "HUM", "DC_OFFSET"}
+
+
 @tool_handler
 def analyze_audio(app, req: AnalyzeRequest) -> dict:
-    tasks = PHASE1_AUTO if req.tasks == "auto" else req.tasks
+    plan = None
+    if req.tasks == "auto":
+        record = app.store.ingest(req.source)
+        plan = plan_auto(app, record, app.store.load(record.audio_id), goal=req.goal, budget=req.budget)
+        tasks = [p["task"] for p in plan]
+    else:
+        tasks = req.tasks
     stages = ["metadata"]  # always report audio_metadata
     for t in tasks:
         stages += [s for s in TASK_TO_STAGES[t] if s not in stages]
@@ -104,7 +112,18 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
         "language": o.language, "word_timestamps": o.word_level_timestamps, "num_speakers": o.num_speakers,
         "diarize": "speaker_diarization" in tasks, "budget": req.budget})
     warns = [warning("UNSUPPORTED_FEATURE", "emotion detection is not implemented")] if o.detect_emotions else []
-    return _respond(outcome, analysis_payload(outcome, o), key="analysis", extra_warnings=warns)
+    if plan is not None:
+        outcome.processing.plan = plan
+    payload = analysis_payload(outcome, o)
+    q, t = outcome.results.get("quality"), outcome.results.get("transcription")
+    if app.settings.auto_preprocess and q and t and t["segments"]:
+        high = [i for i in q["issues"] if i["severity"] == "high" and i["code"] in _RECOVERABLE]
+        ops = [op for op in q["recommendations"] if op != "mono"]
+        if high and ops:
+            audio = app.store.load(outcome.record.audio_id)
+            payload["recovery"] = {"triggered_by": [i["code"] for i in high], "ops": ops,
+                                   **compare_preprocessed_asr(app, outcome.record, audio, ops)}
+    return _respond(outcome, payload, key="analysis", extra_warnings=warns)
 
 
 @tool_handler
