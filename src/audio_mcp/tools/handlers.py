@@ -145,8 +145,13 @@ def order_stages(stages: list[str]) -> list[str]:
 
 
 def _respond(outcome, result, *, key="result", extra_warnings=()):
+    errors = outcome.errors
+    if result is None and not errors:  # the tool's own stage was skipped: never report success with no result
+        errors = [{"code": ErrorCode.MODEL_UNAVAILABLE.value, "stage": sk["stage"], "message": sk["reason"],
+                   "retryable": False} for sk in outcome.processing.stages_skipped] or [
+            {"code": ErrorCode.STAGE_FAILED.value, "message": "no result was produced", "retryable": False}]
     return build_response(result=result, audio_id=outcome.record.audio_id, payload_key=key,
-                          warnings=[*outcome.warnings, *extra_warnings], errors=outcome.errors,
+                          warnings=[*outcome.warnings, *extra_warnings], errors=errors,
                           processing=outcome.processing)
 
 
@@ -476,9 +481,14 @@ def search_audio_library(app, req: SearchLibraryRequest) -> dict:
 def get_job(app, req: GetJobRequest) -> dict:
     job = app.jobs.cancel(req.job_id) if req.action == "cancel" else app.jobs.get(req.job_id)
     result = {"job_status": job.status, "progress": job.progress, "tool": job.tool}
-    if job.response is not None:
-        result["response"] = job.response
-    return build_response(result=result, job_id=job.job_id, status="success" if job.finished else "processing")
+    response = job.response
+    if response is None and job.status == "cancelled":  # cancelled while still queued
+        response = error_response(AudioMCPError(ErrorCode.CANCELLED, "job cancelled before it started"))
+    if response is not None:
+        result["response"] = response
+    # mirror the job's outcome: processing while it runs, then the finished response's own status
+    st = "processing" if not job.finished else "error" if job.status == "cancelled" else response["status"]
+    return build_response(result=result, job_id=job.job_id, status=st)
 
 
 @tool_handler

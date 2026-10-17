@@ -132,3 +132,32 @@ def test_auto_async_for_multi_source_tools(app, speech_en, tmp_path):  # I4
     r = compare_audio(app, CompareRequest(sources=[fp(speech_en)] * 2, baseline=[fp(speech_en)] * 2))
     assert r["status"] == "processing"
     assert compare_audio(app, CompareRequest(sources=[fp(speech_en)] * 2))["status"] == "success"
+
+
+def test_skipped_primary_stage_is_error_not_success(app, speech_en):  # I8
+    from audio_mcp.backends.base import UnavailableBackend
+
+    app.backends.asr = UnavailableBackend("faster-whisper", "faster_whisper not installed")
+    r = transcribe_audio(app, TranscribeRequest(source=fp(speech_en), async_mode="never"))
+    assert r["status"] == "error" and r["result"] is None
+    assert r["errors"][0]["code"] == "MODEL_UNAVAILABLE" and r["errors"][0]["stage"] == "transcription"
+    assert "faster_whisper not installed" in r["errors"][0]["message"]
+
+
+def test_get_job_status_mirrors_outcome(app, speech_en, monkeypatch):  # I8
+    from audio_mcp.backends.base import UnavailableBackend
+
+    app.backends.asr = UnavailableBackend("faster-whisper", "faster_whisper not installed")
+    jid = transcribe_audio(app, TranscribeRequest(source=fp(speech_en), async_mode="always"))["job_id"]
+    wait_until(lambda: status(app, jid)["result"]["job_status"] == "done")
+    s = status(app, jid)
+    assert s["status"] == "error" and s["result"]["response"]["status"] == "error"
+
+    monkeypatch.setattr(app.jobs, "_pool", __import__("concurrent.futures").futures.ThreadPoolExecutor(1))
+    gate = threading.Event()
+    app.jobs.submit("t", lambda ev, prog: (gate.wait(5), {"status": "success"})[1])
+    queued = app.jobs.submit("t", lambda ev, prog: {"status": "success"})
+    assert status(app, queued)["status"] == "processing"
+    c = get_job(app, GetJobRequest(job_id=queued, action="cancel"))
+    assert c["status"] == "error" and c["result"]["response"]["error"]["code"] == "CANCELLED"
+    gate.set()

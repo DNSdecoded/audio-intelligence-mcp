@@ -34,7 +34,7 @@ def test_event_filter(app, synth, speech_en):
 
 def test_folder_index(app, tmp_path, speech_en):
     d = tmp_path / "lib"; d.mkdir(); shutil.copy(speech_en, d / "a.wav"); (d / "notes.txt").write_text("x")
-    out = lib(app, action="index", paths=[str(d)])["result"]
+    out = lib(app, action="index", paths=[str(d)], async_mode="never")["result"]
     assert [Path(i["path"]).name for i in out["indexed"]] == ["a.wav"]
 
 
