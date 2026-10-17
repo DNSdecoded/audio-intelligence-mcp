@@ -1,4 +1,5 @@
 import logging
+import sys
 import threading
 from contextlib import asynccontextmanager
 from typing import Any, Literal
@@ -26,6 +27,9 @@ async def lifespan(_server):
     global _app
     settings = load_settings()
     setup_logging(settings)
+    # the stdio transport already holds the real stdout; stray library prints (panns_inference prints on load)
+    # must not reach the JSON-RPC stream
+    real_stdout, sys.stdout = sys.stdout, sys.stderr
     _app = build_app_context(settings)
     log = logging.getLogger("audio_mcp")
     log.info("server started; temp files removed: %d; sweep: %s", cleanup_temp(settings), sweep(_app))
@@ -44,6 +48,7 @@ async def lifespan(_server):
         _app.jobs.shutdown()
         sweep(_app, final=True)
         cleanup_temp(settings)
+        sys.stdout = real_stdout
 
 
 mcp = FastMCP("audio-intelligence", lifespan=lifespan)
