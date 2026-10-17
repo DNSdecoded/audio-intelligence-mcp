@@ -1,5 +1,7 @@
+import os
 from pathlib import Path
 
+import platformdirs
 import pytest
 
 from audio_mcp.config import Settings
@@ -30,7 +32,11 @@ def speech_es():
 
 @pytest.fixture
 def settings(tmp_path, synth):
+    # persistent shared model cache so slow tests don't re-download; everything else stays in tmp
+    models = Path(os.environ.get("AUDIO_MCP_TEST_MODELS_DIR") or platformdirs.user_data_path("audio-mcp") / "models")
+    models.mkdir(parents=True, exist_ok=True)
     s = Settings(
+        models_dir=models,
         allowed_roots=[tmp_path, FIXTURES_DIR, synth["sine"].parent],
         data_dir=tmp_path / "data",
         backend_profile="fake",
