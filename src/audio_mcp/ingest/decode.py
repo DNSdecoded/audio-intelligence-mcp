@@ -13,6 +13,9 @@ from audio_mcp.config import Settings
 from audio_mcp.envelope import AudioMCPError, ErrorCode
 
 _FLAGS = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+# playlist/concat demuxers open further files named inside the input, bypassing allowed_roots
+_REFERENCING_FORMATS = {"hls", "concat", "applehttp", "dash", "image2"}
+_NO_NET = ["-protocol_whitelist", "file,pipe"]
 
 
 def find_ffmpeg(settings: Settings) -> tuple[Path, Path]:
@@ -58,13 +61,16 @@ def probe(path: Path, settings: Settings) -> ProbeInfo:
     if size == 0:
         raise AudioMCPError(ErrorCode.EMPTY_AUDIO, "file is empty")
     _, ffprobe = find_ffmpeg(settings)
-    r = _run([ffprobe, "-v", "error", "-print_format", "json", "-show_format", "-show_streams", path], 30)
+    r = _run([ffprobe, "-v", "error", *_NO_NET, "-print_format", "json", "-show_format", "-show_streams", path], 30)
     if r.returncode != 0:
         raise AudioMCPError(ErrorCode.CORRUPT_AUDIO, "ffprobe could not read the file")
     try:
         data = json.loads(r.stdout)
     except ValueError as exc:
         raise AudioMCPError(ErrorCode.CORRUPT_AUDIO, "ffprobe returned unreadable output") from exc
+    fmt_names = data.get("format", {}).get("format_name", "").split(",")
+    if any(n in _REFERENCING_FORMATS or "playlist" in n for n in fmt_names):
+        raise AudioMCPError(ErrorCode.UNSUPPORTED_AUDIO_FORMAT, "playlist/concat inputs are not supported")
     streams = [s for s in data.get("streams", []) if s.get("codec_type") == "audio"]
     if not streams:
         raise AudioMCPError(ErrorCode.UNSUPPORTED_AUDIO_FORMAT, "no audio stream found")
@@ -114,7 +120,7 @@ def decode(path: Path, info: ProbeInfo, settings: Settings) -> DecodedAudio:
     warnings: list[str] = []
 
     def run(*opts) -> np.ndarray:
-        r = _run([ffmpeg, "-v", "error", "-i", path, *opts, "-f", "f32le", "-acodec", "pcm_f32le", "-"], timeout)
+        r = _run([ffmpeg, "-v", "error", *_NO_NET, "-i", path, *opts, "-f", "f32le", "-acodec", "pcm_f32le", "-"], timeout)
         if r.returncode != 0:
             raise AudioMCPError(ErrorCode.CORRUPT_AUDIO, "ffmpeg could not decode the file")
         if r.stderr.strip() and not warnings:
@@ -122,12 +128,14 @@ def decode(path: Path, info: ProbeInfo, settings: Settings) -> DecodedAudio:
         n = len(r.stdout) // 4
         if n == 0:
             raise AudioMCPError(ErrorCode.EMPTY_AUDIO, "decoded audio is empty")
-        return np.frombuffer(r.stdout[: n * 4], dtype="<f4").astype(np.float32)
+        return np.frombuffer(r.stdout, dtype="<f4", count=n)  # read-only view, no copy
 
     ch = max(info.channels, 1)
     flat = run("-ac", str(ch), "-ar", str(info.sample_rate_hz))
-    native = flat[: len(flat) // ch * ch].reshape(-1, ch).T.copy()
-    mono = run("-ac", "1", "-ar", "16000")
+    # the single writable copy, made directly in (channels, n) layout
+    native = np.array(flat[: len(flat) // ch * ch].reshape(-1, ch).T, dtype=np.float32, order="C")
+    del flat
+    mono = run("-ac", "1", "-ar", "16000").copy()
     if len(mono) / 16000 < 0.5 * info.duration_seconds:
         raise AudioMCPError(ErrorCode.CORRUPT_AUDIO, "less than half of the audio could be decoded")
     return DecodedAudio(native=native, native_sr=info.sample_rate_hz, mono16k=mono, decode_warnings=warnings)

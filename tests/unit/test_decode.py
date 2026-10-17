@@ -1,4 +1,7 @@
+import os
 import shutil
+import subprocess
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -59,3 +62,22 @@ def test_timeout_code(synth, settings, monkeypatch):
     with pytest.raises(AudioMCPError) as e:
         probe(synth["sine"], settings)
     assert e.value.code == "TIMEOUT" and e.value.retryable
+
+
+def test_playlist_outside_roots_rejected(synth, settings, tmp_path_factory):  # C1
+    outside = tmp_path_factory.mktemp("outside")  # not in allowed_roots
+    seg = outside / "seg.ts"
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(synth["sine"]), str(seg)], check=True)
+    inside = settings.allowed_roots[0] / "p.m3u8"
+    inside.write_text(f"#EXTM3U\n#EXT-X-TARGETDURATION:5\n#EXTINF:2.0,\n{seg.as_posix()}\n#EXT-X-ENDLIST\n")
+    with pytest.raises(AudioMCPError) as e:
+        probe(inside, settings)
+    assert e.value.code.value == "UNSUPPORTED_AUDIO_FORMAT"
+    from audio_mcp.tools.handlers import extract_audio_features
+    from audio_mcp.tools.schemas import FeaturesRequest
+    from audio_mcp.context import build_app_context
+
+    app = build_app_context(settings)
+    r = extract_audio_features(app, FeaturesRequest(source={"type": "file_path", "path": str(inside)}))
+    assert r["status"] == "error" and r["error"]["code"] in ("UNSUPPORTED_AUDIO_FORMAT", "CORRUPT_AUDIO")
+    assert app.store.list_ids() == []
