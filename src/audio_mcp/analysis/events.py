@@ -5,7 +5,7 @@ from audio_mcp.backends.base import TagResult
 from audio_mcp.types import Event
 
 EVENT_CATEGORIES: dict[str, list[str]] = {
-    "alarm": ["Alarm", "Beep, bleep", "Siren", "Smoke detector, smoke alarm", "Buzzer", "Alarm clock", "Fire alarm", "Civil defense siren", "Busy signal", "Dial tone", "Telephone bell ringing", "Ringtone"],
+    "alarm": ["Alarm", "Beep, bleep", "Siren", "Smoke detector, smoke alarm", "Buzzer", "Alarm clock", "Fire alarm", "Civil defense siren"],
     "impact": ["Bang", "Thump, thud", "Slam", "Smash, crash", "Explosion", "Gunshot, gunfire", "Knock", "Thunk"],
     "footsteps": ["Walk, footsteps", "Run", "Shuffle"],
     "door": ["Door", "Doorbell", "Slam", "Knock", "Sliding door", "Cupboard open or close", "Drawer open or close"],

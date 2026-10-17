@@ -81,13 +81,14 @@ class PannsTagger:
         x = resample(np.asarray(mono16k, dtype=np.float32), 16000, SR)
         win, hop = int(WIN * SR), int(HOP * SR)
         n = 1 if len(x) <= win else (len(x) - win + hop - 1) // hop + 1
-        padded = np.zeros(max(len(x), (n - 1) * hop + win), dtype=np.float32)
-        padded[: len(x)] = x
-        frames = np.stack([padded[i * hop : i * hop + win] for i in range(n)])
         scores, embs = [], []
         with torch.inference_mode():
             for b in range(0, n, BATCH):
-                s, e = self._model.inference(frames[b : b + BATCH])
+                frames = np.zeros((min(BATCH, n - b), win), dtype=np.float32)  # only one batch in memory
+                for k in range(len(frames)):
+                    seg = x[(b + k) * hop : (b + k) * hop + win]
+                    frames[k, : len(seg)] = seg  # zero-pads a short last window
+                s, e = self._model.inference(frames)
                 scores.append(s)
                 embs.append(e)
         return TagResult(

@@ -27,3 +27,23 @@ def test_exclude_clamp_and_empty():
 def test_gap_splits_runs():
     t = TagResult(["A"], np.array([[.9], [0], [0], [.9]]), np.array([0, .5, 1, 1.5]), 1.0, np.zeros((4, 1)))
     assert [(e.start, e.end) for e in frames_to_events(t, duration=3, threshold=.3)] == [(0.0, 1.0), (1.5, 2.5)]
+
+
+def test_tag_windows_batches(settings):
+    import math
+
+    from audio_mcp.backends.panns import PannsTagger
+
+    sizes = []
+
+    class FakeModel:
+        def inference(self, frames):
+            sizes.append(len(frames))
+            return np.zeros((len(frames), 527)), np.zeros((len(frames), 2048))
+
+    t = PannsTagger(settings)
+    t._model = FakeModel()
+    r = t.tag_windows(np.zeros(10 * 16000, dtype=np.float32))
+    n = math.ceil((320000 - 32000) / 16000) + 1
+    assert max(sizes) <= 16 and sum(sizes) == n and len(r.scores) == n
+    assert np.allclose(r.window_starts, np.arange(n) * 0.5)
