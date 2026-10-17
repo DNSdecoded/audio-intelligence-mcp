@@ -89,7 +89,7 @@ def make_synthetic(out_dir: Path) -> dict[str, Path]:
 
     if ffmpeg and SPEECH_EN.exists():
         for ext in ("flac", "mp3", "ogg", "m4a", "webm", "aiff"):
-            p[f"speech_en_{ext}"] = _ffmpeg(ffmpeg, SPEECH_EN, out_dir / f"speech_en.{ext}")
+            p[f"speech_en.{ext}"] = _ffmpeg(ffmpeg, SPEECH_EN, out_dir / f"speech_en.{ext}")
     return p
 
 

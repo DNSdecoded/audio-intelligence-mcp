@@ -6,4 +6,4 @@
   - File URL: https://archive.org/download/las_aventuras_de_pinoquio_2305_librivox/aventurasdepinoquio_01_collodi_64kb.mp3
   - Cut: 60.0 s to 68.0 s of chapter 1; ffmpeg, libvorbis, 16 kHz mono.
   - `speech_es.txt` transcript is approximate: machine-assisted (faster-whisper small, Spanish), not verified word-for-word by a human; the clip starts mid-sentence.
-- AudioSet label CSV (CC-BY 4.0): added in Task 8.
+- `class_labels_indices.csv` (AudioSet ontology labels, CC-BY 4.0): http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv ; file committed in Task 8.

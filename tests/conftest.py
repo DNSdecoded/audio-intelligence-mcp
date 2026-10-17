@@ -31,7 +31,7 @@ def speech_es():
 @pytest.fixture
 def settings(tmp_path, synth):
     s = Settings(
-        allowed_roots=[tmp_path, FIXTURES_DIR, next(iter(synth.values())).parent],
+        allowed_roots=[tmp_path, FIXTURES_DIR, synth["sine"].parent],
         data_dir=tmp_path / "data",
         backend_profile="fake",
     )
