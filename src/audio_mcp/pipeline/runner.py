@@ -1,3 +1,4 @@
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
@@ -22,8 +23,24 @@ class AnalysisOutcome:
     errors: list[dict]
 
 
+_held = threading.local()  # per-thread slot depth: nested run_analysis calls reuse the outer slot
+
+
 def run_analysis(app: AppContext, source: AudioSource, stages: list[str], options: dict, *,
                  cancel_event=None, progress=None) -> AnalysisOutcome:
+    depth = getattr(_held, "depth", 0)
+    if depth == 0 and app.slots is not None:
+        app.slots.acquire()  # max_concurrent_jobs bounds sync calls and job threads alike
+    _held.depth = depth + 1
+    try:
+        return _run_analysis(app, source, stages, options, cancel_event, progress)
+    finally:
+        _held.depth = depth
+        if depth == 0 and app.slots is not None:
+            app.slots.release()
+
+
+def _run_analysis(app, source, stages, options, cancel_event, progress) -> AnalysisOutcome:
     t0 = time.monotonic()
     job = JOB_CONTEXT.get()
     if job is not None:  # running inside an async job: inherit its cancel flag and progress reporting

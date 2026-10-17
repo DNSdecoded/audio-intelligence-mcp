@@ -1,3 +1,4 @@
+import threading
 from dataclasses import dataclass
 from typing import Any
 
@@ -16,6 +17,7 @@ class AppContext:
     jobs: Any = None  # filled by later tasks
     library: Any = None
     streams: Any = None
+    slots: threading.BoundedSemaphore | None = None  # caps concurrent analyses (sync and async)
 
 
 def build_app_context(settings: Settings) -> AppContext:
@@ -28,6 +30,7 @@ def build_app_context(settings: Settings) -> AppContext:
     text = backends.text if backends.text.available()[0] else None
     app = AppContext(settings, AudioStore(settings), ResultCache(settings), backends,
                       jobs=JobManager(settings.max_concurrent_jobs),
-                     library=Library(settings.data_dir / "library.sqlite", text))
+                     library=Library(settings.data_dir / "library.sqlite", text),
+                     slots=threading.BoundedSemaphore(max(1, settings.max_concurrent_jobs)))
     app.streams = StreamSessions(app)
     return app

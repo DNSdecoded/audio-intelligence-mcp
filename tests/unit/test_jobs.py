@@ -64,3 +64,31 @@ def test_long_file_goes_async(app, tmp_path):
     r = extract_audio_features(app, FeaturesRequest(source=fp(make_long(tmp_path))))
     assert r["status"] == "processing"
     wait_until(lambda: status(app, r["job_id"])["result"]["job_status"] == "done", timeout=600)
+
+
+def test_sync_calls_respect_max_concurrent_jobs(app, speech_en, dialogue, monkeypatch):  # I3
+    import time
+
+    assert app.settings.max_concurrent_jobs == 1
+    monkeypatch.setattr(app.backends.asr, "transcribe", slow_transcribe(0.8))
+    out = []
+
+    def call(p):
+        out.append(transcribe_audio(app, TranscribeRequest(source=fp(p), async_mode="never"))["status"])
+
+    t0 = time.monotonic()
+    ts = [threading.Thread(target=call, args=(p,)) for p in (speech_en, dialogue)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join(30)
+    assert out == ["success", "success"] and time.monotonic() - t0 >= 1.6
+
+
+def test_nested_run_analysis_does_not_deadlock(app, speech_en):  # I3: plan_auto runs inside analyze_audio
+    out = []
+    t = threading.Thread(target=lambda: out.append(analyze_audio(app, AnalyzeRequest(
+        source=fp(speech_en), tasks="auto", async_mode="never"))))
+    t.start()
+    t.join(30)
+    assert out and out[0]["status"] == "success"
