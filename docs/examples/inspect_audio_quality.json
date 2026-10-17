@@ -11,7 +11,7 @@
     "result": {
       "metrics": {
         "clipping_ratio": 0.0,
-        "rms_dbfs": -9.03090748835443,
+        "rms_dbfs": -9.030907493534567,
         "silence_ratio": 0.0,
         "snr_db_estimate": 0.0036567419278631676,
         "dc_offset": -1.525186897675737e-05,
@@ -52,7 +52,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.422,
+      "duration_seconds": 0.39,
       "stages_run": [
         "vad",
         "features",

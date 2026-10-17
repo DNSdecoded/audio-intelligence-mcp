@@ -224,17 +224,17 @@
           "band_energy": "ratio"
         },
         "values": {
-          "rms": 0.07255065741480302,
-          "rms_dbfs": -22.78717295733602,
+          "rms": 0.07255065712008027,
+          "rms_dbfs": -22.787172992620732,
           "peak_amplitude": 0.822967529296875,
           "per_channel_peak": [
             0.822967529296875
           ],
-          "crest_factor_db": 21.094826961086017,
+          "crest_factor_db": 21.09482699637073,
           "clipping_ratio": 0.0,
           "dc_offset": 0.010997789110417664,
           "snr_method": "vad",
-          "snr_db_estimate": 12.748349585521542,
+          "snr_db_estimate": 12.748349579496537,
           "silence_ratio": 0.4762886597938144,
           "silence_intervals": [
             {
@@ -276,9 +276,9 @@
       "audio_quality": {
         "metrics": {
           "clipping_ratio": 0.0,
-          "rms_dbfs": -22.78717295733602,
+          "rms_dbfs": -22.787172992620732,
           "silence_ratio": 0.4762886597938144,
-          "snr_db_estimate": 12.748349585521542,
+          "snr_db_estimate": 12.748349579496537,
           "dc_offset": 0.010997789110417664,
           "hum_excess_db": -7.1622612650552195,
           "echo_autocorr_peak": 0.6579400581203376,

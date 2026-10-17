@@ -77,7 +77,7 @@ async def test_all_tools_invocable(tmp_path, samples_dir):
             outs["summarize_audio"] = await call(s, "summarize_audio", {"source": by_id})
             outs["compare_audio"] = await call(s, "compare_audio", {"sources": [src("sine.wav"), src("alarm.wav")]})
             outs["search_audio_library"] = await call(s, "search_audio_library", {"action": "index",
-                                                                                  "paths": [str(samples_dir)]})
+                                                                                  "paths": [str(samples_dir)], "async_mode": "never"})
             job = await call(s, "transcribe_audio", {"source": src("speech_en.wav"), "async_mode": "always"})
             assert job["status"] == "processing"
             outs["get_job"] = await call(s, "get_job", {"job_id": job["job_id"]})

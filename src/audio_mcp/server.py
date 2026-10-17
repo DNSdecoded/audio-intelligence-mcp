@@ -131,9 +131,11 @@ async def inspect_audio_quality(
     source: AudioSource,
     apply_preprocessing: bool | list[PreprocessOp] = False,
     compare_transcription: bool = False,
+    async_mode: AsyncMode = "auto",
 ) -> dict:
     return await _run(handlers.inspect_audio_quality, InspectQualityRequest, dict(
-        source=source, apply_preprocessing=apply_preprocessing, compare_transcription=compare_transcription))
+        source=source, apply_preprocessing=apply_preprocessing, compare_transcription=compare_transcription,
+        async_mode=async_mode))
 
 
 @mcp.tool(name="get_audio_timeline", description=(
@@ -143,8 +145,10 @@ async def get_audio_timeline(
     source: AudioSource,
     include: list[NodeType] | None = None,
     diarize: bool = True,
+    async_mode: AsyncMode = "auto",
 ) -> dict:
-    return await _run(handlers.get_audio_timeline, TimelineRequest, dict(source=source, include=include, diarize=diarize))
+    return await _run(handlers.get_audio_timeline, TimelineRequest, dict(
+        source=source, include=include, diarize=diarize, async_mode=async_mode))
 
 
 @mcp.tool(name="ask_audio", description=(
@@ -156,9 +160,10 @@ async def ask_audio(
     question: str,
     include_evidence: bool = True,
     use_llm: bool | None = None,
+    async_mode: AsyncMode = "auto",
 ) -> dict:
     return await _run(handlers.ask_audio, AskRequest, dict(
-        source=source, question=question, include_evidence=include_evidence, use_llm=use_llm))
+        source=source, question=question, include_evidence=include_evidence, use_llm=use_llm, async_mode=async_mode))
 
 
 @mcp.tool(name="summarize_audio", description=(
@@ -169,9 +174,10 @@ async def summarize_audio(
     length: Literal["short", "medium", "long"] = "short",
     focus: str | None = None,
     use_llm: bool | None = None,
+    async_mode: AsyncMode = "auto",
 ) -> dict:
     return await _run(handlers.summarize_audio, SummarizeRequest, dict(
-        source=source, length=length, focus=focus, use_llm=use_llm))
+        source=source, length=length, focus=focus, use_llm=use_llm, async_mode=async_mode))
 
 
 @mcp.tool(name="compare_audio", description=(
@@ -183,9 +189,10 @@ async def compare_audio(
     baseline: list[AudioSource] | None = None,
     aspects: list[Literal["features", "events", "transcript", "embedding"]] | None = None,
     z_threshold: float = 3.0,
+    async_mode: AsyncMode = "auto",
 ) -> dict:
     return await _run(handlers.compare_audio, CompareRequest, dict(
-        sources=sources, baseline=baseline, aspects=aspects, z_threshold=z_threshold))
+        sources=sources, baseline=baseline, aspects=aspects, z_threshold=z_threshold, async_mode=async_mode))
 
 
 @mcp.tool(name="search_audio_library", description=(
@@ -242,9 +249,10 @@ async def export_audio_analysis(
     format: Literal["json", "markdown", "srt", "vtt", "csv", "rttm"],
     tasks: list[TaskName] | Literal["auto"] = "auto",
     redact: bool = False,
+    async_mode: AsyncMode = "auto",
 ) -> dict:
     return await _run(handlers.export_audio_analysis, ExportRequest, dict(
-        audio_id=audio_id, format=format, tasks=tasks, redact=redact))
+        audio_id=audio_id, format=format, tasks=tasks, redact=redact, async_mode=async_mode))
 
 
 def main() -> None:

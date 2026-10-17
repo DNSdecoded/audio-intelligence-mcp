@@ -169,7 +169,7 @@
     ],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.015,
+      "duration_seconds": 0.0,
       "stages_run": [],
       "stages_skipped": [],
       "cache_hits": [

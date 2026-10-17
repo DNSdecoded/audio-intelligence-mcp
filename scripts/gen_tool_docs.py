@@ -77,7 +77,7 @@ async def _examples(s, samples: Path, outside: Path) -> dict:
              ("ask_audio", {"source": by_id, "question": "When does someone mention the budget?"}),
              ("summarize_audio", {"source": by_id, "length": "short"}),
              ("compare_audio", {"sources": [src("sine.wav"), src("alarm.wav")]}),
-             ("search_audio_library", {"action": "index", "paths": [str(samples)]})]
+             ("search_audio_library", {"action": "index", "paths": [str(samples)], "async_mode": "never"})]
     for name, req in plain:
         if name == "compare_audio":
             err = {"sources": [bad, bad]}

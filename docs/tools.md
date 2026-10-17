@@ -528,17 +528,17 @@ Run a multi-task analysis of an audio source (transcription, language, sound eve
         "band_energy": "ratio"
       },
       "values": {
-        "rms": 0.07255065741480302,
-        "rms_dbfs": -22.78717295733602,
+        "rms": 0.07255065712008027,
+        "rms_dbfs": -22.787172992620732,
         "peak_amplitude": 0.822967529296875,
         "per_channel_peak": [
           0.822967529296875
         ],
-        "crest_factor_db": 21.094826961086017,
+        "crest_factor_db": 21.09482699637073,
         "clipping_ratio": 0.0,
         "dc_offset": 0.010997789110417664,
         "snr_method": "vad",
-        "snr_db_estimate": 12.748349585521542,
+        "snr_db_estimate": 12.748349579496537,
         "silence_ratio": 0.4762886597938144,
         "silence_intervals": [
           {
@@ -580,9 +580,9 @@ Run a multi-task analysis of an audio source (transcription, language, sound eve
     "audio_quality": {
       "metrics": {
         "clipping_ratio": 0.0,
-        "rms_dbfs": -22.78717295733602,
+        "rms_dbfs": -22.787172992620732,
         "silence_ratio": 0.4762886597938144,
-        "snr_db_estimate": 12.748349585521542,
+        "snr_db_estimate": 12.748349579496537,
         "dc_offset": 0.010997789110417664,
         "hum_excess_db": -7.1622612650552195,
         "echo_autocorr_peak": 0.6579400581203376,
@@ -1200,7 +1200,7 @@ Transcribe speech in an audio source with segment and optional word timestamps. 
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.015,
+    "duration_seconds": 0.0,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -1467,7 +1467,7 @@ Detect sound events (alarms, impacts, music, animals, ...) in an audio source, o
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.281,
+    "duration_seconds": 0.266,
     "stages_run": [
       "events"
     ],
@@ -1729,17 +1729,17 @@ Compute acoustic features (level, silence, spectral, pitch, rhythm, bands) for a
         "voiced_ratio": "ratio"
       },
       "values": {
-        "rms": 0.09419146393107963,
-        "rms_dbfs": -20.519769064228353,
+        "rms": 0.09419146365091413,
+        "rms_dbfs": -20.519769090063882,
         "peak_amplitude": 0.950592041015625,
         "per_channel_peak": [
           0.950592041015625
         ],
-        "crest_factor_db": 20.079652539703044,
+        "crest_factor_db": 20.079652565538577,
         "clipping_ratio": 0.0,
         "dc_offset": 0.013024628268735575,
         "snr_method": "vad",
-        "snr_db_estimate": 40.440155749236325,
+        "snr_db_estimate": 40.44015572339977,
         "f0_mean_hz": 93.2207162626663,
         "f0_median_hz": 90.61307125379966,
         "f0_min_hz": 70.91408172734307,
@@ -1953,6 +1953,16 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
       "default": false,
       "title": "Compare Transcription",
       "type": "boolean"
+    },
+    "async_mode": {
+      "default": "auto",
+      "enum": [
+        "auto",
+        "always",
+        "never"
+      ],
+      "title": "Async Mode",
+      "type": "string"
     }
   },
   "required": [
@@ -1983,7 +1993,7 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
   "result": {
     "metrics": {
       "clipping_ratio": 0.0,
-      "rms_dbfs": -9.03090748835443,
+      "rms_dbfs": -9.030907493534567,
       "silence_ratio": 0.0,
       "snr_db_estimate": 0.0036567419278631676,
       "dc_offset": -1.525186897675737e-05,
@@ -2024,7 +2034,7 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.422,
+    "duration_seconds": 0.39,
     "stages_run": [
       "vad",
       "features",
@@ -2224,6 +2234,16 @@ Build a chronological event graph of an audio source: speech segments, speaker t
       "default": true,
       "title": "Diarize",
       "type": "boolean"
+    },
+    "async_mode": {
+      "default": "auto",
+      "enum": [
+        "auto",
+        "always",
+        "never"
+      ],
+      "title": "Async Mode",
+      "type": "string"
     }
   },
   "required": [
@@ -2313,7 +2333,7 @@ Build a chronological event graph of an audio source: speech segments, speaker t
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.171,
+    "duration_seconds": 0.156,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -2499,6 +2519,16 @@ Answer a natural-language question about an audio source (e.g. when something is
       ],
       "default": null,
       "title": "Use Llm"
+    },
+    "async_mode": {
+      "default": "auto",
+      "enum": [
+        "auto",
+        "always",
+        "never"
+      ],
+      "title": "Async Mode",
+      "type": "string"
     }
   },
   "required": [
@@ -2747,6 +2777,16 @@ Summarize an audio source extractively: key sentences, topics and key moments, e
       ],
       "default": null,
       "title": "Use Llm"
+    },
+    "async_mode": {
+      "default": "auto",
+      "enum": [
+        "auto",
+        "always",
+        "never"
+      ],
+      "title": "Async Mode",
+      "type": "string"
     }
   },
   "required": [
@@ -3077,6 +3117,16 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
       "default": 3.0,
       "title": "Z Threshold",
       "type": "number"
+    },
+    "async_mode": {
+      "default": "auto",
+      "enum": [
+        "auto",
+        "always",
+        "never"
+      ],
+      "title": "Async Mode",
+      "type": "string"
     }
   },
   "required": [
@@ -3127,8 +3177,8 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
               "unit": "ratio"
             },
             "crest_factor_db": {
-              "a": 3.0103075750748056,
-              "b": 7.569625607126577,
+              "a": 3.010307580254945,
+              "b": 7.569625635439396,
               "delta": 4.559318,
               "unit": "dB"
             },
@@ -3181,14 +3231,14 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
               "unit": "linear"
             },
             "rms": {
-              "a": 0.3535530804900542,
-              "b": 0.20916485988413977,
+              "a": 0.35355308027920024,
+              "b": 0.20916485920233896,
               "delta": -0.144388,
               "unit": "linear"
             },
             "rms_dbfs": {
-              "a": -9.03090748835443,
-              "b": -13.5902255204062,
+              "a": -9.030907493534567,
+              "b": -13.590225548719019,
               "delta": -4.559318,
               "unit": "dBFS"
             },
@@ -3200,7 +3250,7 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
             },
             "snr_db_estimate": {
               "a": 0.0036567419278631676,
-              "b": 54.20230431358955,
+              "b": 54.202304285276625,
               "delta": 54.198648,
               "unit": "dB"
             },
@@ -3313,7 +3363,7 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.469,
+    "duration_seconds": 0.453,
     "stages_run": [
       "aud_8a84c21c384f272e:metadata",
       "aud_8a84c21c384f272e:events",
@@ -3691,7 +3741,8 @@ Index audio files/folders into a persistent local library (transcripts, sound ev
   "action": "index",
   "paths": [
     "./samples"
-  ]
+  ],
+  "async_mode": "never"
 }
 ```
 
@@ -3723,7 +3774,7 @@ Index audio files/folders into a persistent local library (transcripts, sound ev
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.999,
+    "duration_seconds": 0.967,
     "stages_run": [
       "aud_2e130551b6f3fd9a:transcription",
       "aud_2e130551b6f3fd9a:language",
@@ -3932,7 +3983,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
 ```json
 {
   "action": "finish",
-  "session_id": "str_7f508c5addee",
+  "session_id": "str_9fc9cf996792",
   "tasks": [
     "transcription"
   ]
@@ -4055,7 +4106,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
         ]
       }
     },
-    "session_id": "str_7f508c5addee",
+    "session_id": "str_9fc9cf996792",
     "reconciliation": {
       "transcript_word_difference_rate": 0.0,
       "events_confirmed": [],
@@ -4152,6 +4203,16 @@ Export the analysis of a previously ingested audio_id to json, markdown, srt, vt
       "default": false,
       "title": "Redact",
       "type": "boolean"
+    },
+    "async_mode": {
+      "default": "auto",
+      "enum": [
+        "auto",
+        "always",
+        "never"
+      ],
+      "title": "Async Mode",
+      "type": "string"
     }
   },
   "required": [
@@ -4179,7 +4240,7 @@ Export the analysis of a previously ingested audio_id to json, markdown, srt, vt
   "status": "success",
   "audio_id": "aud_0fb68437fd577a5c",
   "result": {
-    "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261017T190319.srt",
+    "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261017T193833.srt",
     "format": "srt",
     "size_bytes": 435,
     "sha256": "90947b76cf3d1e2d45609712e5569768ac4a6525aa64a40b0653f941b71e90e4",
@@ -4193,7 +4254,7 @@ Export the analysis of a previously ingested audio_id to json, markdown, srt, vt
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.157,
+    "duration_seconds": 0.156,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -4266,7 +4327,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
 
 ```json
 {
-  "job_id": "job_18f47d6841db"
+  "job_id": "job_97ca57c22a91"
 }
 ```
 
@@ -4275,7 +4336,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
 ```json
 {
   "status": "success",
-  "job_id": "job_18f47d6841db",
+  "job_id": "job_97ca57c22a91",
   "result": {
     "job_status": "done",
     "progress": 1.0,
@@ -4365,7 +4426,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
       "warnings": [],
       "errors": [],
       "processing": {
-        "duration_seconds": 0.156,
+        "duration_seconds": 0.141,
         "stages_run": [],
         "stages_skipped": [],
         "cache_hits": [

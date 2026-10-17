@@ -59,30 +59,35 @@ def tool_handler(fn):
     return wrapper
 
 
-def _maybe_async(app, tool: str, req, fn) -> dict:
-    """Run fn now, or as a job when async_mode says so (auto: audio longer than async_threshold_seconds)."""
+def _long(app, audio_id: str) -> bool:
+    return app.store.get(audio_id).probe.duration_seconds > app.settings.async_threshold_seconds
+
+
+def _maybe_async(app, tool: str, req, fn, auto=None) -> dict:
+    """Run fn now, or as a job when async_mode says so. auto: audio longer than async_threshold_seconds, or the
+    tool's own `auto(app, req)` predicate when the request has no single `source`."""
     mode = getattr(req, "async_mode", "never")
     if mode == "never" or app.jobs is None:
         return fn(app, req)
-    src, audio_id = getattr(req, "source", None), None
+    src, audio_id = getattr(req, "source", None), getattr(req, "audio_id", None)
     if src is not None:
         rec = app.store.ingest(src)  # also materializes base64/URL sources once
         audio_id = rec.audio_id
-        if mode == "auto" and rec.probe.duration_seconds <= app.settings.async_threshold_seconds:
+        if mode == "auto" and not _long(app, audio_id):
             return fn(app, req)
         req = req.model_copy(update={"source": AudioIdSource(type="audio_id", audio_id=audio_id)})
-    elif mode == "auto" and len(getattr(req, "paths", None) or []) <= 3:
+    elif mode == "auto" and not (auto and auto(app, req)):
         return fn(app, req)
     req = req.model_copy(update={"async_mode": "never"})
     job_id = app.jobs.submit(tool, lambda ev, progress: tool_handler(fn)(app, req))
     return build_response(result=None, job_id=job_id, audio_id=audio_id)
 
 
-def async_capable(tool: str):
+def async_capable(tool: str, auto=None):
     def deco(fn):
         @functools.wraps(fn)
         def wrapper(app, req):
-            return _maybe_async(app, tool, req, fn)
+            return _maybe_async(app, tool, req, fn, auto)
 
         return wrapper
 
@@ -252,6 +257,7 @@ def compare_preprocessed_asr(app, record, audio, ops) -> dict:
 
 
 @tool_handler
+@async_capable("inspect_audio_quality")
 def inspect_audio_quality(app, req: InspectQualityRequest) -> dict:
     outcome = run_analysis(app, req.source, ["quality"], {})
     q = outcome.results.get("quality")
@@ -274,6 +280,7 @@ def inspect_audio_quality(app, req: InspectQualityRequest) -> dict:
 
 
 @tool_handler
+@async_capable("get_audio_timeline")
 def get_audio_timeline(app, req: TimelineRequest) -> dict:
     stages = (["diarization", "speaker_assign"] if req.diarize else []) + ["timeline"]
     outcome = run_analysis(app, req.source, stages, {"diarize": req.diarize, "timeline_include": req.include})
@@ -290,6 +297,7 @@ def text_embedder(app, outcome):
 
 
 @tool_handler
+@async_capable("ask_audio")
 def ask_audio(app, req: AskRequest) -> dict:
     if req.use_llm and not app.backends.llm.available()[0]:
         raise AudioMCPError(ErrorCode.LLM_DISABLED, "use_llm requested but no LLM is configured (llm_provider=none)")
@@ -332,6 +340,7 @@ def _require_llm(app, use_llm):
 
 
 @tool_handler
+@async_capable("summarize_audio")
 def summarize_audio(app, req: SummarizeRequest) -> dict:
     _require_llm(app, req.use_llm)
     outcome = run_analysis(app, req.source, ["timeline", "summary"],
@@ -366,6 +375,7 @@ def _bundle(outcome, duration) -> dict:
 
 
 @tool_handler
+@async_capable("compare_audio", auto=lambda app, req: len(req.sources) + len(req.baseline or []) > 3)
 def compare_audio(app, req: CompareRequest) -> dict:
     aspects = set(req.aspects or ["features", "events", "embedding"])
     stages = ["metadata", "features", "events", "audio_embedding"] + (["transcription"] if "transcript" in aspects else [])
@@ -425,7 +435,8 @@ def _expand(app, raw: str):
 
 
 @tool_handler
-@async_capable("search_audio_library")
+@async_capable("search_audio_library", auto=lambda app, req: req.action == "index" and (
+    len(req.paths) > 3 or any(Path(p).is_dir() for p in req.paths)))
 def search_audio_library(app, req: SearchLibraryRequest) -> dict:
     lib = app.library
     if req.action == "list":
@@ -501,6 +512,7 @@ _EXPORT_TASKS = {"srt": ["transcription", "speaker_diarization"], "vtt": ["trans
 
 
 @tool_handler
+@async_capable("export_audio_analysis", auto=lambda app, req: _long(app, req.audio_id))
 def export_audio_analysis(app, req: ExportRequest) -> dict:
     from audio_mcp.export.exporters import export_analysis
 

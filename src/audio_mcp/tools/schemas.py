@@ -78,12 +78,14 @@ class InspectQualityRequest(_Req):
     source: AudioSource
     apply_preprocessing: bool | list[PreprocessOp] = False
     compare_transcription: bool = False
+    async_mode: AsyncMode = "auto"
 
 
 class TimelineRequest(_Req):
     source: AudioSource
     include: list[NodeType] | None = None
     diarize: bool = True
+    async_mode: AsyncMode = "auto"
 
 
 class AskRequest(_Req):
@@ -91,6 +93,7 @@ class AskRequest(_Req):
     question: str = Field(min_length=3, max_length=1000)
     include_evidence: bool = True
     use_llm: bool | None = None
+    async_mode: AsyncMode = "auto"
 
 
 class SummarizeRequest(_Req):
@@ -98,6 +101,7 @@ class SummarizeRequest(_Req):
     length: Literal["short", "medium", "long"] = "short"
     focus: str | None = Field(None, max_length=500)
     use_llm: bool | None = None
+    async_mode: AsyncMode = "auto"
 
 
 class CompareRequest(_Req):
@@ -105,6 +109,7 @@ class CompareRequest(_Req):
     baseline: list[AudioSource] | None = Field(None, min_length=1, max_length=20)
     aspects: list[Literal["features", "events", "transcript", "embedding"]] | None = None
     z_threshold: float = Field(3.0, gt=0)
+    async_mode: AsyncMode = "auto"
 
     @model_validator(mode="after")
     def _two_or_baseline(self):
@@ -165,3 +170,4 @@ class ExportRequest(_Req):
     format: Literal["json", "markdown", "srt", "vtt", "csv", "rttm"]
     tasks: list[TaskName] | Literal["auto"] = "auto"
     redact: bool = False
+    async_mode: AsyncMode = "auto"

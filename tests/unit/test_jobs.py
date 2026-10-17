@@ -92,3 +92,43 @@ def test_nested_run_analysis_does_not_deadlock(app, speech_en):  # I3: plan_auto
     t.start()
     t.join(30)
     assert out and out[0]["status"] == "success"
+
+
+@pytest.mark.parametrize("tool,model,params", [
+    ("inspect_audio_quality", "InspectQualityRequest", {}),
+    ("get_audio_timeline", "TimelineRequest", {}),
+    ("ask_audio", "AskRequest", {"question": "what is said?"}),
+    ("summarize_audio", "SummarizeRequest", {}),
+    ("compare_audio", "CompareRequest", {"sources": "two"}),
+    ("export_audio_analysis", "ExportRequest", {"format": "json"}),
+    ("search_audio_library", "SearchLibraryRequest", {"action": "index"}),
+])
+def test_new_async_capable_tools(app, speech_en, dialogue, tool, model, params):  # I4
+    from audio_mcp.tools import handlers, schemas
+
+    p = dict(params)
+    if tool == "compare_audio":
+        p["sources"] = [fp(speech_en), fp(dialogue)]
+    elif tool == "export_audio_analysis":
+        p["audio_id"] = app.store.ingest(schemas.FeaturesRequest(source=fp(speech_en)).source).audio_id
+    elif tool == "search_audio_library":
+        p["paths"] = [str(speech_en)]
+    else:
+        p["source"] = fp(speech_en)
+    r = getattr(handlers, tool)(app, getattr(schemas, model)(**p, async_mode="always"))
+    assert r["status"] == "processing", r
+    wait_until(lambda: status(app, r["job_id"])["result"]["job_status"] != "running"
+               and status(app, r["job_id"])["result"]["job_status"] != "queued", timeout=60)
+    s = status(app, r["job_id"])["result"]
+    assert s["job_status"] == "done" and s["response"]["status"] == "success", s
+
+
+def test_auto_async_for_multi_source_tools(app, speech_en, tmp_path):  # I4
+    from audio_mcp.tools.handlers import compare_audio, search_audio_library
+    from audio_mcp.tools.schemas import CompareRequest, SearchLibraryRequest
+
+    r = search_audio_library(app, SearchLibraryRequest(action="index", paths=[str(tmp_path)]))
+    assert r["status"] == "processing"
+    r = compare_audio(app, CompareRequest(sources=[fp(speech_en)] * 2, baseline=[fp(speech_en)] * 2))
+    assert r["status"] == "processing"
+    assert compare_audio(app, CompareRequest(sources=[fp(speech_en)] * 2))["status"] == "success"

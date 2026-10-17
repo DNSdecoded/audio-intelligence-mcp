@@ -1,7 +1,7 @@
 {
   "request": {
     "action": "finish",
-    "session_id": "str_7f508c5addee",
+    "session_id": "str_9fc9cf996792",
     "tasks": [
       "transcription"
     ]
@@ -119,7 +119,7 @@
           ]
         }
       },
-      "session_id": "str_7f508c5addee",
+      "session_id": "str_9fc9cf996792",
       "reconciliation": {
         "transcript_word_difference_rate": 0.0,
         "events_confirmed": [],
