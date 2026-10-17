@@ -6,6 +6,7 @@ from typing import Callable
 from audio_mcp.analysis.events import frames_to_events
 from audio_mcp.context import AppContext
 from audio_mcp.dsp.features import FEATURE_GROUPS, extract_features
+from audio_mcp.dsp.quality import diagnose_quality
 from audio_mcp.envelope import ModelInfo, warning
 from audio_mcp.ingest.decode import DecodedAudio
 from audio_mcp.store.audio_store import AudioRecord
@@ -106,6 +107,14 @@ def _events(ctx):
     return {"events": [e.model_dump(exclude_none=True) for e in ev], "threshold": thr}
 
 
+def _quality(ctx):
+    return diagnose_quality(ctx.audio.native, ctx.audio.native_sr, ctx.results["features"]["values"], _regions(ctx))
+
+
+def _features_cfg(app, o):
+    return {**_vad_cfg(app, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS)}
+
+
 def _vad_cfg(app, o):
     return {"vad": _id(app.backends.vad), "fallback": _id(app.backends.vad_fallback)}
 
@@ -118,8 +127,8 @@ def _asr_cfg(app, o):  # also keys `language`, which only reads the transcriptio
 STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("metadata", (), _metadata, lambda a, o: {}),
     Stage("vad", (), _vad, _vad_cfg),
-    Stage("features", ("vad",), _features,
-          lambda a, o: {**_vad_cfg(a, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS)}),
+    Stage("features", ("vad",), _features, _features_cfg),
+    Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),
     Stage("events", (), _events,

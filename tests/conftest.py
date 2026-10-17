@@ -50,3 +50,14 @@ def load(path):
 
     x, sr = sf.read(path, always_2d=True)
     return x.T.astype("float32"), sr
+
+
+def fp(path):
+    return {"type": "file_path", "path": str(path)}
+
+
+@pytest.fixture
+def app(settings):
+    from audio_mcp.context import build_app_context
+
+    return build_app_context(settings)

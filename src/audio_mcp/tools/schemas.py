@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from audio_mcp.analysis.events import EVENT_CATEGORIES
 from audio_mcp.dsp.features import FEATURE_GROUPS
+from audio_mcp.dsp.preprocess import PREPROCESS_OPS
 from audio_mcp.ingest.sources import AudioSource
 from audio_mcp.pipeline.planner import TASK_TO_STAGES
 
@@ -14,10 +15,12 @@ TaskName = Literal[
 CategoryName = Literal["alarm", "impact", "footsteps", "door", "animal", "machinery", "music", "environment"]
 FeatureGroup = Literal["level", "silence", "spectral", "pitch", "rhythm", "bands"]
 AsyncMode = Literal["auto", "always", "never"]
+PreprocessOp = Literal["remove_dc", "mono", "highpass_80hz", "denoise", "trim_silence", "resample_16k", "normalize"]
 
 # keep the Literals in step with the engine's tables
 assert set(get_args(TaskName)) == set(TASK_TO_STAGES)
 assert set(get_args(FeatureGroup)) == set(FEATURE_GROUPS)
+assert set(get_args(PreprocessOp)) == set(PREPROCESS_OPS)
 assert set(get_args(CategoryName)) <= set(EVENT_CATEGORIES)
 
 
@@ -68,3 +71,9 @@ class FeaturesRequest(_Req):
     source: AudioSource
     feature_groups: list[FeatureGroup] | None = None
     async_mode: AsyncMode = "auto"
+
+
+class InspectQualityRequest(_Req):
+    source: AudioSource
+    apply_preprocessing: bool | list[PreprocessOp] = False
+    compare_transcription: bool = False

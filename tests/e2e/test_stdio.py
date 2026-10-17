@@ -9,7 +9,8 @@ from mcp.client.stdio import stdio_client
 
 from conftest import FIXTURES_DIR
 
-EXPECTED_TOOLS = {"analyze_audio", "transcribe_audio", "detect_audio_events", "extract_audio_features"}
+EXPECTED_TOOLS = {"analyze_audio", "transcribe_audio", "detect_audio_events", "extract_audio_features",
+                  "inspect_audio_quality"}
 
 
 @pytest.mark.asyncio

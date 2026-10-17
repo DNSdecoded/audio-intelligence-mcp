@@ -13,7 +13,7 @@ from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, AsyncMode, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
-    TaskName, TranscribeRequest,
+    InspectQualityRequest, PreprocessOp, TaskName, TranscribeRequest,
 )
 
 _app: AppContext | None = None
@@ -99,6 +99,19 @@ async def extract_audio_features(
 ) -> dict:
     return await _run(handlers.extract_audio_features, FeaturesRequest, dict(
         source=source, feature_groups=feature_groups, async_mode=async_mode))
+
+
+@mcp.tool(name="inspect_audio_quality", description=(
+    "Diagnose recording quality (clipping, low level, silence, noise, hum, echo, bandwidth, DC offset) and "
+    "optionally write a preprocessed variant; the original is never modified. Returns issues, metrics and "
+    "recommended preprocessing."))
+async def inspect_audio_quality(
+    source: AudioSource,
+    apply_preprocessing: bool | list[PreprocessOp] = False,
+    compare_transcription: bool = False,
+) -> dict:
+    return await _run(handlers.inspect_audio_quality, InspectQualityRequest, dict(
+        source=source, apply_preprocessing=apply_preprocessing, compare_transcription=compare_transcription))
 
 
 def main() -> None:
