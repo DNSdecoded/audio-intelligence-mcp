@@ -42,6 +42,14 @@ with `confidence_kind` (`model_probability` or `heuristic`; none are calibrated)
 
 ## Install
 
+From PyPI (once released):
+
+```bash
+pip install "audio-intelligence-mcp[models]"     # or run without installing: uvx --from "audio-intelligence-mcp[models]" audio-mcp
+```
+
+From source:
+
 ```bash
 git clone https://github.com/DNSdecoded/audio-intelligence-mcp.git
 cd audio-intelligence-mcp
@@ -58,7 +66,13 @@ reason, and the DSP tools (features, quality, integrity, comparison) work.
 
 ## Connect a client
 
-Claude Code:
+Claude Code (PyPI release):
+
+```bash
+claude mcp add audio-intel -- uvx --from "audio-intelligence-mcp[models]" audio-mcp
+```
+
+Claude Code (source checkout):
 
 ```bash
 claude mcp add audio-intel -- uv --directory /path/to/audio-intelligence-mcp run audio-mcp
@@ -194,6 +208,9 @@ uv run pytest -m slow                      # real models
 uv run pytest -m long                      # 30-minute file / async path
 uv run python scripts/gen_tool_docs.py --write-examples   # refresh docs/tools.md + examples
 ```
+
+Releasing: bump `version` in `pyproject.toml`, then push a `vX.Y.Z` tag. `.github/workflows/publish.yml` builds
+the package and uploads it to PyPI through trusted publishing (no API token stored).
 
 Evaluation and benchmarks: [docs/evaluation.md](docs/evaluation.md). Design spec, implementation plan, and build
 notes (design rulings and known limits): [docs/superpowers/](docs/superpowers/).
