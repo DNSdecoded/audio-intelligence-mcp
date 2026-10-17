@@ -71,6 +71,8 @@ def analysis_payload(outcome, options: AnalyzeOptions) -> dict:
         a["audio_quality"] = r["quality"]
     if "timeline" in r:
         a["timeline"] = r["timeline"]
+    if "uncertainty" in r:
+        a["uncertainty"] = r["uncertainty"]
     if not options.word_level_timestamps:
         a = _strip(a, {"words"})
     if not options.include_confidence:
@@ -100,7 +102,7 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
     o = req.options
     outcome = run_analysis(app, req.source, order_stages(stages), {
         "language": o.language, "word_timestamps": o.word_level_timestamps, "num_speakers": o.num_speakers,
-        "diarize": "speaker_diarization" in tasks})
+        "diarize": "speaker_diarization" in tasks, "budget": req.budget})
     warns = [warning("UNSUPPORTED_FEATURE", "emotion detection is not implemented")] if o.detect_emotions else []
     return _respond(outcome, analysis_payload(outcome, o), key="analysis", extra_warnings=warns)
 

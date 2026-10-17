@@ -24,9 +24,10 @@ def run_analysis(app: AppContext, source: AudioSource, stages: list[str], option
     t0 = time.monotonic()
     record = app.store.ingest(source)  # AudioMCPError propagates to the handler
     audio = app.store.load(record.audio_id)
+    order = topo_order(stages)
+    options = {**options, "_stages": order}  # lets late stages key their cache on what else ran
     ctx = StageContext(app, record, audio, options, cancel_event=cancel_event)
     ctx.warnings.extend(warning("DECODE_WARNING", w) for w in audio.decode_warnings)
-    order = topo_order(stages)
     ran, skipped, hits, errors = [], [], [], []
     bad: dict[str, str] = {}  # stage -> "failed" | "skipped"
     for done, name in enumerate(order, 1):
