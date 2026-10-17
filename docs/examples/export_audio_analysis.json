@@ -1,0 +1,50 @@
+{
+  "request": {
+    "audio_id": "aud_0fb68437fd577a5c",
+    "format": "srt"
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_0fb68437fd577a5c",
+    "result": {
+      "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261017T190319.srt",
+      "format": "srt",
+      "size_bytes": 435,
+      "sha256": "90947b76cf3d1e2d45609712e5569768ac4a6525aa64a40b0653f941b71e90e4",
+      "redactions": 0
+    },
+    "warnings": [
+      {
+        "code": "OVERLAP_UNSUPPORTED",
+        "message": "overlapping speech is not detected by the ECAPA backend"
+      }
+    ],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.157,
+      "stages_run": [],
+      "stages_skipped": [],
+      "cache_hits": [
+        "metadata",
+        "vad",
+        "transcription"
+      ],
+      "models_used": [],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "audio_id": "aud_0000000000000000",
+    "format": "json"
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "AUDIO_NOT_FOUND",
+      "message": "unknown audio_id",
+      "retryable": false
+    }
+  }
+}

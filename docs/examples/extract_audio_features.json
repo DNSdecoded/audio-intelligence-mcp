@@ -1,0 +1,101 @@
+{
+  "request": {
+    "source": {
+      "type": "file_path",
+      "path": "./samples\\speech_en.wav"
+    },
+    "feature_groups": [
+      "level",
+      "pitch"
+    ]
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_450af10d0835dcd6",
+    "result": {
+      "metadata": {
+        "format": "wav",
+        "codec": "pcm_s16le",
+        "duration_seconds": 4.834,
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "bit_depth": 16,
+        "size_bytes": 154762
+      },
+      "features": {
+        "units": {
+          "rms": "linear",
+          "rms_dbfs": "dBFS",
+          "peak_amplitude": "linear",
+          "per_channel_peak": "linear",
+          "crest_factor_db": "dB",
+          "clipping_ratio": "ratio",
+          "dc_offset": "linear",
+          "snr_db_estimate": "dB",
+          "f0_mean_hz": "Hz",
+          "f0_median_hz": "Hz",
+          "f0_min_hz": "Hz",
+          "f0_max_hz": "Hz",
+          "f0_std_hz": "Hz",
+          "voiced_ratio": "ratio"
+        },
+        "values": {
+          "rms": 0.09419146393107963,
+          "rms_dbfs": -20.519769064228353,
+          "peak_amplitude": 0.950592041015625,
+          "per_channel_peak": [
+            0.950592041015625
+          ],
+          "crest_factor_db": 20.079652539703044,
+          "clipping_ratio": 0.0,
+          "dc_offset": 0.013024628268735575,
+          "snr_method": "vad",
+          "snr_db_estimate": 40.440155749236325,
+          "f0_mean_hz": 93.2207162626663,
+          "f0_median_hz": 90.61307125379966,
+          "f0_min_hz": 70.91408172734307,
+          "f0_max_hz": 134.02225331798547,
+          "f0_std_hz": 15.488208670766868,
+          "voiced_ratio": 0.20735785953177258
+        }
+      }
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.282,
+      "stages_run": [
+        "metadata",
+        "vad",
+        "features"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [],
+      "models_used": [
+        {
+          "stage": "vad",
+          "name": "energy-vad",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    }
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

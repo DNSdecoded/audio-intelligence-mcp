@@ -1,0 +1,101 @@
+{
+  "request": {
+    "source": {
+      "type": "audio_id",
+      "audio_id": "aud_0fb68437fd577a5c"
+    }
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_0fb68437fd577a5c",
+    "result": {
+      "duration_seconds": 9.724,
+      "nodes": [
+        {
+          "id": "seg_0001",
+          "type": "speech_segment",
+          "label": "we need to finish the report by friday",
+          "start": 0.09,
+          "end": 1.32,
+          "source": "transcription",
+          "speaker_id": "speaker_1",
+          "confidence": 0.85,
+          "confidence_kind": "model_probability"
+        },
+        {
+          "id": "turn_0001",
+          "type": "speaker_turn",
+          "label": "speaker_1",
+          "start": 0.09,
+          "end": 1.32,
+          "source": "diarization",
+          "speaker_id": "speaker_1"
+        },
+        {
+          "id": "sil_0001",
+          "type": "silence",
+          "label": "silence",
+          "start": 1.33,
+          "end": 2.445,
+          "source": "features"
+        }
+      ],
+      "edges": [
+        {
+          "source": "seg_0001",
+          "target": "sil_0001",
+          "relation": "precedes",
+          "gap_seconds": 0.01
+        },
+        {
+          "source": "turn_0001",
+          "target": "sil_0001",
+          "relation": "precedes",
+          "gap_seconds": 0.01
+        },
+        {
+          "source": "sil_0001",
+          "target": "sil_0002",
+          "relation": "precedes",
+          "gap_seconds": 0.295
+        }
+      ],
+      "text": "00:00.1–00:01.3  speech_segment  we need to finish the report by friday (speaker_1) (0.85)\n00:00.1–00:01.3  speaker_turn  speaker_1\n00:01.3–00:02.4  silence  silence\n00:02.4–00:02.7  speech_segment  t..."
+    },
+    "warnings": [
+      {
+        "code": "OVERLAP_UNSUPPORTED",
+        "message": "overlapping speech is not detected by the ECAPA backend"
+      }
+    ],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.171,
+      "stages_run": [],
+      "stages_skipped": [],
+      "cache_hits": [
+        "vad",
+        "diarization",
+        "transcription"
+      ],
+      "models_used": [],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    }
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

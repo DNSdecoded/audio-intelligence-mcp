@@ -1,0 +1,90 @@
+{
+  "request": {
+    "source": {
+      "type": "file_path",
+      "path": "./samples\\sine.wav"
+    }
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_8a84c21c384f272e",
+    "result": {
+      "metrics": {
+        "clipping_ratio": 0.0,
+        "rms_dbfs": -9.03090748835443,
+        "silence_ratio": 0.0,
+        "snr_db_estimate": 0.0036567419278631676,
+        "dc_offset": -1.525186897675737e-05,
+        "hum_excess_db": 217.72816668523103,
+        "echo_autocorr_peak": 0.6239934127530874,
+        "rolloff99_hz": 473.73046875,
+        "channels": 2
+      },
+      "issues": [
+        {
+          "code": "HUM",
+          "severity": "high",
+          "message": "Mains hum at 50/60 Hz detected.",
+          "measured": 217.728167,
+          "threshold": 20
+        },
+        {
+          "code": "ECHO",
+          "severity": "medium",
+          "message": "Possible echo/reverberation (heuristic indicator).",
+          "measured": 0.623993,
+          "threshold": 0.5
+        },
+        {
+          "code": "BANDWIDTH_LIMITED",
+          "severity": "high",
+          "message": "Energy is confined below ~3.8 kHz (e.g. telephone-band audio or a narrowband source).",
+          "measured": 473.730469,
+          "threshold": 3800
+        }
+      ],
+      "recommendations": [
+        "highpass_80hz",
+        "mono"
+      ],
+      "overall": "poor"
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.422,
+      "stages_run": [
+        "vad",
+        "features",
+        "quality"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [],
+      "models_used": [
+        {
+          "stage": "vad",
+          "name": "energy-vad",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    }
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "request": {
+    "sources": [
+      {
+        "type": "file_path",
+        "path": "./samples\\sine.wav"
+      },
+      {
+        "type": "file_path",
+        "path": "./samples\\alarm.wav"
+      }
+    ]
+  },
+  "success": {
+    "status": "success",
+    "result": {
+      "audio_ids": [
+        "aud_8a84c21c384f272e",
+        "aud_2e130551b6f3fd9a"
+      ],
+      "comparisons": [
+        {
+          "a": "aud_8a84c21c384f272e",
+          "b": "aud_2e130551b6f3fd9a",
+          "measured_differences": {
+            "features": {
+              "clipping_ratio": {
+                "a": 0.0,
+                "b": 0.0,
+                "delta": 0.0,
+                "unit": "ratio"
+              },
+              "crest_factor_db": {
+                "a": 3.0103075750748056,
+                "b": 7.569625607126577,
+                "delta": 4.559318,
+                "unit": "dB"
+              },
+              "dc_offset": {
+                "a": -1.525186897675737e-05,
+                "b": -1.3160467147827148e-05,
+                "delta": 2e-06,
+                "unit": "linear"
+              },
+              "f0_max_hz": {
+                "a": 440.1120960399446,
+                "b": 615.3846153846154,
+                "delta": 175.272519,
+                "unit": "Hz"
+              },
+              "f0_mean_hz": {
+                "a": 440.10844348156735,
+                "b": 511.0355843048559,
+                "delta": 70.927141,
+                "unit": "Hz"
+              },
+              "f0_median_hz": {
+                "a": 440.1084400857085,
+                "b": 500.23497871174874,
+                "delta": 60.126539,
+                "unit": "Hz"
+              },
+              "f0_min_hz": {
+                "a": 440.1040818180649,
+                "b": 500.2304716054127,
+                "delta": 60.12639,
+                "unit": "Hz"
+              },
+              "f0_std_hz": {
+                "a": 0.0025761553884446112,
+                "b": 33.50455725299295,
+                "delta": 33.501981,
+                "unit": "Hz"
+              },
+              "onset_rate_per_s": {
+                "a": 5.5,
+                "b": 2.0,
+                "delta": -3.5,
+                "unit": "per_second"
+              },
+              "peak_amplitude": {
+                "a": 0.5,
+                "b": 0.5,
+                "delta": 0.0,
+                "unit": "linear"
+              },
+              "rms": {
+                "a": 0.3535530804900542,
+                "b": 0.20916485988413977,
+                "delta": -0.144388,
+                "unit": "linear"
+              },
+              "rms_dbfs": {
+                "a": -9.03090748835443,
+                "b": -13.5902255204062,
+                "delta": -4.559318,
+                "unit": "dBFS"
+              },
+              "silence_ratio": {
+                "a": 0.0,
+                "b": 0.6130653266331658,
+                "delta": 0.613065,
+                "unit": "ratio"
+              },
+              "snr_db_estimate": {
+                "a": 0.0036567419278631676,
+                "b": 54.20230431358955,
+                "delta": 54.198648,
+                "unit": "dB"
+              },
+              "spectral_bandwidth_hz": {
+                "a": 246.96479328948786,
+                "b": 2714.547334980393,
+                "delta": 2467.582542,
+                "unit": "Hz"
+              },
+              "spectral_centroid_hz": {
+                "a": 444.03338302041357,
+                "b": 4640.54744595871,
+                "delta": 4196.514063,
+                "unit": "Hz"
+              },
+              "spectral_flatness": {
+                "a": 0.0004533049813041949,
+                "b": 0.4513854257402206,
+                "delta": 0.450932,
+                "unit": "ratio"
+              },
+              "spectral_rolloff_hz": {
+                "a": 452.197265625,
+                "b": 7525.838744588745,
+                "delta": 7073.641479,
+                "unit": "Hz"
+              },
+              "tempo_bpm": {
+                "a": 184.5703125,
+                "b": 197.3684210526316,
+                "delta": 12.798109,
+                "unit": "BPM"
+              },
+              "voiced_ratio": {
+                "a": 1.0,
+                "b": 0.4331983805668016,
+                "delta": -0.566802,
+                "unit": "ratio"
+              },
+              "zero_crossing_rate": {
+                "a": 0.019943536774793366,
+                "b": 0.272697442948773,
+                "delta": 0.252754,
+                "unit": "ratio"
+              }
+            },
+            "bands": {
+              "0-250": 0.000262,
+              "1000-2000": 0.80976,
+              "2000-4000": 5.7e-05,
+              "250-500": -0.999606,
+              "4000-8000": 7e-06,
+              "500-1000": 0.189517,
+              "8000-16000": 3e-06,
+              "8000-22050": -0.0
+            },
+            "events": {
+              "only_in_a": [
+                "Noise"
+              ],
+              "only_in_b": [
+                "Beep, bleep",
+                "Silence",
+                "Speech"
+              ],
+              "rate_change": {
+                "Beep, bleep": {
+                  "a_per_min": 0.0,
+                  "b_per_min": 15.0
+                },
+                "Noise": {
+                  "a_per_min": 30.0,
+                  "b_per_min": 0.0
+                },
+                "Silence": {
+                  "a_per_min": 0.0,
+                  "b_per_min": 15.0
+                },
+                "Speech": {
+                  "a_per_min": 0.0,
+                  "b_per_min": 15.0
+                }
+              }
+            }
+          },
+          "similarity": {
+            "audio_embedding_cosine": 0.2444
+          },
+          "possible_interpretations": [
+            {
+              "statement": "Spectral balance shifted toward higher frequencies; this may reflect a different source, microphone, or filtering.",
+              "based_on": [
+                "spectral_centroid_hz"
+              ],
+              "kind": "interpretation",
+              "source": "rule"
+            },
+            {
+              "statement": "Sound types present only in B: Beep, bleep, Silence, Speech; their cause is not determined.",
+              "based_on": [
+                "events"
+              ],
+              "kind": "interpretation",
+              "source": "rule"
+            }
+          ]
+        }
+      ]
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.469,
+      "stages_run": [
+        "aud_8a84c21c384f272e:metadata",
+        "aud_8a84c21c384f272e:events",
+        "aud_8a84c21c384f272e:audio_embedding"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [
+        "aud_8a84c21c384f272e:vad",
+        "aud_8a84c21c384f272e:features"
+      ],
+      "models_used": [
+        {
+          "stage": "tagger",
+          "name": "fake-tagger",
+          "version": "1",
+          "local": true
+        },
+        {
+          "stage": "tagger",
+          "name": "fake-tagger",
+          "version": "1",
+          "local": true
+        },
+        {
+          "stage": "vad",
+          "name": "energy-vad",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "sources": [
+      {
+        "type": "file_path",
+        "path": "./outside_allowed_roots/x.wav"
+      },
+      {
+        "type": "file_path",
+        "path": "./outside_allowed_roots/x.wav"
+      }
+    ]
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

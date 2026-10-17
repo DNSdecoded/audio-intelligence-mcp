@@ -1,0 +1,64 @@
+{
+  "request": {
+    "source": {
+      "type": "file_path",
+      "path": "./samples\\alarm.wav"
+    },
+    "categories": [
+      "alarm"
+    ]
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_2e130551b6f3fd9a",
+    "result": {
+      "events": [
+        {
+          "confidence": 0.8,
+          "confidence_kind": "model_probability",
+          "id": "evt_0001",
+          "label": "Beep, bleep",
+          "start": 0.5,
+          "end": 3.5,
+          "source": "panns"
+        }
+      ],
+      "threshold": 0.3
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.281,
+      "stages_run": [
+        "events"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [],
+      "models_used": [
+        {
+          "stage": "tagger",
+          "name": "fake-tagger",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    }
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

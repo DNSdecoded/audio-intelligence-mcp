@@ -1,0 +1,532 @@
+{
+  "request": {
+    "source": {
+      "type": "file_path",
+      "path": "./samples\\dialogue_2spk.wav"
+    },
+    "tasks": "auto",
+    "goal": "meeting"
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_0fb68437fd577a5c",
+    "analysis": {
+      "audio_metadata": {
+        "format": "wav",
+        "codec": "pcm_s16le",
+        "duration_seconds": 9.724,
+        "sample_rate_hz": 16000,
+        "channels": 1,
+        "bit_depth": 16,
+        "size_bytes": 311206
+      },
+      "language": {
+        "primary": "en",
+        "confidence": 0.9,
+        "confidence_kind": "model_probability"
+      },
+      "transcription": {
+        "text": "we need to finish the report by friday the alarm test is scheduled for monday morning we need to finish the report by friday the alarm test is scheduled for monday morning we need to finish the report...",
+        "segments": [
+          {
+            "confidence": 0.85,
+            "confidence_kind": "model_probability",
+            "id": "seg_0001",
+            "start": 0.09,
+            "end": 1.32,
+            "text": "we need to finish the report by friday",
+            "language": "en",
+            "speaker_id": "speaker_1",
+            "words": [
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 0.09,
+                "end": 0.244,
+                "text": "we",
+                "speaker_id": "speaker_1"
+              },
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 0.244,
+                "end": 0.397,
+                "text": "need",
+                "speaker_id": "speaker_1"
+              },
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 0.397,
+                "end": 0.551,
+                "text": "to",
+                "speaker_id": "speaker_1"
+              }
+            ]
+          },
+          {
+            "confidence": 0.85,
+            "confidence_kind": "model_probability",
+            "id": "seg_0002",
+            "start": 2.43,
+            "end": 2.73,
+            "text": "the alarm test is scheduled for monday morning",
+            "language": "en",
+            "speaker_id": "speaker_1",
+            "words": [
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 2.43,
+                "end": 2.468,
+                "text": "the",
+                "speaker_id": "speaker_1"
+              },
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 2.468,
+                "end": 2.505,
+                "text": "alarm",
+                "speaker_id": "speaker_1"
+              },
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 2.505,
+                "end": 2.542,
+                "text": "test",
+                "speaker_id": "speaker_1"
+              }
+            ]
+          },
+          {
+            "confidence": 0.85,
+            "confidence_kind": "model_probability",
+            "id": "seg_0003",
+            "start": 3.06,
+            "end": 3.99,
+            "text": "we need to finish the report by friday",
+            "language": "en",
+            "speaker_id": "speaker_1",
+            "words": [
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 3.06,
+                "end": 3.176,
+                "text": "we",
+                "speaker_id": "speaker_1"
+              },
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 3.176,
+                "end": 3.292,
+                "text": "need",
+                "speaker_id": "speaker_1"
+              },
+              {
+                "confidence": 0.8,
+                "confidence_kind": "model_probability",
+                "start": 3.292,
+                "end": 3.409,
+                "text": "to",
+                "speaker_id": "speaker_1"
+              }
+            ]
+          }
+        ]
+      },
+      "speakers": {
+        "speakers": [
+          {
+            "speaker_id": "speaker_1",
+            "first_seen": 0.09,
+            "last_seen": 9.12,
+            "total_speech_seconds": 4.77
+          }
+        ],
+        "turns": [
+          {
+            "speaker_id": "speaker_1",
+            "start": 0.09,
+            "end": 1.32
+          },
+          {
+            "speaker_id": "speaker_1",
+            "start": 2.43,
+            "end": 2.73
+          },
+          {
+            "speaker_id": "speaker_1",
+            "start": 3.06,
+            "end": 3.99
+          }
+        ],
+        "overlaps": null,
+        "overlap_supported": false
+      },
+      "sound_events": [
+        {
+          "confidence": 0.9,
+          "confidence_kind": "model_probability",
+          "id": "evt_0001",
+          "label": "Speech",
+          "start": 0.0,
+          "end": 4.5,
+          "source": "panns"
+        },
+        {
+          "confidence": 0.7,
+          "confidence_kind": "model_probability",
+          "id": "evt_0002",
+          "label": "Silence",
+          "start": 4.0,
+          "end": 5.0,
+          "source": "panns"
+        },
+        {
+          "confidence": 0.5,
+          "confidence_kind": "model_probability",
+          "id": "evt_0003",
+          "label": "Noise",
+          "start": 4.5,
+          "end": 5.5,
+          "source": "panns"
+        }
+      ],
+      "acoustic_features": {
+        "units": {
+          "rms": "linear",
+          "rms_dbfs": "dBFS",
+          "peak_amplitude": "linear",
+          "per_channel_peak": "linear",
+          "crest_factor_db": "dB",
+          "clipping_ratio": "ratio",
+          "dc_offset": "linear",
+          "snr_db_estimate": "dB",
+          "silence_ratio": "ratio",
+          "silence_intervals": "seconds",
+          "spectral_centroid_hz": "Hz",
+          "spectral_bandwidth_hz": "Hz",
+          "spectral_rolloff_hz": "Hz",
+          "spectral_flatness": "ratio",
+          "zero_crossing_rate": "ratio",
+          "f0_mean_hz": "Hz",
+          "f0_median_hz": "Hz",
+          "f0_min_hz": "Hz",
+          "f0_max_hz": "Hz",
+          "f0_std_hz": "Hz",
+          "voiced_ratio": "ratio",
+          "tempo_bpm": "BPM",
+          "onset_rate_per_s": "per_second",
+          "band_energy": "ratio"
+        },
+        "values": {
+          "rms": 0.07255065741480302,
+          "rms_dbfs": -22.78717295733602,
+          "peak_amplitude": 0.822967529296875,
+          "per_channel_peak": [
+            0.822967529296875
+          ],
+          "crest_factor_db": 21.094826961086017,
+          "clipping_ratio": 0.0,
+          "dc_offset": 0.010997789110417664,
+          "snr_method": "vad",
+          "snr_db_estimate": 12.748349585521542,
+          "silence_ratio": 0.4762886597938144,
+          "silence_intervals": [
+            {
+              "start": 1.33,
+              "end": 2.445
+            },
+            {
+              "start": 2.74,
+              "end": 3.065
+            },
+            {
+              "start": 4.0,
+              "end": 5.085
+            }
+          ],
+          "spectral_centroid_hz": 1616.6726237651321,
+          "spectral_bandwidth_hz": 1481.8134043832556,
+          "spectral_rolloff_hz": 3146.25,
+          "spectral_flatness": 0.23362024038731743,
+          "zero_crossing_rate": 0.08945879933153361,
+          "f0_mean_hz": 158.63788447587868,
+          "f0_median_hz": 169.0226191763237,
+          "f0_min_hz": 74.28771285294061,
+          "f0_max_hz": 615.3846153846154,
+          "f0_std_hz": 77.55207931717752,
+          "voiced_ratio": 0.25496688741721857,
+          "tempo_bpm": 267.85714285714283,
+          "onset_rate_per_s": 1.9539661012591514,
+          "band_energy": {
+            "0-250": 0.4715005228918294,
+            "250-500": 0.318287505548476,
+            "500-1000": 0.12135417881934098,
+            "1000-2000": 0.049783783804859066,
+            "2000-4000": 0.018397408657133456,
+            "4000-8000": 0.02067660027836128
+          }
+        }
+      },
+      "audio_quality": {
+        "metrics": {
+          "clipping_ratio": 0.0,
+          "rms_dbfs": -22.78717295733602,
+          "silence_ratio": 0.4762886597938144,
+          "snr_db_estimate": 12.748349585521542,
+          "dc_offset": 0.010997789110417664,
+          "hum_excess_db": -7.1622612650552195,
+          "echo_autocorr_peak": 0.6579400581203376,
+          "rolloff99_hz": 4773.4375,
+          "channels": 1
+        },
+        "issues": [
+          {
+            "code": "HIGH_NOISE",
+            "severity": "medium",
+            "message": "Estimated SNR is low (vad estimate).",
+            "measured": 12.74835,
+            "threshold": 15
+          },
+          {
+            "code": "ECHO",
+            "severity": "medium",
+            "message": "Possible echo/reverberation (heuristic indicator).",
+            "measured": 0.65794,
+            "threshold": 0.5
+          },
+          {
+            "code": "DC_OFFSET",
+            "severity": "medium",
+            "message": "DC offset present.",
+            "measured": 0.010998,
+            "threshold": 0.01
+          }
+        ],
+        "recommendations": [
+          "denoise",
+          "remove_dc"
+        ],
+        "overall": "fair"
+      },
+      "timeline": {
+        "duration_seconds": 9.724,
+        "nodes": [
+          {
+            "id": "seg_0001",
+            "type": "speech_segment",
+            "label": "we need to finish the report by friday",
+            "start": 0.09,
+            "end": 1.32,
+            "source": "transcription",
+            "speaker_id": "speaker_1",
+            "confidence": 0.85,
+            "confidence_kind": "model_probability"
+          },
+          {
+            "id": "turn_0001",
+            "type": "speaker_turn",
+            "label": "speaker_1",
+            "start": 0.09,
+            "end": 1.32,
+            "source": "diarization",
+            "speaker_id": "speaker_1"
+          },
+          {
+            "id": "sil_0001",
+            "type": "silence",
+            "label": "silence",
+            "start": 1.33,
+            "end": 2.445,
+            "source": "features"
+          }
+        ],
+        "edges": [
+          {
+            "source": "seg_0001",
+            "target": "sil_0001",
+            "relation": "precedes",
+            "gap_seconds": 0.01
+          },
+          {
+            "source": "turn_0001",
+            "target": "sil_0001",
+            "relation": "precedes",
+            "gap_seconds": 0.01
+          },
+          {
+            "source": "sil_0001",
+            "target": "sil_0002",
+            "relation": "precedes",
+            "gap_seconds": 0.295
+          }
+        ],
+        "text": "00:00.1–00:01.3  speech_segment  we need to finish the report by friday (speaker_1) (0.85)\n00:00.1–00:01.3  speaker_turn  speaker_1\n00:01.3–00:02.4  silence  silence\n00:02.4–00:02.7  speech_segment  t..."
+      },
+      "uncertainty": {
+        "items": [],
+        "summary": {
+          "low_confidence_word_ratio": 0.0,
+          "conflict_count": 0,
+          "asr_cross_check": null
+        }
+      },
+      "summary": {
+        "text": "we need to finish the report by friday we need to finish the report by friday",
+        "sentences": [
+          {
+            "text": "we need to finish the report by friday",
+            "evidence_ids": [
+              "seg_0001"
+            ]
+          },
+          {
+            "text": "we need to finish the report by friday",
+            "evidence_ids": [
+              "seg_0003"
+            ]
+          }
+        ],
+        "topics": [
+          {
+            "label": "finish",
+            "evidence_ids": [
+              "seg_0001",
+              "seg_0003",
+              "seg_0005"
+            ]
+          },
+          {
+            "label": "friday",
+            "evidence_ids": [
+              "seg_0001",
+              "seg_0003",
+              "seg_0005"
+            ]
+          },
+          {
+            "label": "need",
+            "evidence_ids": [
+              "seg_0001",
+              "seg_0003",
+              "seg_0005"
+            ]
+          }
+        ],
+        "key_moments": [
+          {
+            "timestamp": 0.09,
+            "description": "Speech begins",
+            "evidence_ids": [
+              "seg_0001"
+            ]
+          }
+        ],
+        "method": "extractive"
+      },
+      "speech_characteristics": {
+        "words_per_minute": 503.1,
+        "articulation_rate_wpm": 4705.9,
+        "pause_count": 4,
+        "mean_pause_seconds": 1.065,
+        "long_pauses": [
+          {
+            "start": 1.32,
+            "end": 2.43
+          },
+          {
+            "start": 3.99,
+            "end": 5.7
+          },
+          {
+            "start": 6.81,
+            "end": 7.92
+          }
+        ],
+        "f0_range_hz": 541.1,
+        "f0_std_hz": 77.55207931717752,
+        "notes": "emotion and tone are not inferred",
+        "per_speaker": {
+          "speaker_1": {
+            "words": 40,
+            "words_per_minute": 503.1
+          }
+        }
+      }
+    },
+    "warnings": [
+      {
+        "code": "OVERLAP_UNSUPPORTED",
+        "message": "overlapping speech is not detected by the ECAPA backend"
+      }
+    ],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.281,
+      "stages_run": [
+        "metadata",
+        "features",
+        "quality"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [
+        "vad"
+      ],
+      "models_used": [
+        {
+          "stage": "asr",
+          "name": "fake-asr",
+          "version": "1",
+          "local": true
+        },
+        {
+          "stage": "speaker",
+          "name": "fake-speaker",
+          "version": "1",
+          "local": true
+        },
+        {
+          "stage": "tagger",
+          "name": "fake-tagger",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": [
+        {
+          "task": "acoustic_features",
+          "reason": "cheap; always run"
+        },
+        {
+          "task": "audio_quality",
+          "reason": "cheap; always run"
+        },
+        {
+          "task": "transcription",
+          "reason": "speech ratio 0.49 >= 0.2"
+        }
+      ]
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    }
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

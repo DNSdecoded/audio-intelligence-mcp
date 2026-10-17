@@ -1,0 +1,111 @@
+{
+  "request": {
+    "source": {
+      "type": "audio_id",
+      "audio_id": "aud_0fb68437fd577a5c"
+    },
+    "length": "short"
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_0fb68437fd577a5c",
+    "result": {
+      "text": "we need to finish the report by friday we need to finish the report by friday",
+      "sentences": [
+        {
+          "text": "we need to finish the report by friday",
+          "evidence_ids": [
+            "seg_0001"
+          ]
+        },
+        {
+          "text": "we need to finish the report by friday",
+          "evidence_ids": [
+            "seg_0003"
+          ]
+        }
+      ],
+      "topics": [
+        {
+          "label": "finish",
+          "evidence_ids": [
+            "seg_0001",
+            "seg_0003",
+            "seg_0005"
+          ]
+        },
+        {
+          "label": "friday",
+          "evidence_ids": [
+            "seg_0001",
+            "seg_0003",
+            "seg_0005"
+          ]
+        },
+        {
+          "label": "need",
+          "evidence_ids": [
+            "seg_0001",
+            "seg_0003",
+            "seg_0005"
+          ]
+        }
+      ],
+      "key_moments": [
+        {
+          "timestamp": 0.09,
+          "description": "Speech begins",
+          "evidence_ids": [
+            "seg_0001"
+          ]
+        }
+      ],
+      "method": "extractive"
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.0,
+      "stages_run": [
+        "summary"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [
+        "metadata",
+        "vad",
+        "features"
+      ],
+      "models_used": [
+        {
+          "stage": "text",
+          "name": "fake-text",
+          "version": "1",
+          "local": true
+        },
+        {
+          "stage": "text",
+          "name": "fake-text",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    }
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

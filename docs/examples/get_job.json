@@ -1,0 +1,136 @@
+{
+  "request": {
+    "job_id": "job_18f47d6841db"
+  },
+  "success": {
+    "status": "success",
+    "job_id": "job_18f47d6841db",
+    "result": {
+      "job_status": "done",
+      "progress": 1.0,
+      "tool": "transcribe_audio",
+      "response": {
+        "status": "success",
+        "audio_id": "aud_450af10d0835dcd6",
+        "result": {
+          "text": "we need to finish the report by friday the alarm test is scheduled for monday morning",
+          "segments": [
+            {
+              "confidence": 0.85,
+              "confidence_kind": "model_probability",
+              "id": "seg_0001",
+              "start": 0.09,
+              "end": 1.62,
+              "text": "we need to finish the report by friday",
+              "language": "en",
+              "words": [
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 0.09,
+                  "end": 0.281,
+                  "text": "we"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 0.281,
+                  "end": 0.473,
+                  "text": "need"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 0.473,
+                  "end": 0.664,
+                  "text": "to"
+                }
+              ]
+            },
+            {
+              "confidence": 0.85,
+              "confidence_kind": "model_probability",
+              "id": "seg_0002",
+              "start": 2.34,
+              "end": 4.17,
+              "text": "the alarm test is scheduled for monday morning",
+              "language": "en",
+              "words": [
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 2.34,
+                  "end": 2.569,
+                  "text": "the"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 2.569,
+                  "end": 2.797,
+                  "text": "alarm"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 2.797,
+                  "end": 3.026,
+                  "text": "test"
+                }
+              ]
+            }
+          ],
+          "language": "en",
+          "languages": [
+            {
+              "language": "en",
+              "start": 0.0,
+              "end": 4.833875,
+              "probability": 0.9
+            }
+          ],
+          "code_switching": false
+        },
+        "warnings": [],
+        "errors": [],
+        "processing": {
+          "duration_seconds": 0.156,
+          "stages_run": [],
+          "stages_skipped": [],
+          "cache_hits": [
+            "vad",
+            "transcription",
+            "language"
+          ],
+          "models_used": [],
+          "data_sent_off_machine": false,
+          "schema_version": "1.0",
+          "plan": null
+        }
+      }
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0,
+      "stages_run": [],
+      "stages_skipped": [],
+      "cache_hits": [],
+      "models_used": [],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "job_id": "job_000000000000"
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "JOB_NOT_FOUND",
+      "message": "unknown job job_000000000000",
+      "retryable": false
+    }
+  }
+}

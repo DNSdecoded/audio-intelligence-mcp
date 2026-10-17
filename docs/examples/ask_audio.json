@@ -1,0 +1,60 @@
+{
+  "request": {
+    "source": {
+      "type": "audio_id",
+      "audio_id": "aud_0fb68437fd577a5c"
+    },
+    "question": "When does someone mention the budget?"
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_0fb68437fd577a5c",
+    "result": {
+      "answer": "The recording does not contain a clear mention of the budget.",
+      "support": "insufficient",
+      "intent": "time_of_mention",
+      "evidence": []
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.0,
+      "stages_run": [
+        "timeline",
+        "uncertainty"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [
+        "metadata",
+        "vad",
+        "features"
+      ],
+      "models_used": [
+        {
+          "stage": "text",
+          "name": "fake-text",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    },
+    "question": "what happens?"
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}

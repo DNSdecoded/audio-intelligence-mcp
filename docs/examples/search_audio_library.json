@@ -1,0 +1,75 @@
+{
+  "request": {
+    "action": "index",
+    "paths": [
+      "./samples"
+    ]
+  },
+  "success": {
+    "status": "success",
+    "result": {
+      "indexed": [
+        {
+          "path": "./samples\\alarm.wav",
+          "audio_id": "aud_2e130551b6f3fd9a",
+          "segments": 4
+        },
+        {
+          "path": "./samples\\dialogue_2spk.wav",
+          "audio_id": "aud_0fb68437fd577a5c",
+          "segments": 9
+        },
+        {
+          "path": "./samples\\sine.wav",
+          "audio_id": "aud_8a84c21c384f272e",
+          "segments": 1
+        }
+      ],
+      "failed": []
+    },
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.999,
+      "stages_run": [
+        "aud_2e130551b6f3fd9a:transcription",
+        "aud_2e130551b6f3fd9a:language",
+        "aud_0fb68437fd577a5c:audio_embedding"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [
+        "aud_2e130551b6f3fd9a:vad",
+        "aud_2e130551b6f3fd9a:events",
+        "aud_2e130551b6f3fd9a:audio_embedding"
+      ],
+      "models_used": [
+        {
+          "stage": "asr",
+          "name": "fake-asr",
+          "version": "1",
+          "local": true
+        },
+        {
+          "stage": "tagger",
+          "name": "fake-tagger",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "action": "search"
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "INVALID_INPUT",
+      "message": "Value error, search needs query or query_audio",
+      "retryable": false
+    }
+  }
+}

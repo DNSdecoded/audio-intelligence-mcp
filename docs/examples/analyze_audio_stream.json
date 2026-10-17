@@ -1,0 +1,149 @@
+{
+  "request": {
+    "action": "finish",
+    "session_id": "str_7f508c5addee",
+    "tasks": [
+      "transcription"
+    ]
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_66761a01bd6eb6c6",
+    "warnings": [],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.172,
+      "stages_run": [
+        "metadata",
+        "vad",
+        "transcription"
+      ],
+      "stages_skipped": [],
+      "cache_hits": [],
+      "models_used": [
+        {
+          "stage": "vad",
+          "name": "energy-vad",
+          "version": "1",
+          "local": true
+        },
+        {
+          "stage": "asr",
+          "name": "fake-asr",
+          "version": "1",
+          "local": true
+        }
+      ],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    },
+    "result": {
+      "analysis": {
+        "audio_metadata": {
+          "format": "flac",
+          "codec": "flac",
+          "duration_seconds": 4.834,
+          "sample_rate_hz": 16000,
+          "channels": 1,
+          "bit_depth": 24,
+          "size_bytes": 73126
+        },
+        "transcription": {
+          "text": "we need to finish the report by friday the alarm test is scheduled for monday morning",
+          "segments": [
+            {
+              "confidence": 0.85,
+              "confidence_kind": "model_probability",
+              "id": "seg_0001",
+              "start": 0.09,
+              "end": 1.62,
+              "text": "we need to finish the report by friday",
+              "language": "en",
+              "words": [
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 0.09,
+                  "end": 0.281,
+                  "text": "we"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 0.281,
+                  "end": 0.473,
+                  "text": "need"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 0.473,
+                  "end": 0.664,
+                  "text": "to"
+                }
+              ]
+            },
+            {
+              "confidence": 0.85,
+              "confidence_kind": "model_probability",
+              "id": "seg_0002",
+              "start": 2.34,
+              "end": 4.17,
+              "text": "the alarm test is scheduled for monday morning",
+              "language": "en",
+              "words": [
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 2.34,
+                  "end": 2.569,
+                  "text": "the"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 2.569,
+                  "end": 2.797,
+                  "text": "alarm"
+                },
+                {
+                  "confidence": 0.8,
+                  "confidence_kind": "model_probability",
+                  "start": 2.797,
+                  "end": 3.026,
+                  "text": "test"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "session_id": "str_7f508c5addee",
+      "reconciliation": {
+        "transcript_word_difference_rate": 0.0,
+        "events_confirmed": [],
+        "events_added": [],
+        "events_dropped": [
+          {
+            "label": "Speech",
+            "start": 0.0,
+            "end": 4.5
+          }
+        ]
+      }
+    }
+  },
+  "error_request": {
+    "action": "status",
+    "session_id": "str_000000000000"
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "INVALID_INPUT",
+      "message": "unknown session",
+      "retryable": false
+    }
+  }
+}

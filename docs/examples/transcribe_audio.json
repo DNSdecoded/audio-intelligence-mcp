@@ -1,0 +1,200 @@
+{
+  "request": {
+    "source": {
+      "type": "audio_id",
+      "audio_id": "aud_0fb68437fd577a5c"
+    },
+    "diarize": true
+  },
+  "success": {
+    "status": "success",
+    "audio_id": "aud_0fb68437fd577a5c",
+    "result": {
+      "text": "we need to finish the report by friday the alarm test is scheduled for monday morning we need to finish the report by friday the alarm test is scheduled for monday morning we need to finish the report...",
+      "segments": [
+        {
+          "confidence": 0.85,
+          "confidence_kind": "model_probability",
+          "id": "seg_0001",
+          "start": 0.09,
+          "end": 1.32,
+          "text": "we need to finish the report by friday",
+          "language": "en",
+          "speaker_id": "speaker_1",
+          "words": [
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 0.09,
+              "end": 0.244,
+              "text": "we",
+              "speaker_id": "speaker_1"
+            },
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 0.244,
+              "end": 0.397,
+              "text": "need",
+              "speaker_id": "speaker_1"
+            },
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 0.397,
+              "end": 0.551,
+              "text": "to",
+              "speaker_id": "speaker_1"
+            }
+          ]
+        },
+        {
+          "confidence": 0.85,
+          "confidence_kind": "model_probability",
+          "id": "seg_0002",
+          "start": 2.43,
+          "end": 2.73,
+          "text": "the alarm test is scheduled for monday morning",
+          "language": "en",
+          "speaker_id": "speaker_1",
+          "words": [
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 2.43,
+              "end": 2.468,
+              "text": "the",
+              "speaker_id": "speaker_1"
+            },
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 2.468,
+              "end": 2.505,
+              "text": "alarm",
+              "speaker_id": "speaker_1"
+            },
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 2.505,
+              "end": 2.542,
+              "text": "test",
+              "speaker_id": "speaker_1"
+            }
+          ]
+        },
+        {
+          "confidence": 0.85,
+          "confidence_kind": "model_probability",
+          "id": "seg_0003",
+          "start": 3.06,
+          "end": 3.99,
+          "text": "we need to finish the report by friday",
+          "language": "en",
+          "speaker_id": "speaker_1",
+          "words": [
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 3.06,
+              "end": 3.176,
+              "text": "we",
+              "speaker_id": "speaker_1"
+            },
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 3.176,
+              "end": 3.292,
+              "text": "need",
+              "speaker_id": "speaker_1"
+            },
+            {
+              "confidence": 0.8,
+              "confidence_kind": "model_probability",
+              "start": 3.292,
+              "end": 3.409,
+              "text": "to",
+              "speaker_id": "speaker_1"
+            }
+          ]
+        }
+      ],
+      "language": "en",
+      "languages": [
+        {
+          "language": "en",
+          "start": 0.0,
+          "end": 9.7238125,
+          "probability": 0.9
+        }
+      ],
+      "code_switching": false,
+      "speakers": {
+        "speakers": [
+          {
+            "speaker_id": "speaker_1",
+            "first_seen": 0.09,
+            "last_seen": 9.12,
+            "total_speech_seconds": 4.77
+          }
+        ],
+        "turns": [
+          {
+            "speaker_id": "speaker_1",
+            "start": 0.09,
+            "end": 1.32
+          },
+          {
+            "speaker_id": "speaker_1",
+            "start": 2.43,
+            "end": 2.73
+          },
+          {
+            "speaker_id": "speaker_1",
+            "start": 3.06,
+            "end": 3.99
+          }
+        ],
+        "overlaps": null,
+        "overlap_supported": false
+      }
+    },
+    "warnings": [
+      {
+        "code": "OVERLAP_UNSUPPORTED",
+        "message": "overlapping speech is not detected by the ECAPA backend"
+      }
+    ],
+    "errors": [],
+    "processing": {
+      "duration_seconds": 0.015,
+      "stages_run": [],
+      "stages_skipped": [],
+      "cache_hits": [
+        "vad",
+        "transcription",
+        "language"
+      ],
+      "models_used": [],
+      "data_sent_off_machine": false,
+      "schema_version": "1.0",
+      "plan": null
+    }
+  },
+  "error_request": {
+    "source": {
+      "type": "file_path",
+      "path": "./outside_allowed_roots/x.wav"
+    }
+  },
+  "error": {
+    "status": "error",
+    "error": {
+      "code": "PATH_NOT_ALLOWED",
+      "message": "path is outside the allowed roots",
+      "retryable": false
+    }
+  }
+}
