@@ -53,12 +53,13 @@ class FakeASR(_Fake):
                      confidence=0.8, confidence_kind="model_probability")
                 for j, t in enumerate(toks)
             ] if word_timestamps else []
-            segs.append(Segment(id=f"seg_{i + 1}", start=r.start, end=r.end, text=text, language=lang,
+            segs.append(Segment(id=f"seg_{i + 1:04d}", start=r.start, end=r.end, text=text, language=lang,
                                 words=words, confidence=0.85, confidence_kind="model_probability"))
-            langs.append({"language": lang, "start": r.start, "end": r.end})
+            langs.append({"language": lang, "start": r.start, "end": r.end, "probability": 0.9})
         top = segs[0].language if segs else (language or "en")
         return ASRResult(segments=segs, language=top, language_probability=0.9,
-                         languages=langs if per_chunk_language else [])
+                         languages=langs if per_chunk_language else
+                         [{"language": top, "start": 0.0, "end": len(mono16k) / 16000, "probability": 0.9}])
 
 
 class FakeTagger(_Fake):

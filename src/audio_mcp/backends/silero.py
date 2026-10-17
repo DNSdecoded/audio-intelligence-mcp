@@ -11,9 +11,9 @@ class SileroVAD:
         self._model = None
 
     def available(self):
-        try:
-            import silero_vad  # noqa: F401
-        except ImportError:
+        from audio_mcp.backends.base import _importable
+
+        if not _importable("silero_vad"):
             return False, "silero_vad not installed (uv sync --extra models)"
         return True, None
 

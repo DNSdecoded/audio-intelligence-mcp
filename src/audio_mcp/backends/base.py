@@ -1,5 +1,5 @@
 """Backend protocols, result types and the registry."""
-import importlib
+import importlib.util
 from dataclasses import dataclass, field
 from typing import Literal, Protocol
 
@@ -114,10 +114,9 @@ class Backends:
 
 
 def _importable(module: str) -> bool:
-    try:
-        importlib.import_module(module)
-        return True
-    except ImportError:
+    try:  # find_spec: no import, so torch stays unloaded until a model is used
+        return importlib.util.find_spec(module) is not None
+    except (ImportError, ValueError, AttributeError):  # ValueError: sys.modules[name] is None
         return False
 
 

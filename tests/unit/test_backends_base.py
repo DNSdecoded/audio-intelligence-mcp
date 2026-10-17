@@ -62,6 +62,9 @@ def test_fake_asr_chunks_language_translate():
                          chunks=[Interval(start=0, end=1), Interval(start=1, end=2)])
     assert [s.language for s in r.segments] == ["en", "es"]
     assert r.segments[0].text.startswith("[en] ")
+    assert r.segments[0].id == "seg_0001"
+    one = b.asr.transcribe(np.zeros(32000, dtype=np.float32), chunks=[Interval(start=0, end=1)])
+    assert one.languages == [{"language": "en", "start": 0.0, "end": 2.0, "probability": 0.9}]
     assert r.segments[0].words[0].confidence_kind == "model_probability"
 
 
@@ -70,3 +73,11 @@ def test_fake_text_and_speaker():
     e = b.text.embed(["hello world", ""])
     assert e.shape == (2, 256) and np.linalg.norm(e[0]) == pytest.approx(1.0)
     assert b.speaker.embed([np.random.default_rng(0).standard_normal(16000)]).shape == (1, 64)
+
+
+def test_real_profile_does_not_import_torch(settings):
+    if "torch" in sys.modules:
+        pytest.skip("torch already imported")
+    settings.backend_profile = "real"
+    build_backends(settings)
+    assert "torch" not in sys.modules
