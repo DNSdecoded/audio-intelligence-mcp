@@ -24,3 +24,12 @@ def test_der_confusion_and_false_alarm():
 def test_load_rttm():
     turns = load_rttm(FIXTURES_DIR / "dialogue_2spk.rttm")
     assert len(turns) == 4 and turns[1] == {"speaker_id": "zira", "start": 2.356, "end": pytest.approx(4.59)}
+
+
+def test_event_prf():
+    from audio_mcp.eval.metrics import event_prf
+
+    ref = [{"label": "Dog", "start": 0, "end": 1}, {"label": "Car", "start": 2, "end": 3}]
+    hyp = [{"label": "dog", "start": 0.1, "end": 1.0}, {"label": "Car", "start": 5, "end": 6}]
+    assert event_prf(ref, hyp) == {"precision": .5, "recall": .5, "f1": .5, "tp": 1, "fp": 1, "fn": 1}
+    assert event_prf([], []) == {"precision": 0.0, "recall": 0.0, "f1": 0.0, "tp": 0, "fp": 0, "fn": 0}

@@ -69,3 +69,25 @@ def word_error_rate(ref: str, hyp: str) -> float:
             cur[j] = min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (rw != hw))
         prev = cur
     return prev[-1] / len(r)
+
+
+def _iou(a: dict, b: dict) -> float:
+    inter = max(0.0, min(a["end"], b["end"]) - max(a["start"], b["start"]))
+    union = max(a["end"], b["end"]) - min(a["start"], b["start"])
+    return inter / union if union > 0 else 0.0
+
+
+def event_prf(ref: list[dict], hyp: list[dict], *, iou: float = 0.5) -> dict:
+    """Event-level precision/recall/F1: same label (case-insensitive), greedy one-to-one matching by IoU."""
+    pairs = sorted(((_iou(r, h), i, j) for i, r in enumerate(ref) for j, h in enumerate(hyp)
+                    if r["label"].lower() == h["label"].lower()), reverse=True)
+    used_r, used_h = set(), set()
+    for v, i, j in pairs:
+        if v >= iou and i not in used_r and j not in used_h:
+            used_r.add(i)
+            used_h.add(j)
+    tp = len(used_r)
+    fp, fn = len(hyp) - tp, len(ref) - tp
+    p = tp / (tp + fp) if tp + fp else 0.0
+    r = tp / (tp + fn) if tp + fn else 0.0
+    return {"precision": p, "recall": r, "f1": 2 * p * r / (p + r) if p + r else 0.0, "tp": tp, "fp": fp, "fn": fn}
