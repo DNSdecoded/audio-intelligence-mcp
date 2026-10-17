@@ -39,8 +39,8 @@ def test_unavailable_backend_skipped(app, speech_en):
 
 
 def test_unregistered_stage_reported(app, speech_en):
-    o = run_analysis(app, src(speech_en), ["summary"], {})
-    assert {"stage": "summary", "reason": "not implemented in this version"} in o.processing.stages_skipped
+    o = run_analysis(app, src(speech_en), ["not_a_stage"], {})
+    assert {"stage": "not_a_stage", "reason": "not implemented in this version"} in o.processing.stages_skipped
 
 
 @pytest.mark.parametrize("name", ["short", "silence"])
