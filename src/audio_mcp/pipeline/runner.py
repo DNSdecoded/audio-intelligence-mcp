@@ -37,6 +37,7 @@ def run_analysis(app: AppContext, source: AudioSource, stages: list[str], option
     ctx.warnings.extend(warning("DECODE_WARNING", w) for w in audio.decode_warnings)
     ran, skipped, hits, errors = [], [], [], []
     bad: dict[str, str] = {}  # stage -> "failed" | "skipped"
+    tainted: set[str] = set()  # stages whose (degraded) result was not cached
     for done, name in enumerate(order, 1):
         if cancel_event is not None and cancel_event.is_set():
             raise AudioMCPError(ErrorCode.CANCELLED, "analysis cancelled")
@@ -45,7 +46,7 @@ def run_analysis(app: AppContext, source: AudioSource, stages: list[str], option
             skipped.append({"stage": name, "reason": "not implemented in this version"})
             bad[name] = "skipped"
         else:
-            _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors)
+            _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors, tainted)
         if progress:
             progress(done, len(order))
     results = {n: ctx.results[n] for n in order if n in ctx.results}
@@ -54,7 +55,7 @@ def run_analysis(app: AppContext, source: AudioSource, stages: list[str], option
     return AnalysisOutcome(record, results, info, ctx.warnings, errors)
 
 
-def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors):
+def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors, tainted):
     key = config_hash(stage.cfg(app, ctx.options))
     cached = app.cache.get(ctx.record.audio_id, stage.name, key)
     if cached is not None:
@@ -74,6 +75,7 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors):
             bad[stage.name] = "skipped"
             return
     n_warn = len(ctx.warnings)
+    ctx.no_cache = False
     try:
         ctx.results[stage.name] = _call_with_timeout(stage.fn, ctx, app.settings.stage_timeout_seconds)
     except AudioMCPError as e:
@@ -92,6 +94,11 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors):
         del ctx.warnings[n_warn:]
         return
     ran.append(stage.name)
+    # never cache a result built around a failure/fallback: a retry must recompute it
+    if (ctx.no_cache or any(d in bad or d in tainted for d in (*stage.deps, *stage.soft_deps))
+            or (stage.reads_all and (bad or tainted))):
+        tainted.add(stage.name)
+        return
     app.cache.put(ctx.record.audio_id, stage.name, key,
                   {"result": ctx.results[stage.name], "warnings": ctx.warnings[n_warn:]})
 

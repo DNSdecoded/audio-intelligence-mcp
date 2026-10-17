@@ -31,6 +31,7 @@ class StageContext:
     models_used: list[ModelInfo] = field(default_factory=list)
     warnings: list[dict] = field(default_factory=list)
     cancel_event: threading.Event | None = None
+    no_cache: bool = False  # a stage sets this when its result is a degraded fallback that must not be cached
 
 
 @dataclass
@@ -41,6 +42,7 @@ class Stage:
     cfg: Callable[[AppContext, dict], dict]
     backend: str | None = None  # Backends field that must be available
     soft_deps: tuple[str, ...] = ()  # scheduled first; their skip/failure does not skip this stage
+    reads_all: bool = False  # reads whatever other stages produced, so any failure in the run changes its output
 
 
 def _regions(ctx) -> list[Interval]:
@@ -64,6 +66,7 @@ def _vad(ctx):
         regions = b.speech_regions(ctx.audio.mono16k)
     except Exception as e:  # any primary VAD failure falls back to the energy VAD
         ctx.warnings.append(warning("VAD_FALLBACK", f"primary VAD failed ({type(e).__name__}: {e}); used fallback VAD"))
+        ctx.no_cache = True  # cached under the primary VAD's key; a retry should try the primary again
         b = ctx.app.backends.vad_fallback
         regions = b.speech_regions(ctx.audio.mono16k)
     ctx.models_used.append(b.info)
@@ -238,18 +241,18 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
           lambda a, o: {**_asr_cfg(a, o), **_diar_cfg(a, o), "tagger": _id(a.backends.tagger),
                         "threshold": _threshold(a, o), "diarize": bool(o.get("diarize")),
                         "include": sorted(o.get("timeline_include") or [])},
-          soft_deps=("vad", "transcription", "events")),
+          soft_deps=("vad", "transcription", "events"), reads_all=True),
     Stage("uncertainty", ("transcription", "vad"), _uncertainty,
           lambda a, o: {**_asr_cfg(a, o), "budget": o.get("budget"), "low": a.settings.low_confidence_threshold,
                         "with": [s for s in ("events", "quality") if s in o.get("_stages", [])],
-                        "tagger": _id(a.backends.tagger), "threshold": _threshold(a, o)}),
+                        "tagger": _id(a.backends.tagger), "threshold": _threshold(a, o)}, reads_all=True),
     Stage("summary", ("timeline",), _summary,
           lambda a, o: {**STAGES["timeline"].cfg(a, o), "text": _id(a.backends.text),
                         "length": o.get("summary_length") or "short", "focus": o.get("summary_focus"),
-                        "with": [s for s in ("diarization",) if s in o.get("_stages", [])]}),
+                        "with": [s for s in ("diarization",) if s in o.get("_stages", [])]}, reads_all=True),
     Stage("speech", ("transcription", "vad", "features"), _speech,
           lambda a, o: {**_asr_cfg(a, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS),
-                        "with": [s for s in ("speaker_assign",) if s in o.get("_stages", [])]}),
+                        "with": [s for s in ("speaker_assign",) if s in o.get("_stages", [])]}, reads_all=True),
     Stage("audio_embedding", (), _audio_embedding, lambda a, o: {"tagger": _id(a.backends.tagger)}, "tagger"),
     Stage("translation", ("transcription",), _translation, lambda a, o: {**_asr_cfg(a, o), "target": "en"}, "asr"),
     Stage("integrity", ("metadata",), _integrity, lambda a, o: {"rules": 1}),

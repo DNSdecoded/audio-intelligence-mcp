@@ -104,3 +104,35 @@ def test_progress_ends_at_total(app, speech_en):
     calls = []
     run_analysis(app, src(speech_en), ["transcription", "language"], {}, progress=lambda d, t: calls.append((d, t)))
     assert calls == [(1, 3), (2, 3), (3, 3)]
+
+
+def test_late_stage_not_cached_after_failed_dep(app, speech_en, monkeypatch):  # I1
+    with monkeypatch.context() as m:
+        m.setattr(app.backends.asr, "transcribe", _raise(RuntimeError("flaky")))
+        o1 = run_analysis(app, src(speech_en), ["timeline"], {})
+    assert o1.errors and not any(n["type"] == "speech_segment" for n in o1.results["timeline"]["nodes"])
+    o2 = run_analysis(app, src(speech_en), ["timeline"], {})
+    assert "timeline" in o2.processing.stages_run and "timeline" not in o2.processing.cache_hits
+    assert any(n["type"] == "speech_segment" for n in o2.results["timeline"]["nodes"])
+
+
+def test_vad_fallback_not_cached(app, speech_en):  # I1
+    real = app.backends.vad
+    calls = []
+
+    class Flaky:
+        info = ModelInfo(stage="vad", name="flaky-vad", version="1")
+        available = staticmethod(lambda: (True, None))
+
+        @staticmethod
+        def speech_regions(x):
+            calls.append(1)
+            if len(calls) == 1:
+                raise RuntimeError("onnx")
+            return real.speech_regions(x)
+
+    app.backends.vad = Flaky()
+    run_analysis(app, src(speech_en), ["features"], {})
+    o = run_analysis(app, src(speech_en), ["features"], {})
+    assert o.processing.cache_hits == [] and o.processing.stages_run == ["vad", "features"]
+    assert o.results["vad"]["backend"] == "flaky-vad" and len(calls) == 2
