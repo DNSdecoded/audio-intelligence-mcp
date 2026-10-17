@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     max_file_mb: int = 500
     max_upload_mb: int = 50
-    max_duration_seconds: float = 14400
+    max_duration_seconds: float = 7200
 
     allow_url_fetch: bool = False
     url_timeout_seconds: float = 30

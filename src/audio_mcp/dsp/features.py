@@ -28,29 +28,33 @@ def _frames(x, size, hop):
 
 
 def frame_rms(x, sr, win=0.025, hop=0.010):
-    x = np.asarray(x, dtype=np.float64)
+    x = np.asarray(x, dtype=np.float32)
     if x.ndim == 2:
         x = x.mean(axis=0)
-    fr = _frames(x, max(1, round(win * sr)), max(1, round(hop * sr)))
-    return np.sqrt((fr ** 2).mean(axis=1))
+    size = max(1, round(win * sr))
+    fr = _frames(x, size, max(1, round(hop * sr)))
+    out, rows = np.empty(len(fr)), max(1, (1 << 20) // size)  # float64 math per block of ~1M samples only
+    for i in range(0, len(fr), rows):
+        out[i:i + rows] = np.sqrt(np.square(fr[i:i + rows], dtype=np.float64).mean(axis=1))
+    return out
 
 
 def _level(m, native, sr, regions):
-    rms, peak = float(np.sqrt((m ** 2).mean())), float(np.abs(m).max())
+    p = np.square(m)
+    rms, peak = float(np.sqrt(p.mean(dtype=np.float64))), float(np.abs(m).max())
     v = {
         "rms": rms, "rms_dbfs": _db(rms, 1, 20), "peak_amplitude": peak,
         "per_channel_peak": [float(np.abs(c).max()) for c in native],
         "crest_factor_db": _db(peak, rms, 20),
-        "clipping_ratio": float((np.abs(m) >= 0.999).mean()), "dc_offset": float(m.mean()),
+        "clipping_ratio": float((np.abs(m) >= 0.999).mean()), "dc_offset": float(m.mean(dtype=np.float64)),
     }
     if regions:
         mask = np.zeros(len(m), bool)
         for r in regions:
             mask[int(r.start * sr):int(r.end * sr)] = True
-        p = m ** 2
         v["snr_method"] = "vad"
         ok = mask.any() and not mask.all()
-        v["snr_db_estimate"] = _db(p[mask].mean(), p[~mask].mean()) if ok else None
+        v["snr_db_estimate"] = _db(p[mask].mean(dtype=np.float64), p[~mask].mean(dtype=np.float64)) if ok else None
     else:
         p = frame_rms(m, sr) ** 2
         v["snr_method"] = "percentile"
@@ -129,6 +133,7 @@ def _yin(m, sr, fmin=50, fmax=600, thr=0.15, size=1024, hop=256):
 
 def _yin_block(fr, sr, fmin, fmax, thr, size):
     w, tmax, tmin = size // 2, int(sr / fmin), int(sr / fmax)
+    fr = fr.astype(np.float64)  # per block: keeps the YIN difference function precise
     a, nfft = fr[:, :w], 2048
     r = np.fft.irfft(np.conj(np.fft.rfft(a, nfft, axis=1)) * np.fft.rfft(fr, nfft, axis=1), nfft, axis=1)[:, :tmax + 1]
     cs = np.concatenate([np.zeros((len(fr), 1)), np.cumsum(fr ** 2, axis=1)], axis=1)
@@ -150,7 +155,7 @@ def _yin_block(fr, sr, fmin, fmax, thr, size):
 
 
 def _pitch(m, sr):
-    y = resample(m.astype(np.float32), sr, 16000).astype(np.float64)
+    y = resample(m.astype(np.float32, copy=False), sr, 16000)
     f0 = _yin(y, 16000)
     voiced = f0[f0 > 0]
     ratio = len(voiced) / len(f0)
@@ -199,8 +204,9 @@ _UNITS = {
 
 
 def extract_features(native, sr, groups=FEATURE_GROUPS, speech_regions=None):
-    native = np.atleast_2d(np.asarray(native, dtype=np.float64))
-    m = native.mean(axis=0)
+    # float32 throughout (half the RAM of float64); reductions accumulate in float64
+    native = np.atleast_2d(np.asarray(native, dtype=np.float32))
+    m = native[0] if len(native) == 1 else native.mean(axis=0, dtype=np.float32)
     fns = {
         "level": lambda: _level(m, native, sr, speech_regions), "silence": lambda: _silence(m, sr),
         "spectral": lambda: _spectral(m, sr), "pitch": lambda: _pitch(m, sr),

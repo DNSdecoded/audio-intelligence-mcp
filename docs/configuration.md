@@ -14,7 +14,7 @@ environment variables `AUDIO_MCP_<NAME>` (list values as JSON, e.g. `AUDIO_MCP_A
 | `models_dir` | `AUDIO_MCP_MODELS_DIR` | `Path \| None` | `""` | model cache (default: data_dir/models) |
 | `max_file_mb` | `AUDIO_MCP_MAX_FILE_MB` | `int` | `500` | reject files larger than this |
 | `max_upload_mb` | `AUDIO_MCP_MAX_UPLOAD_MB` | `int` | `50` | max size for uploaded/base64 audio |
-| `max_duration_seconds` | `AUDIO_MCP_MAX_DURATION_SECONDS` | `float` | `14400` | reject audio longer than this |
+| `max_duration_seconds` | `AUDIO_MCP_MAX_DURATION_SECONDS` | `float` | `7200` | reject audio longer than this |
 | `allow_url_fetch` | `AUDIO_MCP_ALLOW_URL_FETCH` | `bool` | `false` | allow fetching audio from URLs |
 | `url_timeout_seconds` | `AUDIO_MCP_URL_TIMEOUT_SECONDS` | `float` | `30` | URL fetch timeout |
 | `ffmpeg_path` | `AUDIO_MCP_FFMPEG_PATH` | `Path \| None` | `""` | explicit ffmpeg binary (default: PATH) |

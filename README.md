@@ -127,7 +127,7 @@ TOML file (`AUDIO_MCP_CONFIG=/path/config.toml`, see `config.example.toml`) and/
 | Setting | Default | |
 |---|---|---|
 | `allowed_roots` | home dir | folders audio may be read from |
-| `max_file_mb` / `max_upload_mb` / `max_duration_seconds` | 500 / 50 / 14400 | input limits |
+| `max_file_mb` / `max_upload_mb` / `max_duration_seconds` | 500 / 50 / 7200 | input limits |
 | `allow_url_fetch` | false | URL sources (private/loopback/metadata IPs always blocked) |
 | `asr_model` | `small` | faster-whisper size (`tiny` … `large-v3`) |
 | `async_threshold_seconds` | 600 | longer audio runs as a job (`async_mode: "auto"`) |
@@ -152,7 +152,13 @@ TOML file (`AUDIO_MCP_CONFIG=/path/config.toml`, see `config.example.toml`) and/
 
 Any audio ffmpeg can decode: WAV, FLAC, MP3, OGG/Opus, M4A/AAC, WebM, AIFF, WMA, and more; any sample rate and
 channel count (models get a 16 kHz mono mix; measurements use the native signal). Sources: `file_path`,
-`base64`, `url` (off by default), `audio_id`.
+`base64`, `url` (off by default), `audio_id`. Playlist and concat inputs (HLS `.m3u8`, ffconcat, DASH, image
+sequences) are rejected because they make ffmpeg read other files.
+
+Limits and memory: audio longer than `max_duration_seconds` (default 7200 s = 2 h) is rejected. Decoded audio is
+held in RAM as float32 at the native rate plus a 16 kHz mono copy: about 1.6 GB per hour of 48 kHz stereo
+(about 0.9 GB per hour of 44.1 kHz mono), with transient peaks of roughly 2-3x that during decoding and feature
+extraction. The two most recently used recordings stay decoded in memory. Raise the limit only with RAM to match.
 
 Language coverage follows Whisper (≈ 99 languages); translation is to English only.
 

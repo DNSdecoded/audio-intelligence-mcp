@@ -81,3 +81,9 @@ def test_playlist_outside_roots_rejected(synth, settings, tmp_path_factory):  # 
     r = extract_audio_features(app, FeaturesRequest(source={"type": "file_path", "path": str(inside)}))
     assert r["status"] == "error" and r["error"]["code"] in ("UNSUPPORTED_AUDIO_FORMAT", "CORRUPT_AUDIO")
     assert app.store.list_ids() == []
+
+
+def test_decode_single_writable_float32_copy(synth, settings):  # I2
+    d = decode(synth["speech_en.flac"], probe(synth["speech_en.flac"], settings), settings)
+    for a in (d.native, d.mono16k):
+        assert a.dtype == np.float32 and a.flags.c_contiguous and a.flags.writeable and a.flags.owndata

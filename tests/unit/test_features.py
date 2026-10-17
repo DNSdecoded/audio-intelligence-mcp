@@ -63,3 +63,13 @@ def test_bands_clipped_to_nyquist(synth):
     b = extract_features(*load(synth["multichannel"]), ["bands"])["values"]["band_energy"]
     assert list(b) == ["0-250", "250-500", "500-1000", "1000-2000", "2000-4000"]
     assert abs(sum(b.values()) - 1) < 1e-6
+
+
+def test_float32_matches_float64(synth):  # I2: float32 path keeps precision
+    import soundfile as sf
+
+    x, sr = sf.read(synth["speech_en.flac"], always_2d=True)
+    a = extract_features(x.T.astype(np.float64), sr)["values"]
+    b = extract_features(x.T.astype(np.float32), sr)["values"]
+    for k in ("rms_dbfs", "snr_db_estimate", "silence_ratio", "spectral_centroid_hz", "f0_median_hz"):
+        assert a[k] == pytest.approx(b[k], rel=1e-3, abs=1e-3), k

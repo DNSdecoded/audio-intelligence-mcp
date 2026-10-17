@@ -6,7 +6,7 @@
 # models_dir = ""              # model cache (default: data_dir/models)
 max_file_mb = 500              # reject files larger than this
 max_upload_mb = 50             # max size for uploaded/base64 audio
-max_duration_seconds = 14400   # reject audio longer than this
+max_duration_seconds = 7200    # reject audio longer than this
 allow_url_fetch = false        # allow fetching audio from URLs
 url_timeout_seconds = 30       # URL fetch timeout
 # ffmpeg_path = ""             # explicit ffmpeg binary (default: PATH)
