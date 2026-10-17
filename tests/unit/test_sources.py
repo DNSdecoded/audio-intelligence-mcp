@@ -132,3 +132,110 @@ def test_url_blocked_addresses(settings, host):
         materialize_source(UrlSource(type="url", url=f"http://{host}/a.wav"), settings)
     assert e.value.code == ErrorCode.URL_FETCH_FAILED
     assert "blocked address" in e.value.message
+
+
+@pytest.mark.parametrize(
+    "ip,blocked",
+    [
+        ("100.100.100.200", True),
+        ("100.64.0.1", True),
+        ("::ffff:127.0.0.1", True),
+        ("192.0.0.8", True),
+        ("64:ff9b::7f00:1", True),
+        ("2002:7f00:1::", True),
+        ("169.254.169.254", True),
+        ("10.0.0.1", True),
+        ("8.8.8.8", False),
+    ],
+)
+def test_blocked_ips(ip, blocked):
+    from audio_mcp.ingest.sources import _blocked
+
+    assert _blocked(ip) is blocked
+
+
+@pytest.fixture
+def fetch(settings, monkeypatch):
+    import httpx
+
+    from audio_mcp.ingest import sources
+
+    settings.allow_url_fetch = True
+    monkeypatch.setattr(
+        sources.socket, "getaddrinfo", lambda *a, **k: [(2, 1, 6, "", ("8.8.8.8", 80))]
+    )
+
+    def run(handler, url="http://example.org/clip.mp3"):
+        monkeypatch.setattr(
+            sources,
+            "_make_client",
+            lambda t: httpx.Client(transport=httpx.MockTransport(handler), follow_redirects=False),
+        )
+        return materialize_source(UrlSource(type="url", url=url), settings)
+
+    return run
+
+
+def test_url_ok_extension_and_bytes(fetch):
+    import httpx
+
+    m = fetch(lambda r: httpx.Response(200, content=b"data"))
+    assert m.path.suffix == ".mp3" and m.path.read_bytes() == b"data" and m.is_temp
+
+
+def test_url_ok_bad_extension(fetch):
+    import httpx
+
+    m = fetch(lambda r: httpx.Response(200, content=b"d"), url="http://example.org/clip")
+    assert m.path.suffix == ".bin"
+
+
+def test_url_too_large_leaves_no_file(fetch, settings):
+    import httpx
+
+    settings.max_file_mb = 1
+    with pytest.raises(AudioMCPError) as e:
+        fetch(lambda r: httpx.Response(200, content=b"x" * (2 * 2**20)))
+    assert e.value.code == ErrorCode.FILE_TOO_LARGE
+    assert list(settings.resolved_temp_dir.iterdir()) == []
+
+
+def test_url_redirect_not_followed(fetch):
+    import httpx
+
+    with pytest.raises(AudioMCPError) as e:
+        fetch(lambda r: httpx.Response(302, headers={"location": "http://127.0.0.1/"}))
+    assert e.value.code == ErrorCode.URL_FETCH_FAILED and "redirect" in e.value.message
+
+
+def test_url_timeout_retryable(fetch):
+    import httpx
+
+    def boom(r):
+        raise httpx.ReadTimeout("slow")
+
+    with pytest.raises(AudioMCPError) as e:
+        fetch(boom)
+    assert e.value.code == ErrorCode.URL_FETCH_FAILED and e.value.retryable
+
+
+@pytest.mark.parametrize("status,retryable", [(404, False), (503, True)])
+def test_url_status_retryable(fetch, status, retryable):
+    import httpx
+
+    with pytest.raises(AudioMCPError) as e:
+        fetch(lambda r: httpx.Response(status))
+    assert e.value.retryable is retryable
+
+
+def test_url_deadline(fetch, settings, monkeypatch):
+    import httpx
+
+    from audio_mcp.ingest import sources
+
+    settings.url_timeout_seconds = 0
+    t = iter([0.0] + [10.0] * 50)
+    monkeypatch.setattr(sources.time, "monotonic", lambda: next(t))
+    with pytest.raises(AudioMCPError) as e:
+        fetch(lambda r: httpx.Response(200, content=b"x"))
+    assert e.value.retryable and list(settings.resolved_temp_dir.iterdir()) == []

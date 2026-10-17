@@ -5,6 +5,7 @@ import os
 import re
 import socket
 import sys
+import time
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
@@ -52,6 +53,7 @@ class MaterializedSource:
 
 
 _EXT_RE = re.compile(r"\.[A-Za-z0-9]{1,5}")
+_NAT64 = ipaddress.ip_network("64:ff9b::/96")
 
 
 def _norm(p: Path) -> Path:
@@ -102,12 +104,20 @@ def _from_base64(src: Base64Source, settings: Settings) -> MaterializedSource:
 
 def _blocked(ip: str) -> bool:
     a = ipaddress.ip_address(ip.split("%")[0])
-    if isinstance(a, ipaddress.IPv6Address) and a.ipv4_mapped:
-        a = a.ipv4_mapped
-    return (
-        a.is_private or a.is_loopback or a.is_link_local or a.is_reserved
-        or a.is_multicast or a.is_unspecified
-    )
+    if isinstance(a, ipaddress.IPv6Address):
+        # Unwrap embedded IPv4 (mapped, NAT64 64:ff9b::/96, 6to4 2002::/16) and re-check it.
+        if a.ipv4_mapped:
+            return _blocked(str(a.ipv4_mapped))
+        if a in _NAT64:
+            return _blocked(str(ipaddress.IPv4Address(int(a) & 0xFFFFFFFF)))
+        if a.sixtofour:
+            return _blocked(str(a.sixtofour))
+    return not a.is_global or a.is_multicast
+
+
+def _make_client(timeout: float) -> httpx.Client:
+    # Seam for tests (MockTransport). trust_env=False: env proxies must not bypass the IP vetting.
+    return httpx.Client(follow_redirects=False, timeout=timeout, trust_env=False)
 
 
 def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
@@ -126,19 +136,28 @@ def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
     ext = Path(parsed.path).suffix
     ext = ext if _EXT_RE.fullmatch(ext) else ".bin"
     out = settings.resolved_temp_dir / f"{uuid.uuid4().hex}{ext}"
+    deadline = time.monotonic() + settings.url_timeout_seconds
     try:
-        with httpx.stream(
-            "GET", src.url, follow_redirects=False, timeout=settings.url_timeout_seconds
-        ) as r:
+        with _make_client(settings.url_timeout_seconds) as client, client.stream("GET", src.url) as r:
+            if 300 <= r.status_code < 400:
+                raise AudioMCPError(
+                    ErrorCode.URL_FETCH_FAILED, f"HTTP {r.status_code}: redirects are not followed"
+                )
             if r.status_code != 200:
                 raise AudioMCPError(
-                    ErrorCode.URL_FETCH_FAILED, f"unexpected HTTP status {r.status_code}", retryable=True
+                    ErrorCode.URL_FETCH_FAILED,
+                    f"unexpected HTTP status {r.status_code}",
+                    retryable=r.status_code >= 500,
                 )
             total = 0
             with out.open("wb") as fh:
                 for chunk in r.iter_bytes():
                     total += len(chunk)
                     _check_size(total, settings.max_file_mb)
+                    if time.monotonic() > deadline:
+                        raise AudioMCPError(
+                            ErrorCode.URL_FETCH_FAILED, "download timed out", retryable=True
+                        )
                     fh.write(chunk)
     except AudioMCPError:
         out.unlink(missing_ok=True)
