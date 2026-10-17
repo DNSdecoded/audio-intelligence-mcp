@@ -12,8 +12,9 @@ from audio_mcp.ingest.decode import resample
 from audio_mcp.envelope import AudioMCPError, ErrorCode, build_response, error_response, warning
 from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
 from audio_mcp.pipeline.runner import run_analysis
+from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, TimelineRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -214,3 +215,29 @@ def get_audio_timeline(app, req: TimelineRequest) -> dict:
     stages = (["diarization", "speaker_assign"] if req.diarize else []) + ["timeline"]
     outcome = run_analysis(app, req.source, stages, {"diarize": req.diarize, "timeline_include": req.include})
     return _respond(outcome, outcome.results.get("timeline"))
+
+
+def text_embedder(app, outcome):
+    """The text embedder if usable; records it in models_used. Fake/real both qualify."""
+    b = app.backends.text
+    if not b.available()[0]:
+        return None
+    outcome.processing.models_used.append(b.info)
+    return b
+
+
+@tool_handler
+def ask_audio(app, req: AskRequest) -> dict:
+    if req.use_llm and not app.backends.llm.available()[0]:
+        raise AudioMCPError(ErrorCode.LLM_DISABLED, "use_llm requested but no LLM is configured (llm_provider=none)")
+    intent, _ = classify_intent(req.question)
+    diarize = intent in ("speakers", "change")
+    stages = (["diarization", "speaker_assign"] if diarize else []) + (["quality"] if intent == "unusual" else [])
+    stages += ["timeline", "uncertainty"]
+    outcome = run_analysis(app, req.source, stages, {"diarize": diarize})
+    audio = app.store.load(outcome.record.audio_id)
+    results = {**outcome.results, "metadata": {"duration_seconds": round(audio.duration, 3)}}
+    answer = answer_question(req.question, results, audio.duration, text_embedder(app, outcome), audio=audio)
+    if not req.include_evidence:
+        answer.pop("evidence")
+    return _respond(outcome, answer)

@@ -84,3 +84,10 @@ class TimelineRequest(_Req):
     source: AudioSource
     include: list[NodeType] | None = None
     diarize: bool = True
+
+
+class AskRequest(_Req):
+    source: AudioSource
+    question: str = Field(min_length=3, max_length=1000)
+    include_evidence: bool = True
+    use_llm: bool | None = None

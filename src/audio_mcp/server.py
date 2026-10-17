@@ -12,7 +12,7 @@ from audio_mcp.ingest.sources import AudioSource
 from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AsyncMode, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
     InspectQualityRequest, NodeType, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
@@ -123,6 +123,20 @@ async def get_audio_timeline(
     diarize: bool = True,
 ) -> dict:
     return await _run(handlers.get_audio_timeline, TimelineRequest, dict(source=source, include=include, diarize=diarize))
+
+
+@mcp.tool(name="ask_audio", description=(
+    "Answer a natural-language question about an audio source (e.g. when something is mentioned, what happens "
+    "before a sound, whether a sound is present) using timestamped evidence from the analysis. Says when the "
+    "recording does not support a reliable answer."))
+async def ask_audio(
+    source: AudioSource,
+    question: str,
+    include_evidence: bool = True,
+    use_llm: bool | None = None,
+) -> dict:
+    return await _run(handlers.ask_audio, AskRequest, dict(
+        source=source, question=question, include_evidence=include_evidence, use_llm=use_llm))
 
 
 def main() -> None:

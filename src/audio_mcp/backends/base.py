@@ -153,6 +153,12 @@ def build_backends(settings) -> Backends:
         speaker = EcapaEmbedder(settings)
     else:
         speaker = UnavailableBackend("ecapa", f"speechbrain {hint}")
+    if _importable("sentence_transformers"):
+        from audio_mcp.backends.text_embed import MiniLMEmbedder
+
+        text = MiniLMEmbedder(settings)
+    else:
+        text = UnavailableBackend("sentence-transformers", f"sentence_transformers {hint}")
     diarizer = None
     if settings.diarization_backend == "pyannote":
         from audio_mcp.backends.pyannote_diar import PyannoteDiarizer
@@ -165,6 +171,6 @@ def build_backends(settings) -> Backends:
         tagger=tagger,
         speaker=speaker,
         diarizer=diarizer,
-        text=UnavailableBackend("sentence-transformers", todo),
+        text=text,
         llm=NoLLM(),
     )
