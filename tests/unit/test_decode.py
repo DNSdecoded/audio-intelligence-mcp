@@ -37,3 +37,25 @@ def test_duration_limit(synth, settings):
     with pytest.raises(AudioMCPError) as e:
         probe(synth["sine"], settings)
     assert e.value.code == "DURATION_TOO_LONG"
+
+
+def test_partial_decode_warns(synth, settings, tmp_path):
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg absent")
+    b = synth["speech_en.mp3"].read_bytes()
+    p = tmp_path / "partial.mp3"
+    p.write_bytes(b[: int(len(b) * 0.9)] + b"garbage")
+    d = decode(p, probe(p, settings), settings)
+    assert isinstance(d.decode_warnings, list) and len(d.mono16k) > 0
+
+
+def test_timeout_code(synth, settings, monkeypatch):
+    import subprocess
+
+    def boom(*a, **k):
+        raise subprocess.TimeoutExpired("x", 1)
+
+    monkeypatch.setattr(subprocess, "run", boom)
+    with pytest.raises(AudioMCPError) as e:
+        probe(synth["sine"], settings)
+    assert e.value.code == "TIMEOUT" and e.value.retryable

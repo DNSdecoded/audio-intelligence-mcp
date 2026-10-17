@@ -1,8 +1,9 @@
 """Probe and decode audio via ffprobe/ffmpeg (arg lists only, never a shell)."""
 import json
+import math
 import shutil
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
@@ -26,7 +27,7 @@ def _run(args: list, timeout: float) -> subprocess.CompletedProcess:
     try:
         return subprocess.run([str(a) for a in args], capture_output=True, timeout=timeout, creationflags=_FLAGS)
     except subprocess.TimeoutExpired as exc:
-        raise AudioMCPError(ErrorCode.STAGE_FAILED, f"{Path(str(args[0])).name} timed out", retryable=True) from exc
+        raise AudioMCPError(ErrorCode.TIMEOUT, f"{Path(str(args[0])).name} timed out", retryable=True) from exc
 
 
 @dataclass
@@ -72,20 +73,23 @@ def probe(path: Path, settings: Settings) -> ProbeInfo:
         duration = float(s.get("duration") or fmt.get("duration") or 0)
     except ValueError:
         duration = 0.0
-    if duration <= 0:
+    if not math.isfinite(duration) or duration <= 0:
         raise AudioMCPError(ErrorCode.EMPTY_AUDIO, "audio has no duration")
     if duration > settings.max_duration_seconds:
         raise AudioMCPError(
             ErrorCode.DURATION_TOO_LONG,
             f"audio is {duration:.1f}s; limit is {settings.max_duration_seconds:.1f}s",
         )
+    sr, nch = int(s.get("sample_rate") or 0), int(s.get("channels") or 0)
+    if sr <= 0 or nch <= 0:
+        raise AudioMCPError(ErrorCode.UNSUPPORTED_AUDIO_FORMAT, "invalid sample rate or channel count")
     bits = int(s.get("bits_per_raw_sample") or 0) or int(s.get("bits_per_sample") or 0) or None
     return ProbeInfo(
         format_name=fmt.get("format_name", ""),
         codec=s.get("codec_name", ""),
         duration_seconds=duration,
-        sample_rate_hz=int(s.get("sample_rate") or 0),
-        channels=int(s.get("channels") or 0),
+        sample_rate_hz=sr,
+        channels=nch,
         bit_depth=bits,
         size_bytes=size,
     )
@@ -96,6 +100,7 @@ class DecodedAudio:
     native: np.ndarray  # float32 (channels, n)
     native_sr: int
     mono16k: np.ndarray  # float32 (n16,)
+    decode_warnings: list[str] = field(default_factory=list)
 
     @property
     def duration(self) -> float:
@@ -106,10 +111,14 @@ def decode(path: Path, info: ProbeInfo, settings: Settings) -> DecodedAudio:
     ffmpeg, _ = find_ffmpeg(settings)
     timeout = max(60.0, 2 * info.duration_seconds)
 
+    warnings: list[str] = []
+
     def run(*opts) -> np.ndarray:
-        r = _run([ffmpeg, "-v", "error", "-xerror", "-i", path, *opts, "-f", "f32le", "-acodec", "pcm_f32le", "-"], timeout)
+        r = _run([ffmpeg, "-v", "error", "-i", path, *opts, "-f", "f32le", "-acodec", "pcm_f32le", "-"], timeout)
         if r.returncode != 0:
             raise AudioMCPError(ErrorCode.CORRUPT_AUDIO, "ffmpeg could not decode the file")
+        if r.stderr.strip() and not warnings:
+            warnings.append("decoder reported errors; audio may be partially damaged")
         n = len(r.stdout) // 4
         if n == 0:
             raise AudioMCPError(ErrorCode.EMPTY_AUDIO, "decoded audio is empty")
@@ -119,7 +128,9 @@ def decode(path: Path, info: ProbeInfo, settings: Settings) -> DecodedAudio:
     flat = run("-ac", str(ch), "-ar", str(info.sample_rate_hz))
     native = flat[: len(flat) // ch * ch].reshape(-1, ch).T.copy()
     mono = run("-ac", "1", "-ar", "16000")
-    return DecodedAudio(native=native, native_sr=info.sample_rate_hz, mono16k=mono)
+    if len(mono) / 16000 < 0.5 * info.duration_seconds:
+        raise AudioMCPError(ErrorCode.CORRUPT_AUDIO, "less than half of the audio could be decoded")
+    return DecodedAudio(native=native, native_sr=info.sample_rate_hz, mono16k=mono, decode_warnings=warnings)
 
 
 def resample(x: np.ndarray, sr_from: int, sr_to: int) -> np.ndarray:
