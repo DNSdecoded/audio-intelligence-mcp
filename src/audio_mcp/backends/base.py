@@ -135,11 +135,16 @@ def build_backends(settings) -> Backends:
         vad = SileroVAD()
     else:
         vad = UnavailableBackend("silero-vad", f"silero_vad {hint}")
-    asr_reason = todo if _importable("faster_whisper") else f"faster_whisper {hint}"
+    if _importable("faster_whisper"):
+        from audio_mcp.backends.whisper import FasterWhisperASR
+
+        asr = FasterWhisperASR(settings)
+    else:
+        asr = UnavailableBackend("faster-whisper", f"faster_whisper {hint}")
     return Backends(
         vad=vad,
         vad_fallback=EnergyVAD(),
-        asr=UnavailableBackend("faster-whisper", asr_reason),
+        asr=asr,
         tagger=UnavailableBackend("panns", todo),
         speaker=UnavailableBackend("ecapa", todo),
         diarizer=None,
