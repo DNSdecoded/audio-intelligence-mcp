@@ -12,7 +12,7 @@ from audio_mcp.ingest.sources import AudioSource
 from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
     InspectQualityRequest, NodeType, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
@@ -150,6 +150,20 @@ async def summarize_audio(
 ) -> dict:
     return await _run(handlers.summarize_audio, SummarizeRequest, dict(
         source=source, length=length, focus=focus, use_llm=use_llm))
+
+
+@mcp.tool(name="compare_audio", description=(
+    "Compare two or more recordings (feature, band, event, transcript and embedding differences), or compare "
+    "recordings against baseline recordings to localize anomalous windows with z-scores. Measured differences are "
+    "kept separate from hedged interpretations."))
+async def compare_audio(
+    sources: list[AudioSource],
+    baseline: list[AudioSource] | None = None,
+    aspects: list[Literal["features", "events", "transcript", "embedding"]] | None = None,
+    z_threshold: float = 3.0,
+) -> dict:
+    return await _run(handlers.compare_audio, CompareRequest, dict(
+        sources=sources, baseline=baseline, aspects=aspects, z_threshold=z_threshold))
 
 
 def main() -> None:

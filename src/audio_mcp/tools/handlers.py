@@ -6,15 +6,16 @@ from pydantic import ValidationError
 import numpy as np
 
 from audio_mcp.analysis.events import EVENT_CATEGORIES
+from audio_mcp.compare.compare import baseline_anomalies, compare_pair, window_features
 from audio_mcp.dsp.features import extract_features
 from audio_mcp.dsp.preprocess import apply_preprocessing
 from audio_mcp.ingest.decode import resample
-from audio_mcp.envelope import AudioMCPError, ErrorCode, build_response, error_response, warning
+from audio_mcp.envelope import AudioMCPError, ErrorCode, ProcessingInfo, build_response, error_response, warning
 from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -258,3 +259,58 @@ def summarize_audio(app, req: SummarizeRequest) -> dict:
     outcome = run_analysis(app, req.source, ["timeline", "summary"],
                            {"summary_length": req.length, "summary_focus": req.focus})
     return _respond(outcome, outcome.results.get("summary"))
+
+
+def _merge_processing(outcomes) -> ProcessingInfo:
+    p = ProcessingInfo()
+    for o in outcomes:
+        q = o.processing
+        p.duration_seconds = round(p.duration_seconds + q.duration_seconds, 3)
+        p.stages_run += [f"{o.record.audio_id}:{s}" for s in q.stages_run]
+        p.cache_hits += [f"{o.record.audio_id}:{s}" for s in q.cache_hits]
+        p.stages_skipped += [{**s, "audio_id": o.record.audio_id} for s in q.stages_skipped]
+        p.models_used += [m for m in q.models_used if m not in p.models_used]
+    return p
+
+
+def _bundle(outcome, duration) -> dict:
+    r = outcome.results
+    return {"audio_id": outcome.record.audio_id, "duration": duration, "features": r.get("features") or {},
+            "events": (r.get("events") or {}).get("events", []),
+            "transcript": r["transcription"]["text"] if "transcription" in r else None,
+            "embedding": (r.get("audio_embedding") or {}).get("embedding")}
+
+
+@tool_handler
+def compare_audio(app, req: CompareRequest) -> dict:
+    aspects = set(req.aspects or ["features", "events", "embedding"])
+    stages = ["metadata", "features", "events", "audio_embedding"] + (["transcription"] if "transcript" in aspects else [])
+    outs = [run_analysis(app, s, stages, {}) for s in req.sources]
+    warns = [{**w, "audio_id": o.record.audio_id} for o in outs for w in o.warnings]
+    errors = [{**e, "audio_id": o.record.audio_id} for o in outs for e in o.errors]
+    result = {"audio_ids": [o.record.audio_id for o in outs]}
+    if req.baseline:
+        base_outs = [run_analysis(app, s, ["metadata"], {}) for s in req.baseline]
+
+        def wf(o):
+            a = app.store.load(o.record.audio_id)
+            return window_features(a.native, a.native_sr)
+
+        base = [wf(o) for o in base_outs]
+        result["baseline_ids"] = [o.record.audio_id for o in base_outs]
+        result["baseline"] = {o.record.audio_id: baseline_anomalies(wf(o), base, z_threshold=req.z_threshold)
+                              for o in outs}
+        outs_all = outs + base_outs
+    else:
+        bundles = [_bundle(o, app.store.load(o.record.audio_id).duration) for o in outs]
+        comps = []
+        for b in bundles[1:]:
+            c = compare_pair(bundles[0], b)
+            c["measured_differences"] = {k: v for k, v in c["measured_differences"].items()
+                                         if k in aspects or (k == "bands" and "features" in aspects)}
+            if "embedding" in aspects and not c["similarity"]:
+                warns.append(warning("EMBEDDING_UNAVAILABLE", "audio embeddings unavailable; similarity omitted"))
+            comps.append(c)
+        result["comparisons"] = comps
+        outs_all = outs
+    return build_response(result=result, warnings=warns, errors=errors, processing=_merge_processing(outs_all))

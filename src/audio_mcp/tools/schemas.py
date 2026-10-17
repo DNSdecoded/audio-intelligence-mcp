@@ -1,6 +1,6 @@
 from typing import Literal, get_args
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from audio_mcp.analysis.events import EVENT_CATEGORIES
 from audio_mcp.dsp.features import FEATURE_GROUPS
@@ -98,3 +98,16 @@ class SummarizeRequest(_Req):
     length: Literal["short", "medium", "long"] = "short"
     focus: str | None = Field(None, max_length=500)
     use_llm: bool | None = None
+
+
+class CompareRequest(_Req):
+    sources: list[AudioSource] = Field(min_length=1, max_length=10)
+    baseline: list[AudioSource] | None = Field(None, min_length=1, max_length=20)
+    aspects: list[Literal["features", "events", "transcript", "embedding"]] | None = None
+    z_threshold: float = Field(3.0, gt=0)
+
+    @model_validator(mode="after")
+    def _two_or_baseline(self):
+        if not self.baseline and len(self.sources) < 2:
+            raise ValueError("compare needs at least 2 sources, or 1+ sources and a baseline")
+        return self

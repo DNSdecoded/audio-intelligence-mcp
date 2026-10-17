@@ -183,6 +183,13 @@ def _speech(ctx):
     return speech_characteristics(ctx.results)
 
 
+def _audio_embedding(ctx):
+    t = ctx.app.backends.tagger
+    emb = t.embed(ctx.audio.mono16k)
+    ctx.models_used.append(t.info)
+    return {"embedding": [round(float(x), 6) for x in emb]}
+
+
 def _quality(ctx):
     return diagnose_quality(ctx.audio.native, ctx.audio.native_sr, ctx.results["features"]["values"], _regions(ctx))
 
@@ -223,6 +230,7 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("speech", ("transcription", "vad", "features"), _speech,
           lambda a, o: {**_asr_cfg(a, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS),
                         "with": [s for s in ("speaker_assign",) if s in o.get("_stages", [])]}),
+    Stage("audio_embedding", (), _audio_embedding, lambda a, o: {"tagger": _id(a.backends.tagger)}, "tagger"),
     Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),
