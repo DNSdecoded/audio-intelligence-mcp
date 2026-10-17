@@ -68,10 +68,18 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors):
     n_warn = len(ctx.warnings)
     try:
         ctx.results[stage.name] = stage.fn(ctx)
+    except AudioMCPError as e:
+        del ctx.warnings[n_warn:]
+        if e.code != ErrorCode.MODEL_UNAVAILABLE:
+            errors.append({**e.to_dict(), "stage": stage.name})
+            bad[stage.name] = "failed"
+        else:  # a model that can't load is a skip, not an error
+            skipped.append({"stage": stage.name, "reason": e.message})
+            bad[stage.name] = "skipped"
+        return
     except Exception as e:  # one stage failing must not abort the others
-        known = isinstance(e, AudioMCPError)
-        errors.append({"code": e.code.value if known else ErrorCode.STAGE_FAILED.value, "stage": stage.name,
-                       "message": str(e), "retryable": e.retryable if known else False})
+        errors.append({"code": ErrorCode.STAGE_FAILED.value, "stage": stage.name, "message": str(e),
+                       "retryable": False})
         bad[stage.name] = "failed"
         del ctx.warnings[n_warn:]
         return

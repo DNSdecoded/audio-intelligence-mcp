@@ -48,11 +48,15 @@ def _metadata(ctx):
 
 def _vad(ctx):
     b = ctx.app.backends.vad
-    ok, reason = b.available()
-    if not ok:
-        ctx.warnings.append(warning("VAD_FALLBACK", f"primary VAD unavailable ({reason}); used fallback VAD"))
+    try:
+        ok, reason = b.available()
+        if not ok:
+            raise RuntimeError(reason)
+        regions = b.speech_regions(ctx.audio.mono16k)
+    except Exception as e:  # any primary VAD failure falls back to the energy VAD
+        ctx.warnings.append(warning("VAD_FALLBACK", f"primary VAD failed ({type(e).__name__}: {e}); used fallback VAD"))
         b = ctx.app.backends.vad_fallback
-    regions = b.speech_regions(ctx.audio.mono16k)
+        regions = b.speech_regions(ctx.audio.mono16k)
     ctx.models_used.append(b.info)
     speech = sum(r.end - r.start for r in regions)
     return {"speech_regions": [r.model_dump(exclude_none=True) for r in regions],
