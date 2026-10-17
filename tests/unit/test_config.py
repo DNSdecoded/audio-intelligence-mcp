@@ -53,3 +53,10 @@ def test_missing_config_file_raises(tmp_path, monkeypatch):
     monkeypatch.setenv("AUDIO_MCP_CONFIG", str(tmp_path / "nope.toml"))
     with pytest.raises(FileNotFoundError):
         load_settings()
+
+
+def test_unknown_toml_key_rejected(tmp_path):  # M2
+    p = tmp_path / "c.toml"
+    p.write_text('max_upload_mb = 7\nmax_uplaod_mb = 9\n')
+    with pytest.raises(ValueError, match="max_uplaod_mb"):
+        load_settings(p)

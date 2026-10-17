@@ -3,6 +3,7 @@ import logging
 import sys
 
 REDACT = ("text", "transcript", "question", "answer")
+_NOISY = ("httpx", "httpcore", "urllib3", "huggingface_hub", "speechbrain", "mcp")  # per-request INFO chatter
 
 
 class JsonFormatter(logging.Formatter):
@@ -37,3 +38,5 @@ def setup_logging(settings) -> None:
             h.addFilter(RedactFilter())
         root.addHandler(h)
     root.setLevel(settings.log_level.upper())
+    for name in _NOISY:
+        logging.getLogger(name).setLevel(logging.WARNING)

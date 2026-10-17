@@ -1,4 +1,5 @@
 import os
+import tomllib
 import uuid
 from pathlib import Path
 from typing import Literal
@@ -106,6 +107,11 @@ def load_settings(config_path: Path | None = None) -> Settings:
 
     if path and not path.is_file():
         raise FileNotFoundError(f"config file not found: {path}")
+    if path:  # typos in the file must not be silently ignored (env vars may stay lenient)
+        with path.open("rb") as fh:
+            unknown = sorted(set(tomllib.load(fh)) - set(Settings.model_fields))
+        if unknown:
+            raise ValueError(f"unknown config key(s) in {path}: {', '.join(unknown)}")
 
     class _Settings(Settings):
         @classmethod
