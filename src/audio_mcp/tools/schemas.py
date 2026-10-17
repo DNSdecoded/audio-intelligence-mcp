@@ -158,3 +158,10 @@ class StreamRequest(_Req):
     data: str | None = None
     path: str | None = None
     tasks: list[TaskName] | Literal["auto"] = "auto"
+
+
+class ExportRequest(_Req):
+    audio_id: str = Field(pattern=r"^aud_[0-9a-f]{16}$")
+    format: Literal["json", "markdown", "srt", "vtt", "csv", "rttm"]
+    tasks: list[TaskName] | Literal["auto"] = "auto"
+    redact: bool = False

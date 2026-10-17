@@ -14,7 +14,7 @@ from audio_mcp.logging_setup import setup_logging
 from audio_mcp.store.retention import cleanup_temp, sweep
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, GetJobRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, ExportRequest, GetJobRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
     InspectQualityRequest, LibraryFilters, NodeType, SearchLibraryRequest, StreamRequest, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
@@ -227,6 +227,19 @@ async def analyze_audio_stream(
     return await _run(handlers.analyze_audio_stream, StreamRequest, dict(
         action=action, session_id=session_id, chunk_format=chunk_format, sample_rate_hz=sample_rate_hz,
         channels=channels, sample_format=sample_format, data=data, path=path, tasks=tasks))
+
+
+@mcp.tool(name="export_audio_analysis", description=(
+    "Export the analysis of a previously ingested audio_id to json, markdown, srt, vtt, csv or rttm in the "
+    "configured export directory, optionally redacted. Returns the file path, size and sha256."))
+async def export_audio_analysis(
+    audio_id: str,
+    format: Literal["json", "markdown", "srt", "vtt", "csv", "rttm"],
+    tasks: list[TaskName] | Literal["auto"] = "auto",
+    redact: bool = False,
+) -> dict:
+    return await _run(handlers.export_audio_analysis, ExportRequest, dict(
+        audio_id=audio_id, format=format, tasks=tasks, redact=redact))
 
 
 def main() -> None:

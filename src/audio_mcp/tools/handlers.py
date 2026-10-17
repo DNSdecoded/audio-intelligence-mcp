@@ -19,7 +19,7 @@ from audio_mcp.library.index import SUPPORTED_EXTENSIONS
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, GetJobRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, StreamRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, ExportRequest, GetJobRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, StreamRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -463,3 +463,24 @@ def analyze_audio_stream(app, req: StreamRequest) -> dict:
     result["reconciliation"] = ss.reconcile(session, result["analysis"])
     ss.close(req.session_id)
     return {**resp, "result": result}
+
+
+_EXPORT_TASKS = {"srt": ["transcription", "speaker_diarization"], "vtt": ["transcription", "speaker_diarization"],
+                 "rttm": ["speaker_diarization"]}
+
+
+@tool_handler
+def export_audio_analysis(app, req: ExportRequest) -> dict:
+    from audio_mcp.export.exporters import export_analysis
+
+    app.store.get(req.audio_id)  # AUDIO_NOT_FOUND before any work
+    tasks = _EXPORT_TASKS.get(req.format, req.tasks)
+    resp = analyze_audio(app, AnalyzeRequest(source=AudioIdSource(type="audio_id", audio_id=req.audio_id),
+                                             tasks=tasks, async_mode="never"))
+    if resp["status"] == "error":
+        return resp
+    s = app.settings
+    info = export_analysis(req.audio_id, resp["analysis"], req.format, s.resolved_export_dir,
+                           redact=req.redact, extra_patterns=s.redact_extra_patterns)
+    return build_response(result=info, audio_id=req.audio_id, warnings=resp["warnings"], errors=resp["errors"],
+                          processing=ProcessingInfo(**resp["processing"]))
