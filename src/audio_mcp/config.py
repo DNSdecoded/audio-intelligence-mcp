@@ -1,9 +1,10 @@
 import os
+import uuid
 from pathlib import Path
 from typing import Literal
 
 import platformdirs
-from pydantic import model_validator
+from pydantic import PrivateAttr, model_validator
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -68,6 +69,9 @@ class Settings(BaseSettings):
     redact_outputs: bool = False
     redact_extra_patterns: list[str] = []
 
+    # per server instance, so instances sharing data_dir never clean up each other's temp files
+    _instance_tag: str = PrivateAttr(default_factory=lambda: f"proc_{os.getpid()}_{uuid.uuid4().hex[:8]}")
+
     @model_validator(mode="after")
     def _check_llm(self) -> "Settings":
         if self.llm_provider != "none" and not self.llm_model:
@@ -79,6 +83,13 @@ class Settings(BaseSettings):
     @property
     def resolved_temp_dir(self) -> Path:
         return self.temp_dir or self.data_dir / "tmp"
+
+    @property
+    def process_temp_dir(self) -> Path:
+        """This instance's temp subdir (uploads, URL downloads, stream chunks); created on access."""
+        d = self.resolved_temp_dir / self._instance_tag
+        d.mkdir(parents=True, exist_ok=True)
+        return d
 
     @property
     def resolved_export_dir(self) -> Path:

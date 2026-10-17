@@ -70,6 +70,7 @@ class AudioStore:
         self.root = settings.data_dir / "audio"
         self._cache: OrderedDict[str, DecodedAudio] = OrderedDict()
         self._lock = threading.Lock()
+        self.created_ids: set[str] = set()  # stored by this instance (retention "none" deletes only these)
 
     def _dir(self, audio_id: str) -> Path:
         if not _ID_RE.fullmatch(audio_id):  # also blocks path traversal
@@ -107,6 +108,7 @@ class AudioStore:
             }
             if not meta_path.exists():  # a concurrent ingest of the same bytes may have finished meanwhile
                 _atomic_place(lambda t: t.write_text(json.dumps(meta), encoding="utf-8"), meta_path)
+                self.created_ids.add(audio_id)
         return self.get(audio_id)
 
     def get(self, audio_id: str, *, touch: bool = True) -> AudioRecord:

@@ -47,7 +47,7 @@ async def lifespan(_server):
         stop.set()
         _app.jobs.shutdown()
         sweep(_app, final=True)
-        cleanup_temp(settings)
+        cleanup_temp(settings, own=True)
         sys.stdout = real_stdout
 
 

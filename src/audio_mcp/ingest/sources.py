@@ -97,7 +97,7 @@ def _from_base64(src: Base64Source, settings: Settings) -> MaterializedSource:
     hint = src.filename_hint or ""
     suffix = Path(hint.replace("\\", "/")).suffix
     ext = suffix if _EXT_RE.fullmatch(suffix) else ".bin"
-    out = settings.resolved_temp_dir / f"{uuid.uuid4().hex}{ext}"
+    out = settings.process_temp_dir / f"{uuid.uuid4().hex}{ext}"
     out.write_bytes(raw)
     return MaterializedSource(out, Path(hint.replace("\\", "/")).name or out.name, True)
 
@@ -135,7 +135,7 @@ def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
     # shortcut: httpx re-resolves the host (DNS-rebinding window); pin the vetted IP if this threat matters.
     ext = Path(parsed.path).suffix
     ext = ext if _EXT_RE.fullmatch(ext) else ".bin"
-    out = settings.resolved_temp_dir / f"{uuid.uuid4().hex}{ext}"
+    out = settings.process_temp_dir / f"{uuid.uuid4().hex}{ext}"
     deadline = time.monotonic() + settings.url_timeout_seconds
     try:
         with _make_client(settings.url_timeout_seconds) as client, client.stream("GET", src.url) as r:

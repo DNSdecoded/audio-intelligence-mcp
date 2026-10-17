@@ -15,7 +15,7 @@ def test_same_bytes_same_id_across_source_types(settings, speech_en):
     a = store.ingest(FilePathSource(type="file_path", path=str(speech_en)))
     b = store.ingest(Base64Source(type="base64", data=base64.b64encode(speech_en.read_bytes()).decode(), filename_hint="x.wav"))
     assert a.audio_id == b.audio_id and re.fullmatch(r"aud_[0-9a-f]{16}", a.audio_id)
-    assert not any(settings.resolved_temp_dir.iterdir())
+    assert not any(f.is_file() for f in settings.resolved_temp_dir.rglob("*"))
     assert b.ingested_at == a.ingested_at and b.original_name == a.original_name
 
 
@@ -36,7 +36,7 @@ def test_bad_file_rejected_and_nothing_stored(settings):
     bad = Base64Source(type="base64", data=base64.b64encode(b"not audio at all" * 50).decode(), filename_hint="x.wav")
     with pytest.raises(AudioMCPError):
         store.ingest(bad)
-    assert store.list_ids() == [] and not any(settings.resolved_temp_dir.iterdir())
+    assert store.list_ids() == [] and not any(f.is_file() for f in settings.resolved_temp_dir.rglob("*"))
 
 
 def test_get_load_variant_delete_and_lru(settings, speech_en, dialogue):

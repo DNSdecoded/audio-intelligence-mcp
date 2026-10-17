@@ -70,7 +70,7 @@ class StreamSessions:
         if chunk_format == "pcm" and not (sample_rate_hz and channels and sample_format):
             raise AudioMCPError(ErrorCode.INVALID_INPUT, "pcm sessions need sample_rate_hz, channels and sample_format")
         sid = f"str_{uuid.uuid4().hex[:12]}"
-        d = self.app.settings.resolved_temp_dir / f"stream_{sid}"
+        d = self.app.settings.process_temp_dir / f"stream_{sid}"
         d.mkdir(parents=True)
         with self._lock:
             self._sessions[sid] = Session(sid, d, chunk_format, sample_format, sample_rate_hz, channels)

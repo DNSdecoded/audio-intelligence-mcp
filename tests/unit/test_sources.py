@@ -101,7 +101,7 @@ def test_base64_bad_hint_is_neutralised(settings):
         ),
         settings,
     )
-    assert m.path.parent == settings.resolved_temp_dir and m.path.suffix == ".bin" and m.is_temp
+    assert m.path.parent == settings.process_temp_dir and m.path.suffix == ".bin" and m.is_temp
 
 
 def test_base64_good_hint(settings):
@@ -197,7 +197,7 @@ def test_url_too_large_leaves_no_file(fetch, settings):
     with pytest.raises(AudioMCPError) as e:
         fetch(lambda r: httpx.Response(200, content=b"x" * (2 * 2**20)))
     assert e.value.code == ErrorCode.FILE_TOO_LARGE
-    assert list(settings.resolved_temp_dir.iterdir()) == []
+    assert not any(f.is_file() for f in settings.resolved_temp_dir.rglob("*"))
 
 
 def test_url_redirect_not_followed(fetch):
@@ -238,4 +238,4 @@ def test_url_deadline(fetch, settings, monkeypatch):
     monkeypatch.setattr(sources.time, "monotonic", lambda: next(t))
     with pytest.raises(AudioMCPError) as e:
         fetch(lambda r: httpx.Response(200, content=b"x"))
-    assert e.value.retryable and list(settings.resolved_temp_dir.iterdir()) == []
+    assert e.value.retryable and not any(f.is_file() for f in settings.resolved_temp_dir.rglob("*"))
