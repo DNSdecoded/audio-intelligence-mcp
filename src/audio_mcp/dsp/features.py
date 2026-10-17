@@ -8,6 +8,7 @@ from audio_mcp.types import Interval
 FEATURE_GROUPS = ("level", "silence", "spectral", "pitch", "rhythm", "bands")
 _N_FFT, _HOP = 2048, 512
 _EDGES = [0, 250, 500, 1000, 2000, 4000, 8000]
+_BLOCK_FRAMES = 4096  # bounds memory: never hold the whole-file STFT
 _SILENCE_AMP = 10 ** (-50 / 20)
 
 
@@ -75,36 +76,46 @@ def _silence(m, sr):
     return {"silence_ratio": float(quiet.mean()), "silence_intervals": ivs}
 
 
-def _stft_mag(m):
-    fr = _frames(m, _N_FFT, _HOP) * np.hanning(_N_FFT)
-    return np.abs(np.fft.rfft(fr, axis=1))
+def _stft_blocks(m):
+    """Yield STFT magnitude blocks of at most _BLOCK_FRAMES frames."""
+    fr, win = _frames(m, _N_FFT, _HOP), np.hanning(_N_FFT)
+    for i in range(0, len(fr), _BLOCK_FRAMES):
+        yield np.abs(np.fft.rfft(fr[i:i + _BLOCK_FRAMES] * win, axis=1))
 
 
 def _spectral(m, sr):
-    mag = _stft_mag(m)
-    mag = mag[mag.sum(axis=1) > 1e-9]
     keys = ("spectral_centroid_hz", "spectral_bandwidth_hz", "spectral_rolloff_hz", "spectral_flatness")
-    if not len(mag):
-        v = dict.fromkeys(keys)
-    else:
-        f = np.fft.rfftfreq(_N_FFT, 1 / sr)
+    f = np.fft.rfftfreq(_N_FFT, 1 / sr)
+    tot, n = np.zeros(4), 0
+    for mag in _stft_blocks(m):
+        mag = mag[mag.sum(axis=1) > 1e-9]
+        if not len(mag):
+            continue
         w = mag / mag.sum(axis=1, keepdims=True)
         cen = (w * f).sum(axis=1)
         bw = np.sqrt((w * (f - cen[:, None]) ** 2).sum(axis=1))
         roll = f[(np.cumsum(w, axis=1) >= 0.85).argmax(axis=1)]
         flat = np.exp(np.log(mag + 1e-10).mean(axis=1)) / (mag.mean(axis=1) + 1e-10)
-        v = dict(zip(keys, (_f(a.mean()) for a in (cen, bw, roll, flat))))
+        tot += [cen.sum(), bw.sum(), roll.sum(), flat.sum()]
+        n += len(mag)
+    v = dict(zip(keys, (_f(t / n) for t in tot))) if n else dict.fromkeys(keys)
     zc = np.abs(np.diff(np.signbit(m).astype(np.int8))).mean() if len(m) > 1 else 0.0
     v["zero_crossing_rate"] = float(zc)
     return v
 
 
 def _bands(m, sr):
-    ps = _stft_mag(m).mean(axis=0) ** 2
+    nyq = sr / 2
+    edges = [e for e in _EDGES if e < nyq]
     f = np.fft.rfftfreq(_N_FFT, 1 / sr)
-    edges = _EDGES + [sr / 2 + 1]
-    e = np.array([ps[(f >= a) & (f < b)].sum() for a, b in zip(edges[:-1], edges[1:])])
-    names = [f"{a}-{b}" for a, b in zip(_EDGES, _EDGES[1:] + [int(sr / 2)])]
+    ps, n = np.zeros(len(f)), 0
+    for mag in _stft_blocks(m):
+        ps += (mag ** 2).sum(axis=0)
+        n += len(mag)
+    ps /= n
+    hi = edges[1:] + [np.inf]
+    e = np.array([ps[(f >= a) & (f < b)].sum() for a, b in zip(edges, hi)])
+    names = [f"{a}-{b}" for a, b in zip(edges, edges[1:] + [int(nyq)])]
     tot = e.sum()
     return {"band_energy": dict(zip(names, (e / tot if tot > 0 else e).tolist()))}
 
@@ -112,6 +123,11 @@ def _bands(m, sr):
 def _yin(m, sr, fmin=50, fmax=600, thr=0.15, size=1024, hop=256):
     """Return per-frame f0 (0 = unvoiced)."""
     fr = _frames(m, size, hop)
+    return np.concatenate([_yin_block(fr[i:i + _BLOCK_FRAMES], sr, fmin, fmax, thr, size)
+                           for i in range(0, len(fr), _BLOCK_FRAMES)])
+
+
+def _yin_block(fr, sr, fmin, fmax, thr, size):
     w, tmax, tmin = size // 2, int(sr / fmin), int(sr / fmax)
     a, nfft = fr[:, :w], 2048
     r = np.fft.irfft(np.conj(np.fft.rfft(a, nfft, axis=1)) * np.fft.rfft(fr, nfft, axis=1), nfft, axis=1)[:, :tmax + 1]
@@ -147,8 +163,14 @@ def _pitch(m, sr):
 
 
 def _rhythm(m, sr):
-    lm = np.log1p(_stft_mag(m))
-    flux = np.maximum(np.diff(lm, axis=0), 0).sum(axis=1)
+    prev, parts = None, []
+    for mag in _stft_blocks(m):
+        lm = np.log1p(mag)
+        if prev is not None:  # carry last frame so flux is continuous across blocks
+            lm = np.vstack([prev, lm])
+        prev = lm[-1:]
+        parts.append(np.maximum(np.diff(lm, axis=0), 0).sum(axis=1))
+    flux = np.concatenate(parts)
     fps, dur = sr / _HOP, len(m) / sr
     v = {"tempo_bpm": None, "onset_rate_per_s": 0.0}
     if len(flux) < 4 or flux.max() <= 0:

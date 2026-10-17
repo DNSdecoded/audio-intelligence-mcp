@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 
 from audio_mcp.dsp.features import extract_features
@@ -38,3 +39,27 @@ def test_snr_vad_and_json(synth):
     v = extract_features(x, sr, speech_regions=[Interval(start=1.0, end=3.0)])["values"]
     assert v["snr_method"] == "vad" and v["snr_db_estimate"] > 20
     json.dumps(v, allow_nan=False)
+
+
+def test_blocked_matches_default(synth, monkeypatch):
+    from audio_mcp.dsp import features
+
+    for k in ("alarm", "sine"):
+        x, sr = load(synth[k])
+        full = extract_features(x, sr)["values"]
+        monkeypatch.setattr(features, "_BLOCK_FRAMES", 7)
+        got = extract_features(x, sr)["values"]
+        assert got.keys() == full.keys()
+        for key, want in full.items():
+            if isinstance(want, dict):
+                want, g = list(want.values()), list(got[key].values())
+            else:
+                g = got[key]
+            assert g == pytest.approx(want, abs=1e-6) if want is not None else g is None
+        monkeypatch.undo()
+
+
+def test_bands_clipped_to_nyquist(synth):
+    b = extract_features(*load(synth["multichannel"]), ["bands"])["values"]["band_energy"]
+    assert list(b) == ["0-250", "250-500", "500-1000", "1000-2000", "2000-4000"]
+    assert abs(sum(b.values()) - 1) < 1e-6
