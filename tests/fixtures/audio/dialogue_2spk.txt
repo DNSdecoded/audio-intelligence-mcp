@@ -1,0 +1,4 @@
+david: Did you send the budget numbers?
+zira: Yes, I sent them this morning.
+david: Great, then we can close the review.
+zira: I will book the room for Thursday.
