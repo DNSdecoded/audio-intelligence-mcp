@@ -30,6 +30,8 @@ def test_gap_splits_runs():
 
 
 def test_tag_windows_batches(settings):
+    import pytest
+
     pytest.importorskip("torch")
     import math
 
