@@ -528,12 +528,13 @@ def export_audio_analysis(app, req: ExportRequest) -> dict:
 
     app.store.get(req.audio_id)  # AUDIO_NOT_FOUND before any work
     tasks = _EXPORT_TASKS.get(req.format, req.tasks)
-    resp = analyze_audio(app, AnalyzeRequest(source=AudioIdSource(type="audio_id", audio_id=req.audio_id),
-                                             tasks=tasks, async_mode="never"))
+    # unwrapped: the export applies redaction itself (once, with an accurate count); errors raise to our wrapper
+    resp = analyze_audio.__wrapped__(app, AnalyzeRequest(source=AudioIdSource(type="audio_id", audio_id=req.audio_id),
+                                                         tasks=tasks, async_mode="never"))
     if resp["status"] == "error":
         return resp
     s = app.settings
     info = export_analysis(req.audio_id, resp["analysis"], req.format, s.resolved_export_dir,
-                           redact=req.redact, extra_patterns=s.redact_extra_patterns)
+                           redact=req.redact or s.redact_outputs, extra_patterns=s.redact_extra_patterns)
     return build_response(result=info, audio_id=req.audio_id, warnings=resp["warnings"], errors=resp["errors"],
                           processing=ProcessingInfo(**resp["processing"]))

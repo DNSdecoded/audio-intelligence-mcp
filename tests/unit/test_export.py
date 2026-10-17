@@ -75,3 +75,13 @@ def test_export_srt_tool(app, dialogue):
 def test_unknown_audio_id(app):
     r = export_audio_analysis(app, ExportRequest(audio_id="aud_0000000000000000", format="json"))
     assert r["error"]["code"] == "AUDIO_NOT_FOUND"
+
+
+@pytest.mark.parametrize("fmt", ["json", "srt", "markdown"])
+def test_export_honours_redact_outputs(app, speech_en, fmt):  # I9
+    aid = extract_audio_features(app, FeaturesRequest(source=fp(speech_en)))["audio_id"]
+    app.settings.redact_outputs, app.settings.redact_extra_patterns = True, ["friday"]
+    r = export_audio_analysis(app, ExportRequest(audio_id=aid, format=fmt, tasks=["transcription"]))
+    assert r["status"] == "success"
+    text = Path(r["result"]["path"]).read_text(encoding="utf-8")
+    assert "finish the report" in text and "friday" not in text.lower() and r["result"]["redactions"] >= 1

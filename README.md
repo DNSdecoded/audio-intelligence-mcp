@@ -144,6 +144,8 @@ TOML file (`AUDIO_MCP_CONFIG=/path/config.toml`, see `config.example.toml`) and/
 - Stored audio copies and cached results live under `data_dir` and are swept after `retention_ttl_hours`
   (`retention = "none"` deletes everything at shutdown). The search library is persistent
   (`library_retention = "keep"`) and stores derived data and file paths, never audio.
+- Exports written by `export_audio_analysis` to `export_dir` are yours to keep: retention never deletes them.
+  They are redacted when the call sets `redact: true` or the server sets `redact_outputs = true`.
 - Logs go to stderr (and `log_file`) and never contain transcript text unless `log_sensitive = true`.
 - Integrity indicators are signal observations only; the server never states that audio is authentic, edited
   or synthetic, and never infers emotion.
