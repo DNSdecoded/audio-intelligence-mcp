@@ -14,7 +14,7 @@ from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, TimelineRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -73,6 +73,10 @@ def analysis_payload(outcome, options: AnalyzeOptions) -> dict:
         a["timeline"] = r["timeline"]
     if "uncertainty" in r:
         a["uncertainty"] = r["uncertainty"]
+    if "summary" in r:
+        a["summary"] = r["summary"]
+    if "speech" in r:
+        a["speech_characteristics"] = r["speech"]
     if not options.word_level_timestamps:
         a = _strip(a, {"words"})
     if not options.include_confidence:
@@ -241,3 +245,16 @@ def ask_audio(app, req: AskRequest) -> dict:
     if not req.include_evidence:
         answer.pop("evidence")
     return _respond(outcome, answer)
+
+
+def _require_llm(app, use_llm):
+    if use_llm and not app.backends.llm.available()[0]:
+        raise AudioMCPError(ErrorCode.LLM_DISABLED, "use_llm requested but no LLM is configured (llm_provider=none)")
+
+
+@tool_handler
+def summarize_audio(app, req: SummarizeRequest) -> dict:
+    _require_llm(app, req.use_llm)
+    outcome = run_analysis(app, req.source, ["timeline", "summary"],
+                           {"summary_length": req.length, "summary_focus": req.focus})
+    return _respond(outcome, outcome.results.get("summary"))

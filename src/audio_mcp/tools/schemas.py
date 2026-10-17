@@ -91,3 +91,10 @@ class AskRequest(_Req):
     question: str = Field(min_length=3, max_length=1000)
     include_evidence: bool = True
     use_llm: bool | None = None
+
+
+class SummarizeRequest(_Req):
+    source: AudioSource
+    length: Literal["short", "medium", "long"] = "short"
+    focus: str | None = Field(None, max_length=500)
+    use_llm: bool | None = None

@@ -13,7 +13,7 @@ from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
-    InspectQualityRequest, NodeType, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
+    InspectQualityRequest, NodeType, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
 _app: AppContext | None = None
@@ -137,6 +137,19 @@ async def ask_audio(
 ) -> dict:
     return await _run(handlers.ask_audio, AskRequest, dict(
         source=source, question=question, include_evidence=include_evidence, use_llm=use_llm))
+
+
+@mcp.tool(name="summarize_audio", description=(
+    "Summarize an audio source extractively: key sentences, topics and key moments, each linked to transcript "
+    "segment or event ids. Non-speech audio is summarized from detected sounds and features."))
+async def summarize_audio(
+    source: AudioSource,
+    length: Literal["short", "medium", "long"] = "short",
+    focus: str | None = None,
+    use_llm: bool | None = None,
+) -> dict:
+    return await _run(handlers.summarize_audio, SummarizeRequest, dict(
+        source=source, length=length, focus=focus, use_llm=use_llm))
 
 
 def main() -> None:

@@ -11,9 +11,11 @@ from audio_mcp.analysis.uncertainty import find_uncertainties
 from audio_mcp.context import AppContext
 from audio_mcp.dsp.features import FEATURE_GROUPS, extract_features, frame_rms
 from audio_mcp.dsp.quality import diagnose_quality
+from audio_mcp.dsp.speech import speech_characteristics
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo, warning
 from audio_mcp.ingest.decode import DecodedAudio
 from audio_mcp.store.audio_store import AudioRecord
+from audio_mcp.reasoning.summarize import summarize
 from audio_mcp.timeline.graph import build_timeline
 from audio_mcp.types import Interval, Segment
 
@@ -168,6 +170,19 @@ def _uncertainty(ctx):
     return find_uncertainties(ctx.results, low_conf=ctx.app.settings.low_confidence_threshold, second_pass=second)
 
 
+def _summary(ctx):
+    t = ctx.app.backends.text
+    text = t if t.available()[0] else None
+    if text is not None:
+        ctx.models_used.append(t.info)
+    return summarize(ctx.results, ctx.audio.duration, text, length=ctx.options.get("summary_length") or "short",
+                     focus=ctx.options.get("summary_focus"))
+
+
+def _speech(ctx):
+    return speech_characteristics(ctx.results)
+
+
 def _quality(ctx):
     return diagnose_quality(ctx.audio.native, ctx.audio.native_sr, ctx.results["features"]["values"], _regions(ctx))
 
@@ -201,6 +216,13 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
           lambda a, o: {**_asr_cfg(a, o), "budget": o.get("budget"), "low": a.settings.low_confidence_threshold,
                         "with": [s for s in ("events", "quality") if s in o.get("_stages", [])],
                         "tagger": _id(a.backends.tagger), "threshold": _threshold(a, o)}),
+    Stage("summary", ("timeline",), _summary,
+          lambda a, o: {**STAGES["timeline"].cfg(a, o), "text": _id(a.backends.text),
+                        "length": o.get("summary_length") or "short", "focus": o.get("summary_focus"),
+                        "with": [s for s in ("diarization",) if s in o.get("_stages", [])]}),
+    Stage("speech", ("transcription", "vad", "features"), _speech,
+          lambda a, o: {**_asr_cfg(a, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS),
+                        "with": [s for s in ("speaker_assign",) if s in o.get("_stages", [])]}),
     Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),
