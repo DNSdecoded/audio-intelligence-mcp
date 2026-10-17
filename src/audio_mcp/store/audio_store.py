@@ -5,6 +5,7 @@ import re
 import shutil
 import threading
 import time
+import uuid
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
@@ -29,6 +30,7 @@ class AudioRecord:
     probe: ProbeInfo
     original_name: str
     ingested_at: float
+    last_used: float = 0.0
 
 
 def _sha256(path: Path) -> str:
@@ -37,6 +39,23 @@ def _sha256(path: Path) -> str:
         while chunk := fh.read(1 << 20):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _atomic_place(write, final: Path) -> None:
+    """Write via a uniquely named temp file, then rename; a concurrent writer of the same content may win."""
+    tmp = final.with_name(f".{final.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        write(tmp)
+        try:
+            os.replace(tmp, final)
+        except PermissionError:  # Windows: the target is open (another writer placed it first)
+            if not final.exists():
+                raise
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+_TOUCH_INTERVAL = 60.0  # seconds; bounds meta.json rewrites
 
 
 def _probe_from_dict(d: dict) -> ProbeInfo:
@@ -76,33 +95,41 @@ class AudioStore:
         meta_path = d / "meta.json"
         if not meta_path.exists():
             d.mkdir(parents=True, exist_ok=True)
-            tmp = d / f".source{ext}.tmp"
-            shutil.copyfile(path, tmp)
-            os.replace(tmp, d / f"source{ext}")
+            _atomic_place(lambda t: shutil.copyfile(path, t), d / f"source{ext}")
+            now = time.time()
             meta = {
                 "audio_id": audio_id,
                 "original_name": original_name,
-                "ingested_at": time.time(),
+                "ingested_at": now,
+                "last_used": now,
                 "probe": info.to_dict(),
                 "source_ext": ext,
             }
-            tmp_meta = d / "meta.json.tmp"
-            tmp_meta.write_text(json.dumps(meta), encoding="utf-8")
-            os.replace(tmp_meta, meta_path)
+            if not meta_path.exists():  # a concurrent ingest of the same bytes may have finished meanwhile
+                _atomic_place(lambda t: t.write_text(json.dumps(meta), encoding="utf-8"), meta_path)
         return self.get(audio_id)
 
-    def get(self, audio_id: str) -> AudioRecord:
+    def get(self, audio_id: str, *, touch: bool = True) -> AudioRecord:
+        """touch=True records use (retention sweeps on last_used); sweeps read with touch=False."""
         d = self._dir(audio_id)
         try:
             meta = json.loads((d / "meta.json").read_text(encoding="utf-8"))
         except FileNotFoundError:
             raise AudioMCPError(ErrorCode.AUDIO_NOT_FOUND, "unknown audio_id") from None
+        now = time.time()
+        if touch and now - meta.get("last_used", meta["ingested_at"]) >= _TOUCH_INTERVAL:
+            meta["last_used"] = now
+            try:
+                _atomic_place(lambda t: t.write_text(json.dumps(meta), encoding="utf-8"), d / "meta.json")
+            except OSError:  # best effort: a lost touch only makes the record expire sooner
+                pass
         return AudioRecord(
             audio_id,
             d / f"source{meta['source_ext']}",
             _probe_from_dict(meta["probe"]),
             meta["original_name"],
             meta["ingested_at"],
+            meta.get("last_used", meta["ingested_at"]),
         )
 
     def load(self, audio_id: str) -> DecodedAudio:

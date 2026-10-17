@@ -26,7 +26,7 @@ def sweep(app, *, now: float | None = None, final: bool = False) -> dict:
            "library_rows_deleted": 0}
     if s.retention == "ttl" or (s.retention == "none" and final):
         for aid in app.store.list_ids():
-            if s.retention == "none" or app.store.get(aid).ingested_at < cutoff:
+            if s.retention == "none" or app.store.get(aid, touch=False).last_used < cutoff:
                 app.store.delete(aid)
                 app.cache.clear(aid)
                 out["audio_deleted"] += 1

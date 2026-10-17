@@ -64,3 +64,25 @@ def test_cache_roundtrip(settings):
     assert c.get("aud_0000000000000000", "transcription", h) == {"text": "x"}
     c.clear("aud_0000000000000000")
     assert c.get("aud_0000000000000000", "transcription", h) is None
+
+
+def test_concurrent_ingest_same_file(settings, speech_en):  # I5
+    import threading
+
+    store, ids, errs = AudioStore(settings), [], []
+    gate = threading.Barrier(6)
+
+    def go():
+        gate.wait()
+        try:
+            ids.append(store.ingest(FilePathSource(type="file_path", path=str(speech_en))).audio_id)
+        except Exception as e:  # noqa: BLE001 - the test reports any failure
+            errs.append(repr(e))
+
+    ts = [threading.Thread(target=go) for _ in range(6)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join(30)
+    assert errs == [] and len(ids) == 6 and len(set(ids)) == 1
+    assert not list(store._dir(ids[0]).glob("*.tmp"))

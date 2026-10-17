@@ -48,3 +48,14 @@ def test_cleanup_temp(settings):
     (t / "sub").mkdir()
     (t / "sub" / "b.bin").write_bytes(b"y")
     assert cleanup_temp(settings) == 2 and not any(t.iterdir())
+
+
+def test_reuse_refreshes_last_used(app, speech_en, monkeypatch):  # I7
+    t0 = time.time()
+    aid = _ingest(app, speech_en)
+    monkeypatch.setattr(time, "time", lambda: t0 + 20 * 3600)
+    _ingest(app, speech_en)  # re-ingest 20 h later touches the record
+    monkeypatch.undo()
+    assert sweep(app, now=t0 + LATER)["audio_deleted"] == 0  # 5 h after last use, ttl 24 h
+    assert app.store.get(aid).audio_id == aid
+    assert sweep(app, now=t0 + 20 * 3600 + LATER)["audio_deleted"] == 1
