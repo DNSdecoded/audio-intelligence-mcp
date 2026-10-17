@@ -19,4 +19,9 @@ class AppContext:
 
 
 def build_app_context(settings: Settings) -> AppContext:
-    return AppContext(settings, AudioStore(settings), ResultCache(settings), build_backends(settings))
+    from audio_mcp.library.index import Library
+
+    backends = build_backends(settings)
+    text = backends.text if backends.text.available()[0] else None
+    return AppContext(settings, AudioStore(settings), ResultCache(settings), backends,
+                      library=Library(settings.data_dir / "library.sqlite", text))

@@ -111,3 +111,33 @@ class CompareRequest(_Req):
         if not self.baseline and len(self.sources) < 2:
             raise ValueError("compare needs at least 2 sources, or 1+ sources and a baseline")
         return self
+
+
+class LibraryFilters(_Req):
+    language: str | None = None
+    min_duration: float | None = Field(None, ge=0)
+    max_duration: float | None = Field(None, ge=0)
+    event_label: str | None = None
+    speaker_count: int | None = Field(None, ge=1)
+    audio_ids: list[str] | None = None
+
+
+class SearchLibraryRequest(_Req):
+    action: Literal["index", "search", "list", "remove"]
+    paths: list[str] | None = Field(None, min_length=1, max_length=1000)
+    query: str | None = Field(None, max_length=1000)
+    query_audio: AudioSource | None = None
+    filters: LibraryFilters | None = None
+    limit: int = Field(10, ge=1, le=100)
+    audio_id: str | None = Field(None, pattern=r"^aud_[0-9a-f]{16}$")
+    async_mode: AsyncMode = "auto"
+
+    @model_validator(mode="after")
+    def _per_action(self):
+        need = {"index": self.paths, "remove": self.audio_id}.get(self.action, True)
+        if self.action == "search":
+            need = self.query or self.query_audio
+        if not need:
+            raise ValueError({"index": "index needs paths", "remove": "remove needs audio_id",
+                              "search": "search needs query or query_audio"}[self.action])
+        return self

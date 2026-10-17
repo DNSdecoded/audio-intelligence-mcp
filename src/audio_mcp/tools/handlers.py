@@ -1,5 +1,6 @@
 import functools
 import logging
+from pathlib import Path
 
 from pydantic import ValidationError
 
@@ -12,10 +13,12 @@ from audio_mcp.dsp.preprocess import apply_preprocessing
 from audio_mcp.ingest.decode import resample
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ProcessingInfo, build_response, error_response, warning
 from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
+from audio_mcp.ingest.sources import FilePathSource, check_path_allowed
+from audio_mcp.library.index import SUPPORTED_EXTENSIONS
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -314,3 +317,59 @@ def compare_audio(app, req: CompareRequest) -> dict:
         result["comparisons"] = comps
         outs_all = outs
     return build_response(result=result, warnings=warns, errors=errors, processing=_merge_processing(outs_all))
+
+
+_INDEX_STAGES = ["transcription", "language", "events", "audio_embedding"]
+
+
+def _expand(app, raw: str):
+    """Yield (path, error) for a file or folder argument, enforcing allowed roots on every file."""
+    try:
+        yield check_path_allowed(raw, app.settings.allowed_roots), None
+        return
+    except AudioMCPError as e:
+        if e.code != ErrorCode.INVALID_INPUT or not Path(raw).is_dir():  # INVALID_INPUT here = allowed directory
+            yield raw, e
+            return
+    for f in sorted(Path(raw).resolve().rglob("*")):
+        if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS:
+            try:
+                yield check_path_allowed(f, app.settings.allowed_roots), None
+            except AudioMCPError as e:
+                yield f, e
+
+
+@tool_handler
+def search_audio_library(app, req: SearchLibraryRequest) -> dict:
+    lib = app.library
+    if req.action == "list":
+        return build_response(result={"recordings": lib.list_recordings(limit=req.limit)})
+    if req.action == "remove":
+        return build_response(result={"removed": lib.remove(req.audio_id)}, audio_id=req.audio_id)
+    if req.action == "search":
+        outs, emb = [], None
+        if req.query_audio is not None:
+            o = run_analysis(app, req.query_audio, ["audio_embedding"], {})
+            outs.append(o)
+            emb = (o.results.get("audio_embedding") or {}).get("embedding")
+        filters = req.filters.model_dump(exclude_none=True) if req.filters else {}
+        matches = lib.search(req.query, filters=filters, limit=req.limit, query_audio_embedding=emb)
+        warns = [w for o in outs for w in o.warnings]
+        if req.query_audio is not None and emb is None:
+            warns.append(warning("EMBEDDING_UNAVAILABLE", "audio embedding unavailable; query_audio ignored"))
+        return build_response(result={"matches": matches}, warnings=warns, processing=_merge_processing(outs))
+    indexed, failed, outs = [], [], []
+    for raw in req.paths:
+        for path, err in _expand(app, raw):
+            if err is None:
+                try:
+                    o = run_analysis(app, FilePathSource(type="file_path", path=str(path)), _INDEX_STAGES, {})
+                    emb = (o.results.get("audio_embedding") or {}).get("embedding")
+                    n = lib.add(o.record, Path(path), o.results, emb)
+                    outs.append(o)
+                    indexed.append({"path": str(path), "audio_id": o.record.audio_id, "segments": n})
+                    continue
+                except AudioMCPError as e:
+                    err = e
+            failed.append({"path": str(path), "error": err.to_dict()})
+    return build_response(result={"indexed": indexed, "failed": failed}, processing=_merge_processing(outs))

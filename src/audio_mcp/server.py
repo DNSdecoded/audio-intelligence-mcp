@@ -13,7 +13,7 @@ from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
-    InspectQualityRequest, NodeType, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
+    InspectQualityRequest, LibraryFilters, NodeType, SearchLibraryRequest, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
 _app: AppContext | None = None
@@ -164,6 +164,25 @@ async def compare_audio(
 ) -> dict:
     return await _run(handlers.compare_audio, CompareRequest, dict(
         sources=sources, baseline=baseline, aspects=aspects, z_threshold=z_threshold))
+
+
+@mcp.tool(name="search_audio_library", description=(
+    "Index audio files/folders into a persistent local library (transcripts, sound events, embeddings) and search "
+    "it by keywords, natural language, filters, or an example audio clip. Returns matching recordings and "
+    "timestamped segments with scores."))
+async def search_audio_library(
+    action: Literal["index", "search", "list", "remove"],
+    paths: list[str] | None = None,
+    query: str | None = None,
+    query_audio: AudioSource | None = None,
+    filters: LibraryFilters | None = None,
+    limit: int = 10,
+    audio_id: str | None = None,
+    async_mode: AsyncMode = "auto",
+) -> dict:
+    return await _run(handlers.search_audio_library, SearchLibraryRequest, dict(
+        action=action, paths=paths, query=query, query_audio=query_audio, filters=filters, limit=limit,
+        audio_id=audio_id, async_mode=async_mode))
 
 
 def main() -> None:
