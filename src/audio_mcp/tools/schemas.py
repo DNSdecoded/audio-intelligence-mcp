@@ -141,3 +141,8 @@ class SearchLibraryRequest(_Req):
             raise ValueError({"index": "index needs paths", "remove": "remove needs audio_id",
                               "search": "search needs query or query_audio"}[self.action])
         return self
+
+
+class GetJobRequest(_Req):
+    job_id: str = Field(pattern=r"^job_[0-9a-f]{12}$")
+    action: Literal["status", "cancel"] = "status"

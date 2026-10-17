@@ -12,7 +12,7 @@ from audio_mcp.ingest.sources import AudioSource
 from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, GetJobRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
     InspectQualityRequest, LibraryFilters, NodeType, SearchLibraryRequest, SummarizeRequest, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
@@ -26,7 +26,10 @@ async def lifespan(_server):
     setup_logging(settings)
     _app = build_app_context(settings)
     logging.getLogger("audio_mcp").info("server started")
-    yield
+    try:
+        yield
+    finally:
+        _app.jobs.shutdown()
 
 
 mcp = FastMCP("audio-intelligence", lifespan=lifespan)
@@ -183,6 +186,13 @@ async def search_audio_library(
     return await _run(handlers.search_audio_library, SearchLibraryRequest, dict(
         action=action, paths=paths, query=query, query_audio=query_audio, filters=filters, limit=limit,
         audio_id=audio_id, async_mode=async_mode))
+
+
+@mcp.tool(name="get_job", description=(
+    "Check the status/progress of an async analysis job (returned as job_id with status 'processing' by long "
+    "analyses) or cancel it. When finished, the job's full response is included."))
+async def get_job(job_id: str, action: Literal["status", "cancel"] = "status") -> dict:
+    return await _run(handlers.get_job, GetJobRequest, dict(job_id=job_id, action=action))
 
 
 def main() -> None:

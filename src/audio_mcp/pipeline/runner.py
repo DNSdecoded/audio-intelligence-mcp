@@ -1,9 +1,12 @@
 import time
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeout
 from dataclasses import dataclass
 
 from audio_mcp.context import AppContext
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ProcessingInfo, warning
 from audio_mcp.ingest.sources import AudioSource
+from audio_mcp.jobs import JOB_CONTEXT
 from audio_mcp.pipeline.planner import topo_order
 from audio_mcp.pipeline.stages import STAGES, StageContext
 from audio_mcp.store.audio_store import AudioRecord
@@ -22,6 +25,10 @@ class AnalysisOutcome:
 def run_analysis(app: AppContext, source: AudioSource, stages: list[str], options: dict, *,
                  cancel_event=None, progress=None) -> AnalysisOutcome:
     t0 = time.monotonic()
+    job = JOB_CONTEXT.get()
+    if job is not None:  # running inside an async job: inherit its cancel flag and progress reporting
+        cancel_event = cancel_event or job[0]
+        progress = progress or job[1]
     record = app.store.ingest(source)  # AudioMCPError propagates to the handler
     audio = app.store.load(record.audio_id)
     order = topo_order(stages)
@@ -68,7 +75,7 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors):
             return
     n_warn = len(ctx.warnings)
     try:
-        ctx.results[stage.name] = stage.fn(ctx)
+        ctx.results[stage.name] = _call_with_timeout(stage.fn, ctx, app.settings.stage_timeout_seconds)
     except AudioMCPError as e:
         del ctx.warnings[n_warn:]
         if e.code != ErrorCode.MODEL_UNAVAILABLE:
@@ -87,3 +94,16 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors):
     ran.append(stage.name)
     app.cache.put(ctx.record.audio_id, stage.name, key,
                   {"result": ctx.results[stage.name], "warnings": ctx.warnings[n_warn:]})
+
+
+def _call_with_timeout(fn, ctx, timeout: float):
+    # shortcut: a timed-out stage thread is abandoned, not killed (Python cannot kill threads); acceptable
+    # because stages are pure computations on in-memory audio.
+    pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="audio-mcp-stage")
+    fut = pool.submit(fn, ctx)
+    try:
+        return fut.result(timeout=timeout)
+    except FutureTimeout:
+        raise AudioMCPError(ErrorCode.TIMEOUT, f"stage exceeded {timeout:g} s", retryable=True) from None
+    finally:
+        pool.shutdown(wait=False)

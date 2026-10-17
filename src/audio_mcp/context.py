@@ -19,9 +19,11 @@ class AppContext:
 
 
 def build_app_context(settings: Settings) -> AppContext:
+    from audio_mcp.jobs import JobManager
     from audio_mcp.library.index import Library
 
     backends = build_backends(settings)
     text = backends.text if backends.text.available()[0] else None
     return AppContext(settings, AudioStore(settings), ResultCache(settings), backends,
+                      jobs=JobManager(settings.max_concurrent_jobs),
                       library=Library(settings.data_dir / "library.sqlite", text))

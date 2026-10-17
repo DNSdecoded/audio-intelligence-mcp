@@ -13,12 +13,12 @@ from audio_mcp.dsp.preprocess import apply_preprocessing
 from audio_mcp.ingest.decode import resample
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ProcessingInfo, build_response, error_response, warning
 from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
-from audio_mcp.ingest.sources import FilePathSource, check_path_allowed
+from audio_mcp.ingest.sources import AudioIdSource, FilePathSource, check_path_allowed
 from audio_mcp.library.index import SUPPORTED_EXTENSIONS
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, AskRequest, CompareRequest, DetectEventsRequest, GetJobRequest, FeaturesRequest, InspectQualityRequest, SearchLibraryRequest, SummarizeRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -45,6 +45,36 @@ def tool_handler(fn):
             return error_response(AudioMCPError(ErrorCode.STAGE_FAILED, f"{fn.__name__} failed: {type(e).__name__}"))
 
     return wrapper
+
+
+def _maybe_async(app, tool: str, req, fn) -> dict:
+    """Run fn now, or as a job when async_mode says so (auto: audio longer than async_threshold_seconds)."""
+    mode = getattr(req, "async_mode", "never")
+    if mode == "never" or app.jobs is None:
+        return fn(app, req)
+    src, audio_id = getattr(req, "source", None), None
+    if src is not None:
+        rec = app.store.ingest(src)  # also materializes base64/URL sources once
+        audio_id = rec.audio_id
+        if mode == "auto" and rec.probe.duration_seconds <= app.settings.async_threshold_seconds:
+            return fn(app, req)
+        req = req.model_copy(update={"source": AudioIdSource(type="audio_id", audio_id=audio_id)})
+    elif mode == "auto" and len(getattr(req, "paths", None) or []) <= 3:
+        return fn(app, req)
+    req = req.model_copy(update={"async_mode": "never"})
+    job_id = app.jobs.submit(tool, lambda ev, progress: tool_handler(fn)(app, req))
+    return build_response(result=None, job_id=job_id, audio_id=audio_id)
+
+
+def async_capable(tool: str):
+    def deco(fn):
+        @functools.wraps(fn)
+        def wrapper(app, req):
+            return _maybe_async(app, tool, req, fn)
+
+        return wrapper
+
+    return deco
 
 
 def _strip(x, drop):
@@ -107,6 +137,7 @@ _RECOVERABLE = {"LOW_LEVEL", "HIGH_NOISE", "HUM", "DC_OFFSET"}
 
 
 @tool_handler
+@async_capable("analyze_audio")
 def analyze_audio(app, req: AnalyzeRequest) -> dict:
     plan = None
     if req.tasks == "auto":
@@ -138,6 +169,7 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
 
 
 @tool_handler
+@async_capable("transcribe_audio")
 def transcribe_audio(app, req: TranscribeRequest) -> dict:
     stages = ["transcription", "language"] + (["diarization", "speaker_assign"] if req.diarize else [])
     stages += ["translation"] if req.translate_to_en else []
@@ -161,6 +193,7 @@ def transcribe_audio(app, req: TranscribeRequest) -> dict:
 
 
 @tool_handler
+@async_capable("detect_audio_events")
 def detect_audio_events(app, req: DetectEventsRequest) -> dict:
     labels = list(req.labels or [])
     for c in req.categories or []:
@@ -172,6 +205,7 @@ def detect_audio_events(app, req: DetectEventsRequest) -> dict:
 
 
 @tool_handler
+@async_capable("extract_audio_features")
 def extract_audio_features(app, req: FeaturesRequest) -> dict:
     outcome = run_analysis(app, req.source, ["metadata", "features"], {"feature_groups": req.feature_groups})
     r = outcome.results
@@ -349,6 +383,7 @@ def _expand(app, raw: str):
 
 
 @tool_handler
+@async_capable("search_audio_library")
 def search_audio_library(app, req: SearchLibraryRequest) -> dict:
     lib = app.library
     if req.action == "list":
@@ -382,3 +417,12 @@ def search_audio_library(app, req: SearchLibraryRequest) -> dict:
                     err = e
             failed.append({"path": str(path), "error": err.to_dict()})
     return build_response(result={"indexed": indexed, "failed": failed}, processing=_merge_processing(outs))
+
+
+@tool_handler
+def get_job(app, req: GetJobRequest) -> dict:
+    job = app.jobs.cancel(req.job_id) if req.action == "cancel" else app.jobs.get(req.job_id)
+    result = {"job_status": job.status, "progress": job.progress, "tool": job.tool}
+    if job.response is not None:
+        result["response"] = job.response
+    return build_response(result=result, job_id=job.job_id, status="success" if job.finished else "processing")

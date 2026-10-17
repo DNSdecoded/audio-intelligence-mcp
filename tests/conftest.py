@@ -61,3 +61,28 @@ def app(settings):
     from audio_mcp.context import build_app_context
 
     return build_app_context(settings)
+
+
+def wait_until(pred, timeout=30.0, interval=0.05):
+    import time
+
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        if pred():
+            return True
+        time.sleep(interval)
+    raise AssertionError("condition not met in time")
+
+
+def slow_transcribe(seconds):
+    import time
+
+    from audio_mcp.backends.fake import FakeASR
+
+    asr = FakeASR()
+
+    def run(*a, **k):
+        time.sleep(seconds)
+        return asr.transcribe(*a, **k)
+
+    return run
