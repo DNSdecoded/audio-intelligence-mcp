@@ -13,7 +13,7 @@ from audio_mcp.logging_setup import setup_logging
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, AsyncMode, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
-    InspectQualityRequest, PreprocessOp, TaskName, TranscribeRequest,
+    InspectQualityRequest, NodeType, PreprocessOp, TaskName, TimelineRequest, TranscribeRequest,
 )
 
 _app: AppContext | None = None
@@ -112,6 +112,17 @@ async def inspect_audio_quality(
 ) -> dict:
     return await _run(handlers.inspect_audio_quality, InspectQualityRequest, dict(
         source=source, apply_preprocessing=apply_preprocessing, compare_transcription=compare_transcription))
+
+
+@mcp.tool(name="get_audio_timeline", description=(
+    "Build a chronological event graph of an audio source: speech segments, speaker turns, sound events, silence, "
+    "overlaps and transitions, with relation edges (precedes, during, overlaps, interrupts) and a text rendering."))
+async def get_audio_timeline(
+    source: AudioSource,
+    include: list[NodeType] | None = None,
+    diarize: bool = True,
+) -> dict:
+    return await _run(handlers.get_audio_timeline, TimelineRequest, dict(source=source, include=include, diarize=diarize))
 
 
 def main() -> None:

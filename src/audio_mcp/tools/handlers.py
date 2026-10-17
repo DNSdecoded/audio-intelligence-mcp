@@ -13,7 +13,7 @@ from audio_mcp.envelope import AudioMCPError, ErrorCode, build_response, error_r
 from audio_mcp.pipeline.planner import TASK_TO_STAGES
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.tools.schemas import (
-    AnalyzeOptions, AnalyzeRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, TranscribeRequest,
+    AnalyzeOptions, AnalyzeRequest, DetectEventsRequest, FeaturesRequest, InspectQualityRequest, TimelineRequest, TranscribeRequest,
 )
 
 log = logging.getLogger("audio_mcp.tools")
@@ -69,11 +69,20 @@ def analysis_payload(outcome, options: AnalyzeOptions) -> dict:
         a["acoustic_features"] = r["features"]
     if "quality" in r:
         a["audio_quality"] = r["quality"]
+    if "timeline" in r:
+        a["timeline"] = r["timeline"]
     if not options.word_level_timestamps:
         a = _strip(a, {"words"})
     if not options.include_confidence:
         a = _strip(a, {"confidence", "confidence_kind"})
     return a
+
+
+LATE_STAGES = ("timeline", "uncertainty", "summary")  # read whatever earlier stages produced
+
+
+def order_stages(stages: list[str]) -> list[str]:
+    return [s for s in stages if s not in LATE_STAGES] + [s for s in LATE_STAGES if s in stages]
 
 
 def _respond(outcome, result, *, key="result", extra_warnings=()):
@@ -89,8 +98,9 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
     for t in tasks:
         stages += [s for s in TASK_TO_STAGES[t] if s not in stages]
     o = req.options
-    outcome = run_analysis(app, req.source, stages, {"language": o.language, "word_timestamps": o.word_level_timestamps,
-                                                     "num_speakers": o.num_speakers})
+    outcome = run_analysis(app, req.source, order_stages(stages), {
+        "language": o.language, "word_timestamps": o.word_level_timestamps, "num_speakers": o.num_speakers,
+        "diarize": "speaker_diarization" in tasks})
     warns = [warning("UNSUPPORTED_FEATURE", "emotion detection is not implemented")] if o.detect_emotions else []
     return _respond(outcome, analysis_payload(outcome, o), key="analysis", extra_warnings=warns)
 
@@ -176,3 +186,10 @@ def inspect_audio_quality(app, req: InspectQualityRequest) -> dict:
         pre["transcription_comparison"] = compare_preprocessed_asr(app, outcome.record, audio, ops)
     result["preprocessing"] = pre
     return _respond(outcome, result)
+
+
+@tool_handler
+def get_audio_timeline(app, req: TimelineRequest) -> dict:
+    stages = (["diarization", "speaker_assign"] if req.diarize else []) + ["timeline"]
+    outcome = run_analysis(app, req.source, stages, {"diarize": req.diarize, "timeline_include": req.include})
+    return _respond(outcome, outcome.results.get("timeline"))

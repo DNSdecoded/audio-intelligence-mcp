@@ -15,6 +15,7 @@ TaskName = Literal[
 CategoryName = Literal["alarm", "impact", "footsteps", "door", "animal", "machinery", "music", "environment"]
 FeatureGroup = Literal["level", "silence", "spectral", "pitch", "rhythm", "bands"]
 AsyncMode = Literal["auto", "always", "never"]
+NodeType = Literal["speech_segment", "speaker_turn", "sound_event", "silence", "overlap", "transition"]
 PreprocessOp = Literal["remove_dc", "mono", "highpass_80hz", "denoise", "trim_silence", "resample_16k", "normalize"]
 
 # keep the Literals in step with the engine's tables
@@ -77,3 +78,9 @@ class InspectQualityRequest(_Req):
     source: AudioSource
     apply_preprocessing: bool | list[PreprocessOp] = False
     compare_transcription: bool = False
+
+
+class TimelineRequest(_Req):
+    source: AudioSource
+    include: list[NodeType] | None = None
+    diarize: bool = True

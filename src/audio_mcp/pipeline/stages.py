@@ -3,14 +3,17 @@ import threading
 from dataclasses import dataclass, field
 from typing import Callable
 
+import numpy as np
+
 from audio_mcp.analysis.diarize import assign_speakers, cluster_speakers, speaker_summary
 from audio_mcp.analysis.events import frames_to_events
 from audio_mcp.context import AppContext
-from audio_mcp.dsp.features import FEATURE_GROUPS, extract_features
+from audio_mcp.dsp.features import FEATURE_GROUPS, extract_features, frame_rms
 from audio_mcp.dsp.quality import diagnose_quality
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo, warning
 from audio_mcp.ingest.decode import DecodedAudio
 from audio_mcp.store.audio_store import AudioRecord
+from audio_mcp.timeline.graph import build_timeline
 from audio_mcp.types import Interval, Segment
 
 
@@ -142,6 +145,17 @@ def _diar_cfg(app, o):
             "num_speakers": o.get("num_speakers"), "max_speakers": app.settings.max_speakers}
 
 
+def _level_windows(audio) -> list[float | None]:
+    rms = frame_rms(audio.mono16k, 16000, win=1.0, hop=1.0)
+    return [round(20 * float(np.log10(r)), 1) if r > 0 else None for r in rms]
+
+
+def _timeline(ctx):
+    include = ctx.options.get("timeline_include")
+    return build_timeline(ctx.results, ctx.audio.duration, include=set(include) if include else None,
+                          level_db=_level_windows(ctx.audio))
+
+
 def _quality(ctx):
     return diagnose_quality(ctx.audio.native, ctx.audio.native_sr, ctx.results["features"]["values"], _regions(ctx))
 
@@ -166,6 +180,11 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("diarization", ("vad",), _diarization, _diar_cfg),
     Stage("speaker_assign", ("transcription", "diarization"), _speaker_assign,
           lambda a, o: {**_asr_cfg(a, o), **_diar_cfg(a, o)}),
+    Stage("timeline", ("metadata", "features"), _timeline,
+          lambda a, o: {**_asr_cfg(a, o), **_diar_cfg(a, o), "tagger": _id(a.backends.tagger),
+                        "threshold": _threshold(a, o), "diarize": bool(o.get("diarize")),
+                        "include": sorted(o.get("timeline_include") or [])},
+          soft_deps=("vad", "transcription", "events")),
     Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),
