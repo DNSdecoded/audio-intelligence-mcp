@@ -93,6 +93,9 @@ def load_settings(config_path: Path | None = None) -> Settings:
     """Precedence: env > TOML (arg, else AUDIO_MCP_CONFIG) > defaults."""
     path = config_path or (Path(p) if (p := os.environ.get("AUDIO_MCP_CONFIG")) else None)
 
+    if path and not path.is_file():
+        raise FileNotFoundError(f"config file not found: {path}")
+
     class _Settings(Settings):
         @classmethod
         def settings_customise_sources(
