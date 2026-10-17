@@ -1,4 +1,5 @@
 import logging
+import threading
 from contextlib import asynccontextmanager
 from typing import Any, Literal
 
@@ -10,6 +11,7 @@ from audio_mcp.config import load_settings
 from audio_mcp.context import AppContext, build_app_context
 from audio_mcp.ingest.sources import AudioSource
 from audio_mcp.logging_setup import setup_logging
+from audio_mcp.store.retention import cleanup_temp, sweep
 from audio_mcp.tools import handlers
 from audio_mcp.tools.schemas import (
     AnalyzeOptions, AnalyzeRequest, AskRequest, AsyncMode, CompareRequest, GetJobRequest, CategoryName, DetectEventsRequest, FeatureGroup, FeaturesRequest,
@@ -25,11 +27,23 @@ async def lifespan(_server):
     settings = load_settings()
     setup_logging(settings)
     _app = build_app_context(settings)
-    logging.getLogger("audio_mcp").info("server started")
+    log = logging.getLogger("audio_mcp")
+    log.info("server started; temp files removed: %d; sweep: %s", cleanup_temp(settings), sweep(_app))
+
+    stop = threading.Event()
+
+    def hourly():
+        while not stop.wait(3600):
+            log.info("retention sweep: %s", sweep(_app))
+
+    threading.Thread(target=hourly, name="audio-mcp-retention", daemon=True).start()
     try:
         yield
     finally:
+        stop.set()
         _app.jobs.shutdown()
+        sweep(_app, final=True)
+        cleanup_temp(settings)
 
 
 mcp = FastMCP("audio-intelligence", lifespan=lifespan)

@@ -11,6 +11,7 @@ from audio_mcp.compare.compare import baseline_anomalies, compare_pair, window_f
 from audio_mcp.dsp.features import extract_features
 from audio_mcp.dsp.preprocess import apply_preprocessing
 from audio_mcp.ingest.decode import resample
+from audio_mcp.export.redact import redact_analysis
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ProcessingInfo, build_response, error_response, warning
 from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
 from audio_mcp.ingest.sources import AudioIdSource, FilePathSource, check_path_allowed
@@ -31,11 +32,21 @@ def invalid_input(e: ValidationError) -> dict:
     return error_response(AudioMCPError(ErrorCode.INVALID_INPUT, f"{loc}: {err['msg']}" if loc else err["msg"]))
 
 
+def _redacted(app, resp: dict) -> dict:
+    s = app.settings
+    if not s.redact_outputs or resp.get("status") == "error":
+        return resp
+    out, n = redact_analysis(resp, s.redact_extra_patterns)
+    if n:
+        out["warnings"] = [*out.get("warnings", []), warning("REDACTED", f"{n} sensitive spans redacted")]
+    return out
+
+
 def tool_handler(fn):
     @functools.wraps(fn)
     def wrapper(app, req):
         try:
-            return fn(app, req)
+            return _redacted(app, fn(app, req))
         except AudioMCPError as e:
             return error_response(e)
         except ValidationError as e:
