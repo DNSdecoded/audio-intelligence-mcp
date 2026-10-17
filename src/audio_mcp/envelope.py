@@ -1,3 +1,4 @@
+import math
 from enum import StrEnum
 from typing import Any
 
@@ -64,6 +65,17 @@ class ProcessingInfo(BaseModel):
     plan: list[dict] | None = None
 
 
+def _finite(x):
+    """Replace NaN/inf floats with None, recursively: responses must be strict JSON."""
+    if isinstance(x, float):
+        return x if math.isfinite(x) else None
+    if isinstance(x, dict):
+        return {k: _finite(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [_finite(v) for v in x]
+    return x
+
+
 def build_response(
     *,
     result: dict | None,
@@ -87,7 +99,7 @@ def build_response(
         resp["audio_id"] = audio_id
     if job_id is not None:
         resp["job_id"] = job_id
-    resp[payload_key] = result
+    resp[payload_key] = _finite(result)
     resp["warnings"] = list(warnings)
     resp["errors"] = list(errors)
     resp["processing"] = (processing or ProcessingInfo()).model_dump()

@@ -8,12 +8,18 @@ from audio_mcp.dsp.features import _HOP, _N_FFT, _stft_blocks
 def _hum_excess_db(m, sr):
     if len(m) < sr // 4:
         return None
+    with np.errstate(all="ignore"):  # NaN/inf samples give a None result, not warnings
+        return _hum_db(m, sr)
+
+
+def _hum_db(m, sr):
     f, p = welch(m, fs=sr, nperseg=min(sr, len(m)))
     band = p[(f >= 30) & (f <= 120)]
     if not band.size or np.median(band) <= 0:
         return None
     peak = max(p[np.argmin(np.abs(f - hz))] for hz in (50, 60))
-    return float(10 * np.log10(peak / np.median(band))) if peak > 0 else None
+    db = 10 * np.log10(peak / np.median(band)) if peak > 0 else np.nan
+    return float(db) if np.isfinite(db) else None  # NaN/inf input (e.g. float files) must not leak out
 
 
 def _echo_peak(m, sr):

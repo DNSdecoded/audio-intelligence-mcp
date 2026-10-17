@@ -65,3 +65,23 @@ def test_build_response_serialises_processing_info():
     assert p["stages_run"] == ["decode"]
     assert p["models_used"][0] == {"stage": "transcription", "name": "faster-whisper", "version": "small", "local": True}
     assert p["data_sent_off_machine"] is False
+
+
+def test_non_finite_floats_become_none():  # M1
+    import json
+
+    from audio_mcp.envelope import build_response
+
+    r = build_response(result={"x": float("inf"), "y": [1.0, float("nan"), {"z": -float("inf")}], "ok": 2.5})
+    assert r["result"] == {"x": None, "y": [1.0, None, {"z": None}], "ok": 2.5}
+    json.dumps(r, allow_nan=False)
+
+
+def test_hum_guard_non_finite():  # M1
+    import numpy as np
+
+    from audio_mcp.dsp.quality import _hum_excess_db
+
+    x = np.zeros(16000, dtype=np.float32)
+    x[100] = np.inf
+    assert _hum_excess_db(x, 16000) is None
