@@ -1,7 +1,10 @@
 import base64
 
 import numpy as np
+import pytest
 import soundfile as sf
+
+from audio_mcp.envelope import AudioMCPError
 
 from audio_mcp.tools.handlers import analyze_audio_stream
 from audio_mcp.tools.schemas import StreamRequest
@@ -54,3 +57,24 @@ def test_expire(app):
     sid = stream(app, action="start", chunk_format="file")["result"]["session_id"]
     assert app.streams.expire(idle_seconds=-1) == 1
     assert stream(app, action="status", session_id=sid)["error"]["code"] == "INVALID_INPUT"
+
+
+def test_concurrent_pushes_and_close(app):  # M4
+    import threading
+
+    sid = stream(app, action="start", chunk_format="pcm", sample_rate_hz=16000, channels=1,
+                 sample_format="s16le")["result"]["session_id"]
+    part = base64.b64encode((np.ones(1600, dtype=np.int16) * 1000).tobytes()).decode()
+    idx = []
+    ts = [threading.Thread(target=lambda: idx.append(
+        stream(app, action="push", session_id=sid, data=part)["result"]["chunk_index"])) for _ in range(8)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join(30)
+    assert sorted(idx) == list(range(8))
+    s = app.streams._get(sid)
+    assert s.buffer.stat().st_size == 8 * 1600 * 4 and s.chunks[-1][1] == 0.8
+    stream(app, action="cancel", session_id=sid)
+    with pytest.raises(AudioMCPError):  # a late push after close never writes into a deleted session
+        app.streams.push(sid, part)

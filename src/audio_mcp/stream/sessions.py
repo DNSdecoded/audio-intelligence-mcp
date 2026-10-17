@@ -36,6 +36,8 @@ class Session:
     provisional_text: list = field(default_factory=list)
     provisional_events: list = field(default_factory=list)
     last_activity: float = field(default_factory=time.time)
+    lock: threading.Lock = field(default_factory=threading.Lock, repr=False)  # serializes push/finish/close
+    closed: bool = False
 
     @property
     def buffer(self) -> Path:
@@ -109,6 +111,12 @@ class StreamSessions:
 
     def push(self, session_id, data_b64=None, path=None) -> dict:
         s = self._get(session_id)
+        with s.lock:
+            if s.closed:
+                raise AudioMCPError(ErrorCode.INVALID_INPUT, "unknown session")
+            return self._push(s, data_b64, path)
+
+    def _push(self, s: Session, data_b64, path) -> dict:
         x = self._decode_chunk(s, data_b64, path)
         if (s.samples + x.shape[1]) / s.sr > self.app.settings.max_duration_seconds:
             raise AudioMCPError(ErrorCode.DURATION_TOO_LONG, "stream exceeds max_duration_seconds")
@@ -156,12 +164,15 @@ class StreamSessions:
     def finish_audio(self, session_id):
         """Write the stream to FLAC and ingest it; returns (record, session) for the caller's full analysis."""
         s = self._get(session_id)
-        if not s.samples:
-            raise AudioMCPError(ErrorCode.EMPTY_AUDIO, "no audio was pushed to this session")
-        data = np.fromfile(s.buffer, dtype=np.float32).reshape(-1, s.channels)
-        out = s.dir / "stream.flac"
-        sf.write(out, np.clip(data, -1.0, 1.0), s.sr, subtype="PCM_24")
-        return self.app.store.ingest_path(out, f"stream-{s.id}.flac"), s
+        with s.lock:
+            if s.closed:
+                raise AudioMCPError(ErrorCode.INVALID_INPUT, "unknown session")
+            if not s.samples:
+                raise AudioMCPError(ErrorCode.EMPTY_AUDIO, "no audio was pushed to this session")
+            data = np.fromfile(s.buffer, dtype=np.float32).reshape(-1, s.channels)
+            out = s.dir / "stream.flac"
+            sf.write(out, np.clip(data, -1.0, 1.0), s.sr, subtype="PCM_24")
+            return self.app.store.ingest_path(out, f"stream-{s.id}.flac"), s
 
     def reconcile(self, s: Session, analysis: dict) -> dict:
         final_text = (analysis.get("transcription") or {}).get("text", "")
@@ -182,7 +193,9 @@ class StreamSessions:
             s = self._sessions.pop(session_id, None)
         if s is None:
             raise AudioMCPError(ErrorCode.INVALID_INPUT, "unknown session")
-        shutil.rmtree(s.dir, ignore_errors=True)
+        with s.lock:  # wait for an in-flight push/finish before deleting its files
+            s.closed = True
+            shutil.rmtree(s.dir, ignore_errors=True)
         return {"session_id": session_id, "state": "cancelled"}
 
     def expire(self, idle_seconds: float = 3600) -> int:
