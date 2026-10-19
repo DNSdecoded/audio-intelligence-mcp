@@ -1,0 +1,39 @@
+{
+  "file": "F:/eval_data/sets/long/long_10min.flac",
+  "duration_seconds": 616.469938,
+  "profile": "real",
+  "repeats": 1,
+  "stages": [
+    {
+      "stage": "vad",
+      "mean_seconds": 9.0067,
+      "min_seconds": 9.0067,
+      "rtf": 0.0146
+    },
+    {
+      "stage": "transcription",
+      "mean_seconds": 357.1197,
+      "min_seconds": 357.1197,
+      "rtf": 0.5793
+    },
+    {
+      "stage": "events",
+      "mean_seconds": 139.6901,
+      "min_seconds": 139.6901,
+      "rtf": 0.2266
+    },
+    {
+      "stage": "diarization",
+      "mean_seconds": 352.3026,
+      "min_seconds": 352.3026,
+      "rtf": 0.5715
+    },
+    {
+      "stage": "speaker_assign",
+      "mean_seconds": 0.3147,
+      "min_seconds": 0.3147,
+      "rtf": 0.0005
+    }
+  ],
+  "peak_rss_mb": 2095.9
+}

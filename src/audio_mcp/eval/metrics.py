@@ -1,5 +1,5 @@
 """Evaluation metrics: diarization error rate (frame-based) and word error rate."""
-import re
+import unicodedata
 from pathlib import Path
 
 import numpy as np
@@ -54,12 +54,21 @@ def der(ref: list[dict], hyp: list[dict], *, collar: float = 0.25, frame: float 
 
 
 def _words(text: str) -> list[str]:
-    return re.sub(r"[^\w\s']", " ", text.lower()).split()
+    # strip punctuation/symbols by Unicode category; \W would also strip combining marks (Devanagari, Arabic vowels)
+    return "".join(" " if unicodedata.category(c)[0] in "PS" and c != "'" else c for c in text.lower()).split()
 
 
 def word_error_rate(ref: str, hyp: str) -> float:
     """Word-level Levenshtein distance / reference length (lowercased, punctuation stripped)."""
-    r, h = _words(ref), _words(hyp)
+    return _edit_rate(_words(ref), _words(hyp))
+
+
+def char_error_rate(ref: str, hyp: str) -> float:
+    """Character-level error rate over the same normalization, spaces removed (for unsegmented scripts)."""
+    return _edit_rate(list("".join(_words(ref))), list("".join(_words(hyp))))
+
+
+def _edit_rate(r: list[str], h: list[str]) -> float:
     if not r:
         return 0.0 if not h else 1.0
     prev = list(range(len(h) + 1))
@@ -78,9 +87,10 @@ def _iou(a: dict, b: dict) -> float:
 
 
 def event_prf(ref: list[dict], hyp: list[dict], *, iou: float = 0.5) -> dict:
-    """Event-level precision/recall/F1: same label (case-insensitive), greedy one-to-one matching by IoU."""
+    """Event-level precision/recall/F1: same label (case-insensitive; a reference label "A|B" accepts either),
+    greedy one-to-one matching by IoU."""
     pairs = sorted(((_iou(r, h), i, j) for i, r in enumerate(ref) for j, h in enumerate(hyp)
-                    if r["label"].lower() == h["label"].lower()), reverse=True)
+                    if h["label"].lower() in r["label"].lower().split("|")), reverse=True)
     used_r, used_h = set(), set()
     for v, i, j in pairs:
         if v >= iou and i not in used_r and j not in used_h:

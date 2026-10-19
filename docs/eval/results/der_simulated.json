@@ -1,0 +1,94 @@
+{
+  "metric": "der",
+  "per_file": [
+    {
+      "file": "conv_00.flac",
+      "der": 0.1765,
+      "missed": 0.0013,
+      "false_alarm": 0.0,
+      "confusion": 0.1752
+    },
+    {
+      "file": "conv_01.flac",
+      "der": 0.1603,
+      "missed": 0.0119,
+      "false_alarm": 0.0,
+      "confusion": 0.1484
+    },
+    {
+      "file": "conv_02.flac",
+      "der": 0.15,
+      "missed": 0.0132,
+      "false_alarm": 0.0,
+      "confusion": 0.1368
+    },
+    {
+      "file": "conv_03.flac",
+      "der": 0.0974,
+      "missed": 0.0719,
+      "false_alarm": 0.0,
+      "confusion": 0.0256
+    },
+    {
+      "file": "conv_04.flac",
+      "der": 0.3657,
+      "missed": 0.0266,
+      "false_alarm": 0.0,
+      "confusion": 0.3391
+    },
+    {
+      "file": "conv_05.flac",
+      "der": 0.1081,
+      "missed": 0.0097,
+      "false_alarm": 0.0,
+      "confusion": 0.0984
+    },
+    {
+      "file": "conv_06.flac",
+      "der": 0.1026,
+      "missed": 0.0067,
+      "false_alarm": 0.0,
+      "confusion": 0.096
+    },
+    {
+      "file": "conv_07.flac",
+      "der": 0.1387,
+      "missed": 0.0082,
+      "false_alarm": 0.0,
+      "confusion": 0.1305
+    },
+    {
+      "file": "conv_08.flac",
+      "der": 0.1393,
+      "missed": 0.0355,
+      "false_alarm": 0.0,
+      "confusion": 0.1037
+    },
+    {
+      "file": "conv_09.flac",
+      "der": 0.1116,
+      "missed": 0.0296,
+      "false_alarm": 0.0,
+      "confusion": 0.0819
+    },
+    {
+      "file": "conv_10.flac",
+      "der": 0.1073,
+      "missed": 0.0187,
+      "false_alarm": 0.0001,
+      "confusion": 0.0885
+    },
+    {
+      "file": "conv_11.flac",
+      "der": 0.0592,
+      "missed": 0.011,
+      "false_alarm": 0.0,
+      "confusion": 0.0482
+    }
+  ],
+  "aggregate": {
+    "der": 0.1327,
+    "files": 12,
+    "collar": 0.25
+  }
+}

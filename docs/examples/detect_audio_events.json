@@ -28,7 +28,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.281,
+      "duration_seconds": 0.328,
       "stages_run": [
         "events"
       ],

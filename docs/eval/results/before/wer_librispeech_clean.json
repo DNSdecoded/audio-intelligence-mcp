@@ -1,0 +1,570 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "1089-134686-0000.flac",
+      "wer": 0.0,
+      "ref_units": 28,
+      "language": "en",
+      "hypothesis": "He hoped there would be stew for dinner, turnips and carrots and bruised potatoes and fat mutton pieces to be ladled out in thick, peppered, flour-fattened sauce."
+    },
+    {
+      "file": "1089-134686-0001.flac",
+      "wer": 0.125,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Stuff it into you. His belly counseled him."
+    },
+    {
+      "file": "1188-133604-0000.flac",
+      "wer": 0.0526,
+      "ref_units": 19,
+      "language": "en",
+      "hypothesis": "You will find me continually speaking of 4 men, Titian, Holbein, Turner, and Tintoret in almost the same terms."
+    },
+    {
+      "file": "1188-133604-0001.flac",
+      "wer": 0.0,
+      "ref_units": 18,
+      "language": "en",
+      "hypothesis": "They unite every quality. And sometimes you will find me referring to them as colorists, sometimes as chiaroscurists."
+    },
+    {
+      "file": "121-121726-0000.flac",
+      "wer": 0.1765,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "Also, a popular condrivens, whereby lovemaking may be suspended, but not stopped during the picnic season."
+    },
+    {
+      "file": "121-121726-0001.flac",
+      "wer": 0.125,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Hurang! The tiresome product of a tireless tongue."
+    },
+    {
+      "file": "1221-135766-0000.flac",
+      "wer": 0.0,
+      "ref_units": 37,
+      "language": "en",
+      "hypothesis": "How strange it seemed to the sad woman as she watched the growth and the beauty that became every day more brilliant and the intelligence that threw its quivering sunshine over the tiny features of this child."
+    },
+    {
+      "file": "1221-135766-0001.flac",
+      "wer": 0.0625,
+      "ref_units": 48,
+      "language": "en",
+      "hypothesis": "God, as a direct consequence of the sin which man thus punished, had given her a lovely child, whose place was on that same dishonored bosom to connect her parent forever with the race and descent of mortals, and to be finally a blessed soul in heaven."
+    },
+    {
+      "file": "1284-1180-0000.flac",
+      "wer": 0.0,
+      "ref_units": 24,
+      "language": "en",
+      "hypothesis": "He wore blue silk stockings, blue knee-pants with gold buckles, a blue ruffled waist, and a jacket of bright blue braided with gold."
+    },
+    {
+      "file": "1284-1180-0001.flac",
+      "wer": 0.0,
+      "ref_units": 26,
+      "language": "en",
+      "hypothesis": "His hat had a peaked crown and a flat brim, and around the brim was a row of tiny golden bells that tinkled when he moved."
+    },
+    {
+      "file": "1320-122612-0000.flac",
+      "wer": 0.0,
+      "ref_units": 41,
+      "language": "en",
+      "hypothesis": "Since the period of our tale, the active spirit of the country has surrounded it with a belt of rich and thriving settlements, though none but the hunter or the savage is ever known even now to penetrate its wild recesses."
+    },
+    {
+      "file": "1320-122612-0001.flac",
+      "wer": 0.0,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "The dews were suffered to exhale, and the sun had dispersed the mists, and was shedding a strong and clear light in the forest when the travelers resumed their journey."
+    },
+    {
+      "file": "1580-141083-0000.flac",
+      "wer": 0.0333,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "I will endeavor in my statement to avoid such terms as would serve to limit the events to any particular place or give a clue as to the people concerned."
+    },
+    {
+      "file": "1580-141083-0001.flac",
+      "wer": 0.0,
+      "ref_units": 34,
+      "language": "en",
+      "hypothesis": "I had always known him to be restless in his manner, but on this particular occasion he was in such a state of uncontrollable agitation that it was clear something very unusual had occurred."
+    },
+    {
+      "file": "1995-1826-0000.flac",
+      "wer": 0.0741,
+      "ref_units": 27,
+      "language": "en",
+      "hypothesis": "In the debate between the senior societies, her defense of the 15th Amendment had been not only a notable bit of reasoning, but delivered with real enthusiasm."
+    },
+    {
+      "file": "1995-1826-0001.flac",
+      "wer": 0.0,
+      "ref_units": 27,
+      "language": "en",
+      "hypothesis": "The South she had not thought of seriously and yet, knowing of its delightful hospitality and mild climate, she was not averse to Charleston or New Orleans."
+    },
+    {
+      "file": "2094-142345-0000.flac",
+      "wer": 0.0,
+      "ref_units": 49,
+      "language": "en",
+      "hypothesis": "It is a very fine old place, of red brick, softened by a pale, powdery lichen, which has dispersed itself with happy irregularity, so as to bring the red brick into terms of friendly companionship with the limestone ornaments surrounding the three gables, the windows, and the door place."
+    },
+    {
+      "file": "2094-142345-0001.flac",
+      "wer": 0.0,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "But the windows are patched with wooden panes, and the door, I think, is like the gate. It is never opened."
+    },
+    {
+      "file": "2300-131720-0000.flac",
+      "wer": 0.0,
+      "ref_units": 13,
+      "language": "en",
+      "hypothesis": "The Paris plant, like that at the Crystal Palace, was a temporary exhibit."
+    },
+    {
+      "file": "2300-131720-0001.flac",
+      "wer": 0.0606,
+      "ref_units": 33,
+      "language": "en",
+      "hypothesis": "The London plant was less temporary, but not permanent. Supplying, before it was torn out, no fewer than 3,000 lamps in hotels, churches, stores, and dwellings in the vicinity of Holborn Viaduct."
+    },
+    {
+      "file": "237-126133-0000.flac",
+      "wer": 0.0,
+      "ref_units": 38,
+      "language": "en",
+      "hypothesis": "Here she would stay, comforted and soothed among the lovely plants and rich exotics, rejoicing the heart of old Turner the gardener, who since Polly's first rapturous entrance had taken her into his good graces for all time."
+    },
+    {
+      "file": "237-126133-0001.flac",
+      "wer": 0.0,
+      "ref_units": 37,
+      "language": "en",
+      "hypothesis": "Every chance she could steal after practice hours were over, and after the clamorous demands of the boys upon her time were fully satisfied, was seized to fly on the wings of the wind to the flowers."
+    },
+    {
+      "file": "260-123286-0000.flac",
+      "wer": 0.0833,
+      "ref_units": 12,
+      "language": "en",
+      "hypothesis": "Saturday, August 15th. The sea unbroken all round. No land in sight."
+    },
+    {
+      "file": "260-123286-0001.flac",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "The horizon seems extremely distant."
+    },
+    {
+      "file": "2830-3979-0000.flac",
+      "wer": 0.0476,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "We want you to help us publish some leading work of Luthers for the general American market. Will you do it?"
+    },
+    {
+      "file": "2830-3979-0001.flac",
+      "wer": 0.0,
+      "ref_units": 47,
+      "language": "en",
+      "hypothesis": "The condition is that I will be permitted to make Luther talk American. Streamline him, so to speak, because you will never get people whether in or outside the Lutheran Church actually to read Luther unless we make him talk as he would talk today to Americans."
+    },
+    {
+      "file": "2961-960-0000.flac",
+      "wer": 0.0196,
+      "ref_units": 51,
+      "language": "en",
+      "hypothesis": "He passes abruptly from persons to ideas and numbers, and from ideas and numbers to persons, from the heavens to man, from astronomy to physiology. He confuses, or rather does not distinguish, subject and object, first and final causes, and his dreaming of geometrical figures lost in a flux of sense."
+    },
+    {
+      "file": "2961-960-0001.flac",
+      "wer": 0.0667,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "The influence which the Timaeus has exercised upon posterity is due partly to a misunderstanding."
+    },
+    {
+      "file": "3570-5694-0000.flac",
+      "wer": 0.0811,
+      "ref_units": 37,
+      "language": "en",
+      "hypothesis": "But already, at a point in economic evolution, far ant-dating the emergence of the lady, specialized consumption of goods, as an evidence of pecuniary strength, had begun to work out in a more or less elaborate system."
+    },
+    {
+      "file": "3570-5694-0001.flac",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "The utility of consumption as an evidence of wealth is to be classed as a derivative growth."
+    },
+    {
+      "file": "3575-170457-0000.flac",
+      "wer": 0.04,
+      "ref_units": 25,
+      "language": "en",
+      "hypothesis": "And often, as my mother said, while on her lap I laid my head, she feared for time I was not made, but for eternity."
+    },
+    {
+      "file": "3575-170457-0001.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "Why are we to be denied each other's society?"
+    },
+    {
+      "file": "3729-6852-0000.flac",
+      "wer": 0.0312,
+      "ref_units": 32,
+      "language": "en",
+      "hypothesis": "To celebrate the arrival of her son, Sylvia gave a splendid supper to which she had invited all her relatives, and it was a good opportunity for me to make their acquaintance."
+    },
+    {
+      "file": "3729-6852-0001.flac",
+      "wer": 0.0,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "Without saying it positively, she made me understand that being herself an illustrious member of the Republic of Letters, she was well aware that she was speaking to an insect."
+    },
+    {
+      "file": "4077-13751-0000.flac",
+      "wer": 0.1538,
+      "ref_units": 26,
+      "language": "en",
+      "hypothesis": "On the 6th of April, 1830, the Church of Jesus Christ of Latter-day Saints was formerly organized and thus took on a legal existence."
+    },
+    {
+      "file": "4077-13751-0001.flac",
+      "wer": 0.0,
+      "ref_units": 19,
+      "language": "en",
+      "hypothesis": "its origin was small, a germ, an insignificant seed, hardly to be thought of as likely to arouse opposition."
+    },
+    {
+      "file": "4446-2271-0000.flac",
+      "wer": 0.25,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Main hall liked Alexander because he was an engineer."
+    },
+    {
+      "file": "4446-2271-0001.flac",
+      "wer": 0.0,
+      "ref_units": 19,
+      "language": "en",
+      "hypothesis": "He had preconceived ideas about everything, and his idea about Americans was that they should be engineers or mechanics."
+    },
+    {
+      "file": "4507-16021-0000.flac",
+      "wer": 0.3333,
+      "ref_units": 3,
+      "language": "en",
+      "hypothesis": "Chapter 1 Origin"
+    },
+    {
+      "file": "4507-16021-0001.flac",
+      "wer": 0.15,
+      "ref_units": 20,
+      "language": "en",
+      "hypothesis": "It engenders a whole world, La Pegre, for which red theft, and a hell, La Pegren, for which red hunger."
+    },
+    {
+      "file": "4970-29093-0000.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "You'll never dig it out of the Astor Library."
+    },
+    {
+      "file": "4970-29093-0001.flac",
+      "wer": 0.0,
+      "ref_units": 29,
+      "language": "en",
+      "hypothesis": "To the young American, here or elsewhere, the paths to fortune are innumerable and all open. There is invitation in the air and success in all his wide horizon."
+    },
+    {
+      "file": "4992-23283-0000.flac",
+      "wer": 0.0,
+      "ref_units": 18,
+      "language": "en",
+      "hypothesis": "But the more forgetfulness had then prevailed, the more powerful was the force of remembrance when she awoke."
+    },
+    {
+      "file": "4992-23283-0001.flac",
+      "wer": 0.0,
+      "ref_units": 6,
+      "language": "en",
+      "hypothesis": "Miss Milner's health is not good."
+    },
+    {
+      "file": "5105-28233-0000.flac",
+      "wer": 0.3,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "Length of service, 14 years, 3 months, and 5 days."
+    },
+    {
+      "file": "5105-28233-0001.flac",
+      "wer": 0.0,
+      "ref_units": 13,
+      "language": "en",
+      "hypothesis": "He seemed born to please without being conscious of the power he possessed."
+    },
+    {
+      "file": "5142-33396-0000.flac",
+      "wer": 0.2,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "At another time, Harold asked,"
+    },
+    {
+      "file": "5142-33396-0001.flac",
+      "wer": 0.0,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "What is your country, Olaf? Have you always been a thrall? The thrall's eyes flashed."
+    },
+    {
+      "file": "5639-40744-0000.flac",
+      "wer": 0.0638,
+      "ref_units": 47,
+      "language": "en",
+      "hypothesis": "11 o'clock had struck. It was a fine clear night, there were the only persons on the road, and they sauntered leisurely along, to avoid paying the price of fatigue for the recreation provided for the Toledans in the valley or on the banks of their river."
+    },
+    {
+      "file": "5639-40744-0001.flac",
+      "wer": 0.0286,
+      "ref_units": 35,
+      "language": "en",
+      "hypothesis": "Secure, as he thought, in the careful administration of justice in that city, and the character of its well-disposed inhabitants, the good Hidalgo was far from thinking that any disaster could befall his family."
+    },
+    {
+      "file": "5683-32865-0000.flac",
+      "wer": 0.25,
+      "ref_units": 4,
+      "language": "en",
+      "hypothesis": "You know, Captain Leek?"
+    },
+    {
+      "file": "5683-32865-0001.flac",
+      "wer": 0.2,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "said Lord Shelford, addressing me."
+    },
+    {
+      "file": "61-70968-0000.flac",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "He began a confused complaint against the wizard, who had vanished behind the curtain on the left."
+    },
+    {
+      "file": "61-70968-0001.flac",
+      "wer": 0.0,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "Give not so earnest a mind to these mummeries child"
+    },
+    {
+      "file": "672-122797-0000.flac",
+      "wer": 0.0,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "Out in the woods stood a nice little fir tree."
+    },
+    {
+      "file": "672-122797-0001.flac",
+      "wer": 0.0278,
+      "ref_units": 36,
+      "language": "en",
+      "hypothesis": "The place he had was a very good one. The sun shone on him. As to fresh air, there was enough of that. And round him grew many large-sized comrades, pines as well as furs."
+    },
+    {
+      "file": "6829-68769-0000.flac",
+      "wer": 0.0556,
+      "ref_units": 36,
+      "language": "en",
+      "hypothesis": "Kenneth and Beth refrained from telling the other girls, or Uncle John, of Old Will Rogers' visit, but they got Mr. Watson in the library and questioned him closely about the penalty for forging a check."
+    },
+    {
+      "file": "6829-68769-0001.flac",
+      "wer": 0.0667,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "It was a serious crime indeed, Mr. Watson told them, and Tom Gates bade fair to serve a lengthy term in the state's prison as a consequence of his rash act."
+    },
+    {
+      "file": "6930-75918-0000.flac",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0001.flac",
+      "wer": 0.0233,
+      "ref_units": 43,
+      "language": "en",
+      "hypothesis": "The English voted to the French baskets of flowers of which they had made a plentiful provision to greet the arrival of the young princess. The French, in return, invited the English to a supper, which was to be given the next day."
+    },
+    {
+      "file": "7021-79730-0000.flac",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0001.flac",
+      "wer": 0.0385,
+      "ref_units": 26,
+      "language": "en",
+      "hypothesis": "To suppose that the object of this work is to aid in affecting such a substitution as that is entirely to mistake its nature and design."
+    },
+    {
+      "file": "7127-75946-0000.flac",
+      "wer": 0.0169,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at 5 o'clock, the King entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0001.flac",
+      "wer": 0.0,
+      "ref_units": 3,
+      "language": "en",
+      "hypothesis": "Ah, very well."
+    },
+    {
+      "file": "7176-88083-0000.flac",
+      "wer": 0.0667,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "All about him was a tumult of bright and broken color, scattered and broad splashes."
+    },
+    {
+      "file": "7176-88083-0001.flac",
+      "wer": 0.0732,
+      "ref_units": 41,
+      "language": "en",
+      "hypothesis": "The mergancer had a crusted head of iridescent green black, a broad collar of lustrous white, black back, black and white wings, white belly, sides finely penciled in black and white, and a breast of rich chestnut red streaked with black."
+    },
+    {
+      "file": "7729-102255-0000.flac",
+      "wer": 0.2857,
+      "ref_units": 7,
+      "language": "en",
+      "hypothesis": "The bogus legislature numbered 36 members."
+    },
+    {
+      "file": "7729-102255-0001.flac",
+      "wer": 0.3333,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "This was at the March election, 1855."
+    },
+    {
+      "file": "8224-274381-0000.flac",
+      "wer": 0.0,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "Though thrown into prison for this enterprise and detained some time, he was not discouraged, but still continued by his countenance and protection to infuse spirit into the distressed royalists."
+    },
+    {
+      "file": "8224-274381-0001.flac",
+      "wer": 0.0217,
+      "ref_units": 46,
+      "language": "en",
+      "hypothesis": "Among other persons of distinction who united themselves to him was Lord Napier of Merchaston, son of the famous inventor of the logarithms, the person to whom the title of a great man is more justly due than to any other whom his country ever produced."
+    },
+    {
+      "file": "8230-279154-0000.flac",
+      "wer": 0.0417,
+      "ref_units": 24,
+      "language": "en",
+      "hypothesis": "The analysis of knowledge will occupy us until the end of the 13th lecture and is the most difficult part of our whole enterprise."
+    },
+    {
+      "file": "8230-279154-0001.flac",
+      "wer": 0.0,
+      "ref_units": 34,
+      "language": "en",
+      "hypothesis": "What is called perception differs from sensation by the fact that the sensational ingredients bring up habitual associates, images and expectations of their usual correlates, all of which are subjectively indistinguishable from the sensation."
+    },
+    {
+      "file": "8455-210777-0000.flac",
+      "wer": 0.0,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "I remained there alone for many hours, but I must acknowledge that before I left the chambers, I had gradually brought myself to look at the matter in another light."
+    },
+    {
+      "file": "8455-210777-0001.flac",
+      "wer": 0.1,
+      "ref_units": 50,
+      "language": "en",
+      "hypothesis": "Had Eva Kressweller not been good looking? Had Jack been still at college? Had Sir Kennington Oval remained in England? Had Mr. Bunnet and the barkeeper not succeeded in stopping my carriage on the hill? Should I have succeeded in arranging for the final departure of my old friend?"
+    },
+    {
+      "file": "8463-287645-0000.flac",
+      "wer": 0.0,
+      "ref_units": 14,
+      "language": "en",
+      "hypothesis": "This was what did the mischief so far as the running away was concerned."
+    },
+    {
+      "file": "8463-287645-0001.flac",
+      "wer": 0.0,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "It is hardly necessary to say more of them here."
+    },
+    {
+      "file": "8555-284447-0000.flac",
+      "wer": 0.2222,
+      "ref_units": 27,
+      "language": "en",
+      "hypothesis": "Then he rushed downstairs into the courtyard, shouting loudly for his soldiers and threatening to patch everybody and his dominions that the sailor man was not recaptured."
+    },
+    {
+      "file": "8555-284447-0001.flac",
+      "wer": 0.0714,
+      "ref_units": 28,
+      "language": "en",
+      "hypothesis": "Hold him fast, my man, and as soon as I've had my coffee and oatmeal, I'll take him to the room of the Great Knife and pat him."
+    },
+    {
+      "file": "908-157963-0000.flac",
+      "wer": 0.0333,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "to fade away like morning beauty from her mortal day. Down by the river of Adana, her soft voice is heard, and thus her gentle lamentation falls like morning dew."
+    },
+    {
+      "file": "908-157963-0001.flac",
+      "wer": 0.1667,
+      "ref_units": 6,
+      "language": "en",
+      "hypothesis": "Oh life of this our spring"
+    }
+  ],
+  "aggregate": {
+    "wer": 0.0408,
+    "files": 80,
+    "language_accuracy": 1.0
+  }
+}

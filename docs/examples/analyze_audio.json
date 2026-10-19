@@ -205,6 +205,7 @@
           "crest_factor_db": "dB",
           "clipping_ratio": "ratio",
           "dc_offset": "linear",
+          "active_rms_dbfs": "dBFS",
           "snr_db_estimate": "dB",
           "silence_ratio": "ratio",
           "silence_intervals": "seconds",
@@ -233,8 +234,9 @@
           "crest_factor_db": 21.09482699637073,
           "clipping_ratio": 0.0,
           "dc_offset": 0.010997789110417664,
+          "active_rms_dbfs": -19.886405012999504,
           "snr_method": "vad",
-          "snr_db_estimate": 12.748349579496537,
+          "snr_db_estimate": null,
           "silence_ratio": 0.4762886597938144,
           "silence_intervals": [
             {
@@ -277,29 +279,16 @@
         "metrics": {
           "clipping_ratio": 0.0,
           "rms_dbfs": -22.787172992620732,
+          "active_rms_dbfs": -19.886405012999504,
           "silence_ratio": 0.4762886597938144,
-          "snr_db_estimate": 12.748349579496537,
+          "snr_db_estimate": null,
           "dc_offset": 0.010997789110417664,
           "hum_excess_db": -7.1622612650552195,
-          "echo_autocorr_peak": 0.6579400581203376,
-          "rolloff99_hz": 4773.4375,
+          "echo_cepstral_z": 10.490420897219929,
+          "hf_energy_ratio_db": -13.312005480328144,
           "channels": 1
         },
         "issues": [
-          {
-            "code": "HIGH_NOISE",
-            "severity": "medium",
-            "message": "Estimated SNR is low (vad estimate).",
-            "measured": 12.74835,
-            "threshold": 15
-          },
-          {
-            "code": "ECHO",
-            "severity": "medium",
-            "message": "Possible echo/reverberation (heuristic indicator).",
-            "measured": 0.65794,
-            "threshold": 0.5
-          },
           {
             "code": "DC_OFFSET",
             "severity": "medium",
@@ -309,7 +298,6 @@
           }
         ],
         "recommendations": [
-          "denoise",
           "remove_dc"
         ],
         "overall": "fair"
@@ -467,7 +455,7 @@
     ],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.281,
+      "duration_seconds": 0.469,
       "stages_run": [
         "metadata",
         "features",

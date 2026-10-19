@@ -1,0 +1,472 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "1688-142285-0000.flac",
+      "wer": 0.0,
+      "ref_units": 32,
+      "language": "en",
+      "hypothesis": "There's iron, they say, in all our blood, and a grain or two, perhaps, is good. But his, he makes me harshly feel, has got a little too much of steel. Anon."
+    },
+    {
+      "file": "1688-142285-0001.flac",
+      "wer": 0.0882,
+      "ref_units": 34,
+      "language": "en",
+      "hypothesis": "Margaret, said Mr. Hale, as he returned from showing his guests downstairs. I could not help watching your face with some anxiety, when Mr. Thornton made his confession of having been a shop boy."
+    },
+    {
+      "file": "1998-15444-0000.flac",
+      "wer": 0.0,
+      "ref_units": 42,
+      "language": "en",
+      "hypothesis": "If called to a case supposed or suspected to be one of poisoning, the medical man has two duties to perform, to save the patient's life and to place himself in a position to give evidence if called on to do so."
+    },
+    {
+      "file": "1998-15444-0001.flac",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "He should make inquiries as to symptoms and time at which food or medicine was last taken."
+    },
+    {
+      "file": "2033-164914-0000.flac",
+      "wer": 0.0526,
+      "ref_units": 19,
+      "language": "en",
+      "hypothesis": "replied he of a truth I heard him not and I want him not and folks are all sleeping"
+    },
+    {
+      "file": "2033-164914-0001.flac",
+      "wer": 1.0,
+      "ref_units": 11,
+      "language": "ar",
+      "hypothesis": "\u0644\u0643\u0646\u0647\u0627 \u0642\u0644\u062a \u0645\u0646\u0630 \u0643\u0630\u0644\u0643 \u064a\u062c\u0628 \u0639\u0644\u064a\u0643 \u0623\u0646 \u062a\u062a\u0630\u0643\u0631 \u060c \u0623\u0646\u0647 \u0647\u0648 \u0631\u0633\u0627\u0626\u0631"
+    },
+    {
+      "file": "2414-128291-0000.flac",
+      "wer": 0.4,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "what has happened to me."
+    },
+    {
+      "file": "2414-128291-0001.flac",
+      "wer": 0.1333,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "He asked himself, something warm and living quickenets me, it must be in the neighborhood."
+    },
+    {
+      "file": "2609-156975-0000.flac",
+      "wer": 0.0909,
+      "ref_units": 11,
+      "language": "en",
+      "hypothesis": "Then the Moses was afraid and said, Surely the thing is known."
+    },
+    {
+      "file": "2609-156975-0001.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "Hold on, hold fast, hold out, Patience is genius."
+    },
+    {
+      "file": "3005-163389-0000.flac",
+      "wer": 0.0,
+      "ref_units": 24,
+      "language": "en",
+      "hypothesis": "They swarmed up in front of Sherburn's palings as thick as they could jam together, and you couldn't hear yourself think for the noise."
+    },
+    {
+      "file": "3005-163389-0001.flac",
+      "wer": 0.0909,
+      "ref_units": 11,
+      "language": "en",
+      "hypothesis": "Some song out tear down the fence tear down the fence"
+    },
+    {
+      "file": "3080-5032-0000.flac",
+      "wer": 0.0,
+      "ref_units": 11,
+      "language": "en",
+      "hypothesis": "But I am hugely pleased that you have seen my lady."
+    },
+    {
+      "file": "3080-5032-0001.flac",
+      "wer": 0.0,
+      "ref_units": 23,
+      "language": "en",
+      "hypothesis": "I knew you could not choose but like her but yet let me tell you you have seen but the worst of her"
+    },
+    {
+      "file": "3331-159605-0000.flac",
+      "wer": 0.0263,
+      "ref_units": 38,
+      "language": "en",
+      "hypothesis": "She pulled her hair down, turned her skirt back, put her feet on the fender and took Potter into her lap, all of which arrangements signified that something very important had got to be thought over and settled."
+    },
+    {
+      "file": "3331-159605-0001.flac",
+      "wer": 0.0,
+      "ref_units": 6,
+      "language": "en",
+      "hypothesis": "The more proposals, the more credit."
+    },
+    {
+      "file": "3528-168656-0000.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "She had even been in society before the revolution."
+    },
+    {
+      "file": "3528-168656-0001.flac",
+      "wer": 0.0,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "It was her pleasure and her vanity to drag in these names on every pretext."
+    },
+    {
+      "file": "3538-142836-0000.flac",
+      "wer": 0.1111,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "General observations on preserves, confectionery, ices, and dessert dishes."
+    },
+    {
+      "file": "3538-142836-0001.flac",
+      "wer": 0.08,
+      "ref_units": 25,
+      "language": "en",
+      "hypothesis": "The expense of preserving them with sugar is a serious objection, for except a sugar is used in considerable qualities, the success is very uncertain."
+    },
+    {
+      "file": "367-130732-0000.flac",
+      "wer": 0.0,
+      "ref_units": 3,
+      "language": "en",
+      "hypothesis": "Lobsters and Lobsters"
+    },
+    {
+      "file": "367-130732-0001.flac",
+      "wer": 0.0,
+      "ref_units": 12,
+      "language": "en",
+      "hypothesis": "When is a lobster not a lobster? When it is a crayfish."
+    },
+    {
+      "file": "3764-168670-0000.flac",
+      "wer": 0.0417,
+      "ref_units": 24,
+      "language": "en",
+      "hypothesis": "The strides of a lame man are like the ogling glances of a one-eyed man. They do not reach their goal very properly."
+    },
+    {
+      "file": "3764-168670-0001.flac",
+      "wer": 0.0,
+      "ref_units": 4,
+      "language": "en",
+      "hypothesis": "Cosette had waked up."
+    },
+    {
+      "file": "3997-180294-0000.flac",
+      "wer": 0.0417,
+      "ref_units": 24,
+      "language": "en",
+      "hypothesis": "The Duke comes every morning. They will tell him when he comes that I am asleep, and perhaps he will wait until I awake."
+    },
+    {
+      "file": "3997-180294-0001.flac",
+      "wer": 0.0,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "Yes, but if I should already ask for something, what?"
+    },
+    {
+      "file": "4198-12259-0000.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "Draw. Reach. Fill. Mix. Give it me without water."
+    },
+    {
+      "file": "4198-12259-0001.flac",
+      "wer": 0.0,
+      "ref_units": 23,
+      "language": "en",
+      "hypothesis": "So my friend so whip me off this glass neatly bring me hither some claret a full weeping glass till it run over"
+    },
+    {
+      "file": "4294-14317-0000.flac",
+      "wer": 0.0,
+      "ref_units": 25,
+      "language": "en",
+      "hypothesis": "As I thought that this was due to some fault in the earth, I wanted to make these first experiments before I undertook my Perseus."
+    },
+    {
+      "file": "4294-14317-0001.flac",
+      "wer": 0.0909,
+      "ref_units": 44,
+      "language": "en",
+      "hypothesis": "When I saw this bust came out sharp and clean I said it wants to construct a little furnace in the workshop erected for me by the Duke After my own plans and design in the house, which the Duke had given me"
+    },
+    {
+      "file": "4350-10919-0000.flac",
+      "wer": 0.0,
+      "ref_units": 23,
+      "language": "en",
+      "hypothesis": "He perceived that it was no good talking to the old man, and that the principal person in the house was the mother."
+    },
+    {
+      "file": "4350-10919-0001.flac",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Before her, he decided to scatter his pearls."
+    },
+    {
+      "file": "4852-28311-0000.flac",
+      "wer": 0.25,
+      "ref_units": 4,
+      "language": "en",
+      "hypothesis": "Say, you know something?"
+    },
+    {
+      "file": "4852-28311-0001.flac",
+      "wer": 0.0,
+      "ref_units": 14,
+      "language": "en",
+      "hypothesis": "Chris looked from a nickel-plated flashlight to a car jack and spark plug."
+    },
+    {
+      "file": "533-1066-0000.flac",
+      "wer": 0.6667,
+      "ref_units": 3,
+      "language": "en",
+      "hypothesis": "when church yards yawn."
+    },
+    {
+      "file": "533-1066-0001.flac",
+      "wer": 0.087,
+      "ref_units": 23,
+      "language": "en",
+      "hypothesis": "I knew well enough that he might be carried thousands of miles in the boxcar, locked in perhaps without water or food."
+    },
+    {
+      "file": "5442-32873-0000.flac",
+      "wer": 0.0833,
+      "ref_units": 12,
+      "language": "en",
+      "hypothesis": "Captain Lake did not look at all like at London Dandy now."
+    },
+    {
+      "file": "5442-32873-0001.flac",
+      "wer": 0.1,
+      "ref_units": 20,
+      "language": "en",
+      "hypothesis": "There was a very natural savagery and ejection there, and a wild deer in his yellow eyes. Rachel sat down."
+    },
+    {
+      "file": "5484-24317-0000.flac",
+      "wer": 0.0,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "When he came from the bath, Proclus visited him again."
+    },
+    {
+      "file": "5484-24317-0001.flac",
+      "wer": 0.0577,
+      "ref_units": 52,
+      "language": "en",
+      "hypothesis": "But Hermon was not in the mood to share a joyous revel, and he frankly said so, although immediately after his return he had accepted the invitation to the festival, which the whole fellowship of artists would give the following day in honor of the seventeenth birthday of the old sculptor Euphrainer."
+    },
+    {
+      "file": "5764-299665-0000.flac",
+      "wer": 0.0588,
+      "ref_units": 34,
+      "language": "en",
+      "hypothesis": "Afterward, it was supposed that he was satisfied with the blood of oxen, lamps and doves, and that in exchange for or in account of these sacrifices, this God gave rain, sunshine and harvest."
+    },
+    {
+      "file": "5764-299665-0001.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "whether he was the creator of yourself and myself."
+    },
+    {
+      "file": "6070-63485-0000.flac",
+      "wer": 0.1429,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "There, done far, said the schoolmaster in a low-key to the sweat. Out with your vitriol, and mind your eye."
+    },
+    {
+      "file": "6070-63485-0001.flac",
+      "wer": 0.0,
+      "ref_units": 18,
+      "language": "en",
+      "hypothesis": "The two monsters took off their shoes and moved stealthily along, keeping in the shadows of the houses."
+    },
+    {
+      "file": "6128-63240-0000.flac",
+      "wer": 0.0,
+      "ref_units": 44,
+      "language": "en",
+      "hypothesis": "The gentleman had not even needed to sit down to become interested. Apparently he had taken up the volume from a table as soon as he came in and standing there after a single glance round the apartment had lost himself in its pages."
+    },
+    {
+      "file": "6128-63240-0001.flac",
+      "wer": 0.0,
+      "ref_units": 11,
+      "language": "en",
+      "hypothesis": "That has an unflattering sound for me,\" said the young man."
+    },
+    {
+      "file": "6432-63722-0000.flac",
+      "wer": 0.7857,
+      "ref_units": 14,
+      "language": "en",
+      "hypothesis": "But excuse me, then you'll figure out I'm doing some detecting and giving up vision?"
+    },
+    {
+      "file": "6432-63722-0001.flac",
+      "wer": 0.0385,
+      "ref_units": 26,
+      "language": "en",
+      "hypothesis": "And Shag, with the freedom of an old servant, stood looking at his mastery as if not quite understanding the new twist the affairs had taken."
+    },
+    {
+      "file": "6938-70848-0000.flac",
+      "wer": 0.0,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "Even the sun came out pale and watery at noon."
+    },
+    {
+      "file": "6938-70848-0001.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "the colds and rheumatism of the rainy months vanished."
+    },
+    {
+      "file": "7018-75788-0000.flac",
+      "wer": 0.0,
+      "ref_units": 36,
+      "language": "en",
+      "hypothesis": "Then I took up a great stone from among the trees and coming up to him smote him therewith on the head With all my might and crushed in his skull as he lay dead drunk"
+    },
+    {
+      "file": "7018-75788-0001.flac",
+      "wer": 0.0,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "Behold, a ship was making for the island through the dashing sea and clashing waves."
+    },
+    {
+      "file": "7105-2330-0000.flac",
+      "wer": 0.25,
+      "ref_units": 12,
+      "language": "en",
+      "hypothesis": "Unfortunately, there could be no doubt our misconception as the Platterbath's guilt."
+    },
+    {
+      "file": "7105-2330-0001.flac",
+      "wer": 0.0,
+      "ref_units": 40,
+      "language": "en",
+      "hypothesis": "He had not only pleaded guilty, but had expressed his intention of repeating his escapade in other directions as soon as circumstances permitted. Throughout the trial, he was busy examining a small model of the free trade hall in Manchester."
+    },
+    {
+      "file": "7902-96591-0000.flac",
+      "wer": 0.2222,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "I'm from the cutter lying off the coast."
+    },
+    {
+      "file": "7902-96591-0001.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "Don't cry, he said. I was obliged to come."
+    },
+    {
+      "file": "7975-280057-0000.flac",
+      "wer": 0.0,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "These hatreds were soon to make trouble for me, of which I had never dreamed."
+    },
+    {
+      "file": "7975-280057-0001.flac",
+      "wer": 0.0476,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "Henry Washington Younger, my father, represented Jackson County three times in the legislature and was also a judge of the county court."
+    },
+    {
+      "file": "8131-117016-0000.flac",
+      "wer": 0.5,
+      "ref_units": 2,
+      "language": "en",
+      "hypothesis": "Captain Murdock"
+    },
+    {
+      "file": "8131-117016-0001.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "But Marsport had flourished enough to kill it off."
+    },
+    {
+      "file": "8188-269288-0000.flac",
+      "wer": 0.4444,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "Any co-triester had begun to make prints with Leslie."
+    },
+    {
+      "file": "8188-269288-0001.flac",
+      "wer": 0.0909,
+      "ref_units": 11,
+      "language": "en",
+      "hypothesis": "Leslie determined to try for honours in English language and literature."
+    },
+    {
+      "file": "8280-266249-0000.flac",
+      "wer": 0.0345,
+      "ref_units": 29,
+      "language": "en",
+      "hypothesis": "Old Mr. Dinsmore had accepted a pressing invitation from his granddaughter and her husband to join the party, and with the addition of servants it was a large one."
+    },
+    {
+      "file": "8280-266249-0001.flac",
+      "wer": 0.0,
+      "ref_units": 31,
+      "language": "en",
+      "hypothesis": "As they were in no haste, and the confinement of a railroad car would be very irksome to the younger children, it had been decided to make the journey by water."
+    },
+    {
+      "file": "8461-258277-0000.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "When it was the seven hundred and eighteenth night"
+    },
+    {
+      "file": "8461-258277-0001.flac",
+      "wer": 0.2963,
+      "ref_units": 27,
+      "language": "en",
+      "hypothesis": "But he answered, ''Needs my thigh half Zaynab also.'' Now, suddenly, there came a wrap at the door, and the maid said, ''Who is at the door?''"
+    }
+  ],
+  "aggregate": {
+    "wer": 0.0671,
+    "files": 66,
+    "language_accuracy": 0.9848
+  }
+}

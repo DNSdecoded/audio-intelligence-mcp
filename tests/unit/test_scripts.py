@@ -54,3 +54,13 @@ def test_evaluate_events_and_der_fake(tmp_path):
     der = run(["scripts/evaluate.py", "der", "--rttm-dir", str(d), "--audio-dir", str(d), "--profile", "fake"],
               env(tmp_path, d))
     assert 0 <= der["aggregate"]["der"]
+
+
+def test_evaluate_quality_fake(tmp_path, synth):
+    d = tmp_path / "corpus"
+    d.mkdir()
+    shutil.copy(synth["clipped"], d / "clipped.wav")
+    (d / "labels.csv").write_text("file,issues\nclipped.wav,CLIPPING\n", encoding="utf-8")
+    rep = run(["scripts/evaluate.py", "quality", "--labels", str(d / "labels.csv"), "--audio-dir", str(d),
+               "--profile", "fake"], env(tmp_path, d))
+    assert rep["per_issue"]["CLIPPING"]["tp"] == 1 and rep["per_file"][0]["expected"] == ["CLIPPING"]

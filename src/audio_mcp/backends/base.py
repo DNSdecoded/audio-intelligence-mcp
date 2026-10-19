@@ -135,7 +135,7 @@ def build_backends(settings) -> Backends:
     if _importable("silero_vad"):
         from audio_mcp.backends.silero import SileroVAD
 
-        vad = SileroVAD()
+        vad = SileroVAD(settings)
     else:
         vad = UnavailableBackend("silero-vad", f"silero_vad {hint}")
     if _importable("faster_whisper"):

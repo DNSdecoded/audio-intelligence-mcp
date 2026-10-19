@@ -67,3 +67,9 @@ def test_short_window_joins_nearest_cluster():
     regions = [Interval(start=0, end=2), Interval(start=2.5, end=2.9), Interval(start=3.4, end=5.4)]
     turns = cluster_speakers(x, regions, SignEmbedder(), threshold=0.5, num_speakers=None, max_speakers=8)
     assert [t.speaker_id for t in turns] == ["speaker_1", "speaker_2", "speaker_2"]
+
+
+def test_diarization_only_skips_transcription(app, dialogue):
+    r = analyze_audio(app, AnalyzeRequest(source=fp(dialogue), tasks=["speaker_diarization"]))
+    assert r["analysis"]["speakers"]["turns"]
+    assert "transcription" not in r["processing"]["stages_run"] and "speaker_assign" not in r["processing"]["stages_run"]

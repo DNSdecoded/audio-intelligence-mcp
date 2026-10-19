@@ -7,7 +7,7 @@
     "status": "success",
     "audio_id": "aud_0fb68437fd577a5c",
     "result": {
-      "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261017T195753.srt",
+      "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261019T091256.srt",
       "format": "srt",
       "size_bytes": 435,
       "sha256": "90947b76cf3d1e2d45609712e5569768ac4a6525aa64a40b0653f941b71e90e4",
@@ -21,7 +21,7 @@
     ],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.157,
+      "duration_seconds": 0.218,
       "stages_run": [],
       "stages_skipped": [],
       "cache_hits": [

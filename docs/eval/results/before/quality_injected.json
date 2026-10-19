@@ -1,0 +1,1071 @@
+{
+  "metric": "quality",
+  "per_file": [
+    {
+      "file": "1221-135766-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "DC_OFFSET",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1221-135766-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1995-1826-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "exact": true
+    },
+    {
+      "file": "1995-1826-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1995-1826-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [],
+      "exact": false
+    },
+    {
+      "file": "1995-1826-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "DC_OFFSET",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1995-1826-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1995-1826-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1995-1826-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "1995-1826-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "1995-1826-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "DC_OFFSET",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "2961-960-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "2961-960-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "DC_OFFSET",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "DC_OFFSET",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "HIGH_NOISE",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4077-13751-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "4077-13751-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "DC_OFFSET",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "4992-23283-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "4992-23283-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "DC_OFFSET",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "DC_OFFSET",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "5683-32865-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "5683-32865-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "HIGH_NOISE",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "DC_OFFSET",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "HIGH_NOISE",
+        "LOW_LEVEL"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "HIGH_NOISE",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "61-70968-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "61-70968-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "DC_OFFSET",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "ECHO"
+      ],
+      "exact": true
+    },
+    {
+      "file": "672-122797-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "672-122797-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "ECHO",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "7127-75946-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "7127-75946-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "ECHO"
+      ],
+      "exact": false
+    },
+    {
+      "file": "7127-75946-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "DC_OFFSET"
+      ],
+      "exact": false
+    },
+    {
+      "file": "7127-75946-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "DC_OFFSET",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "7127-75946-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "ECHO"
+      ],
+      "exact": true
+    },
+    {
+      "file": "7127-75946-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "7127-75946-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "7127-75946-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "7127-75946-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__bandlimit.wav",
+      "expected": [
+        "BANDWIDTH_LIMITED"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__clean.wav",
+      "expected": [],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__clipping.wav",
+      "expected": [
+        "CLIPPING"
+      ],
+      "detected": [
+        "DC_OFFSET",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__dc_offset.wav",
+      "expected": [
+        "DC_OFFSET"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "DC_OFFSET",
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__echo.wav",
+      "expected": [
+        "ECHO"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__hum.wav",
+      "expected": [
+        "HUM"
+      ],
+      "detected": [
+        "BANDWIDTH_LIMITED",
+        "ECHO",
+        "HIGH_NOISE",
+        "HUM"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__low_level.wav",
+      "expected": [
+        "LOW_LEVEL"
+      ],
+      "detected": [
+        "ECHO",
+        "HIGH_NOISE",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    },
+    {
+      "file": "8230-279154-0000__noise.wav",
+      "expected": [
+        "HIGH_NOISE"
+      ],
+      "detected": [
+        "HIGH_NOISE"
+      ],
+      "exact": true
+    },
+    {
+      "file": "8230-279154-0000__silence.wav",
+      "expected": [
+        "SILENCE"
+      ],
+      "detected": [
+        "ECHO",
+        "LOW_LEVEL",
+        "SILENCE"
+      ],
+      "exact": false
+    }
+  ],
+  "per_issue": {
+    "BANDWIDTH_LIMITED": {
+      "tp": 10,
+      "fp": 25,
+      "fn": 0,
+      "precision": 0.2857,
+      "recall": 1.0
+    },
+    "CLIPPING": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 10,
+      "precision": null,
+      "recall": 0.0
+    },
+    "DC_OFFSET": {
+      "tp": 10,
+      "fp": 4,
+      "fn": 0,
+      "precision": 0.7143,
+      "recall": 1.0
+    },
+    "ECHO": {
+      "tp": 7,
+      "fp": 51,
+      "fn": 3,
+      "precision": 0.1207,
+      "recall": 0.7
+    },
+    "HIGH_NOISE": {
+      "tp": 10,
+      "fp": 42,
+      "fn": 0,
+      "precision": 0.1923,
+      "recall": 1.0
+    },
+    "HUM": {
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "LOW_LEVEL": {
+      "tp": 10,
+      "fp": 16,
+      "fn": 0,
+      "precision": 0.3846,
+      "recall": 1.0
+    },
+    "SILENCE": {
+      "tp": 10,
+      "fp": 10,
+      "fn": 0,
+      "precision": 0.5,
+      "recall": 1.0
+    }
+  },
+  "aggregate": {
+    "exact_match": 0.1222,
+    "files": 90
+  }
+}

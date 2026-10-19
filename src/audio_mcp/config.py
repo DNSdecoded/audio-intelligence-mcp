@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     asr_model: str = "small"
     asr_compute_type: str = "int8"
 
+    # Silero VAD; defaults tuned on AMI dev meetings (speech-detection error 20.9% -> 14.6% vs Silero's 0.5/100/30)
+    vad_threshold: float = 0.35  # speech probability threshold
+    vad_min_silence_ms: int = 300  # shorter pauses do not split a speech region
+    vad_speech_pad_ms: int = 150  # padding added to each side of a speech region
+
     diarization_backend: Literal["ecapa", "pyannote"] = "ecapa"
     diarization_threshold: float = 0.55
     max_speakers: int = 8

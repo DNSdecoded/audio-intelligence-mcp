@@ -7,6 +7,8 @@ from audio_mcp.backends.base import ASRResult, group_chunks
 from audio_mcp.envelope import AudioMCPError, ErrorCode, ModelInfo
 from audio_mcp.types import Segment, Word
 
+_TEMPERATURES = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)  # faster-whisper's own fallback schedule
+
 
 def _r(x: float, duration: float) -> float:
     return round(min(max(float(x), 0.0), duration), 3)
@@ -68,7 +70,10 @@ class FasterWhisperASR:
             word_timestamps=word_timestamps,
             vad_filter=False,
             beam_size=decode_kwargs.get("beam_size", 5),
-            temperature=decode_kwargs.get("temperature", 0.0),
+            # fallback temperatures re-decode segments that fail the compression/log-prob checks (repetition loops);
+            # not conditioning on earlier text stops one looping segment from seeding the next
+            temperature=decode_kwargs.get("temperature", _TEMPERATURES),
+            condition_on_previous_text=False,
         )
         segments, dropped = [], 0
         for s in gen:

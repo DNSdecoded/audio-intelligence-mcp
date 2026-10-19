@@ -65,7 +65,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.0,
+      "duration_seconds": 0.016,
       "stages_run": [
         "summary"
       ],

@@ -55,12 +55,13 @@ async def test_stdio_roundtrip(tmp_path):
 
 
 @pytest.mark.asyncio
-async def test_all_tools_invocable(tmp_path, samples_dir):
+@pytest.mark.parametrize("profile,topic", [("fake", "report"), pytest.param("real", "budget", marks=pytest.mark.slow)])
+async def test_all_tools_invocable(tmp_path, samples_dir, profile, topic):
     def src(name):
         return {"type": "file_path", "path": str(samples_dir / name)}
 
-    with anyio.fail_after(240):
-        async with session(tmp_path, [samples_dir]) as s:
+    with anyio.fail_after(240 if profile == "fake" else 1800):
+        async with session(tmp_path, [samples_dir], profile) as s:
             outs = {}
             outs["analyze_audio"] = a = await call(s, "analyze_audio", {"source": src("dialogue_2spk.wav"),
                                                                         "goal": "meeting"})
@@ -73,7 +74,7 @@ async def test_all_tools_invocable(tmp_path, samples_dir):
             outs["inspect_audio_quality"] = await call(s, "inspect_audio_quality", {"source": src("sine.wav")})
             outs["get_audio_timeline"] = await call(s, "get_audio_timeline", {"source": by_id})
             outs["ask_audio"] = await call(s, "ask_audio", {"source": by_id,
-                                                            "question": "When does someone mention the report?"})
+                                                            "question": f"When does someone mention the {topic}?"})
             outs["summarize_audio"] = await call(s, "summarize_audio", {"source": by_id})
             outs["compare_audio"] = await call(s, "compare_audio", {"sources": [src("sine.wav"), src("alarm.wav")]})
             outs["search_audio_library"] = await call(s, "search_audio_library", {"action": "index",

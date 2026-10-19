@@ -1,6 +1,6 @@
 # Audio Intelligence MCP Server
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 ![Python 3.12 | 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
 ![Platforms: Windows | macOS | Linux](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
 
@@ -186,6 +186,26 @@ extraction. The two most recently used recordings stay decoded in memory. Raise 
 
 Language coverage follows Whisper (≈ 99 languages); translation is to English only.
 
+## Evaluation
+
+Measured on public datasets with the default local models on a 4-core CPU (Whisper small int8, PANNs CNN14,
+ECAPA). Full tables, per-file JSON and before/after numbers: [docs/eval/RESULTS.md](docs/eval/RESULTS.md); method,
+datasets and caveats: [docs/evaluation.md](docs/evaluation.md).
+
+| Capability | Dataset | Result |
+|---|---|---|
+| Transcription | LibriSpeech test-clean / test-other | **4.1 % / 6.1 % WER** (Whisper small published: 3.4 % / 7.6 %) |
+| Noise robustness | LibriSpeech + real ambient noise, 20 / 10 / 5 / 0 dB SNR | 4.3 / 5.0 / 8.4 / 14.5 % WER |
+| Formats | 12 containers/codecs/rates (wav 8–48 kHz, flac, mp3, ogg, opus, m4a, aac, webm, aiff, wma) | all decode; 0.6 % WER |
+| Multilingual | FLEURS en / es / de / fr / zh / ar / hi / te | 6.7 / 5.7 / 12.9 / 13.7 / 24.6 (CER) / 37.7 / 58.8 / 103 % WER; language detected 88–100 % |
+| Speaker diarization | AMI test meetings (real, with overlap) | 38.2 % DER (30.4 % with 0.25 s collar); most error is overlapped speech |
+| Sound events | ESC-50, 200 clips, zero-shot | 73 % clip recall, 65 % top-1 (lenient AudioSet labels) |
+| Quality diagnosis | 90 files with 8 injected defects | 88 % exact issue set; per-issue recall 100 % |
+| Speed | 10-min file, CPU | transcription 0.58× real time, events 0.23×, diarization 0.57×; peak 2.1 GB RAM |
+
+Low-resource languages (Arabic, Hindi, Telugu) are not usable with `asr_model = "small"`; use a larger model and
+pass `language`.
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -235,6 +255,7 @@ tests/              unit, integration, e2e (stdio)
 
 - Confidence values are raw model probabilities or heuristics, never calibrated.
 - Default diarization (ECAPA clustering) does not detect overlapping speech; install the `pyannote` extra for that.
+- Accuracy on low-resource languages with the default `small` model is poor (see Evaluation).
 - Translation is to English only (Whisper).
 - Integrity indicators are signal heuristics, not a deepfake or tamper detector.
 - Malformed tool arguments are rejected by the MCP layer before the server sees them, so they come back as MCP
@@ -245,9 +266,9 @@ Full list: [docs/capabilities.md](docs/capabilities.md) and
 
 ## License
 
-The code in this repository is released under the [MIT License](LICENSE).
+The code in this repository is released under the [Apache License 2.0](LICENSE) (see also [NOTICE](NOTICE)).
 
-Third-party models and data keep their own licenses, which the MIT License does not cover:
+Third-party models and data keep their own licenses, which the Apache License does not cover:
 faster-whisper (MIT) and Whisper weights (MIT); PANNs code (MIT) and CNN14 weights (CC BY 4.0, trained on
 AudioSet); SpeechBrain (Apache-2.0) and spkrec-ecapa-voxceleb (Apache-2.0); all-MiniLM-L6-v2 (Apache-2.0);
 silero-vad (MIT); pyannote.audio (MIT) with gated model terms; AudioSet ontology labels (CC BY 4.0). Test

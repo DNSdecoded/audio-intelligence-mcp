@@ -8,6 +8,7 @@ import argparse
 import json
 import os
 import statistics
+import sys
 import threading
 import time
 
@@ -48,6 +49,7 @@ def main(argv=None):
     ap.add_argument("--repeat", type=int, default=3)
     ap.add_argument("--profile", choices=["real", "fake"], default="real")
     a = ap.parse_args(argv)
+    out, sys.stdout = sys.stdout, sys.stderr  # model libraries print on load; keep stdout pure JSON
     settings = load_settings()
     settings.backend_profile = a.profile
     app = build_app_context(settings)
@@ -68,7 +70,7 @@ def main(argv=None):
                           "rtf": round(statistics.mean(v) / duration, 4) if duration else None}
                          for s, v in times.items()],
               "peak_rss_mb": round(mem.peak / 2 ** 20, 1)}
-    print(json.dumps(report, indent=2))
+    out.write(json.dumps(report, indent=2) + "\n")
 
 
 if __name__ == "__main__":

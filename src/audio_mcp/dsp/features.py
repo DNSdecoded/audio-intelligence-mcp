@@ -9,7 +9,10 @@ FEATURE_GROUPS = ("level", "silence", "spectral", "pitch", "rhythm", "bands")
 _N_FFT, _HOP = 2048, 512
 _EDGES = [0, 250, 500, 1000, 2000, 4000, 8000]
 _BLOCK_FRAMES = 4096  # bounds memory: never hold the whole-file STFT
+_FLOOR_AMP = 10 ** (-60 / 20)  # frames below -60 dBFS never count as active signal
+_SILENCE_REL_DB = 30  # silence = more than 30 dB below the active level (never above -50 dBFS)
 _SILENCE_AMP = 10 ** (-50 / 20)
+_CLIP_RUN = 4  # flat-topped run length at the file's own peak that counts as clipping
 
 
 def _f(x):
@@ -39,31 +42,72 @@ def frame_rms(x, sr, win=0.025, hop=0.010):
     return out
 
 
+def _clip_ratio(m, peak):
+    """Share of samples at full scale, or in flat-topped runs at the file's own peak (clipped, then scaled)."""
+    n, flat, block = len(m), 0, 1 << 20
+    for i in range(0, n, block):
+        a = np.abs(m[i:i + block + _CLIP_RUN - 1])  # overlap so runs crossing a block edge are seen
+        hit = a >= 0.999
+        if peak >= 0.25:
+            at = a >= peak - 1e-4
+            run = np.ones(len(a) - _CLIP_RUN + 1, bool) if len(a) >= _CLIP_RUN else np.zeros(0, bool)
+            for k in range(_CLIP_RUN):
+                run &= at[k:len(a) - _CLIP_RUN + 1 + k]
+            for k in range(_CLIP_RUN):
+                hit[k:k + len(run)] |= run
+        flat += int(hit[:block].sum())
+    return flat / n if n else 0.0
+
+
+def _speech_frames(n_frames, regions, hop=0.010, win=0.025):
+    centers = np.arange(n_frames) * hop + win / 2
+    mask = np.zeros(n_frames, bool)
+    for r in regions:
+        mask |= (centers >= r.start) & (centers < r.end)
+    return mask
+
+
 def _level(m, native, sr, regions):
     p = np.square(m)
     rms, peak = float(np.sqrt(p.mean(dtype=np.float64))), float(np.abs(m).max())
+    dc = float(m.mean(dtype=np.float64))
     v = {
         "rms": rms, "rms_dbfs": _db(rms, 1, 20), "peak_amplitude": peak,
         "per_channel_peak": [float(np.abs(c).max()) for c in native],
         "crest_factor_db": _db(peak, rms, 20),
-        "clipping_ratio": float((np.abs(m) >= 0.999).mean()), "dc_offset": float(m.mean(dtype=np.float64)),
+        "clipping_ratio": _clip_ratio(m, peak), "dc_offset": dc,
     }
-    if regions:
-        mask = np.zeros(len(m), bool)
-        for r in regions:
-            mask[int(r.start * sr):int(r.end * sr)] = True
-        v["snr_method"] = "vad"
-        ok = mask.any() and not mask.all()
-        v["snr_db_estimate"] = _db(p[mask].mean(dtype=np.float64), p[~mask].mean(dtype=np.float64)) if ok else None
+    fp = np.maximum(frame_rms(m, sr) ** 2 - dc ** 2, 0.0)  # frame power without the DC offset
+    speech = _speech_frames(len(fp), regions) if regions else None
+    active = fp[speech] if speech is not None and speech.any() else fp[fp > _FLOOR_AMP ** 2]
+    v["active_rms_dbfs"] = _db(float(np.sqrt(active.mean())), 1, 20) if len(active) else None
+    if speech is not None:
+        pad = 5  # frames (50 ms) either side of speech still carry speech onsets/tails
+        near = np.convolve(speech.astype(np.int8), np.ones(2 * pad + 1, np.int8), "same") > 0
+        noise = fp[~near]
+        if speech.any() and len(noise) * 0.010 >= 0.5:
+            v["snr_method"] = "vad"
+            v["snr_db_estimate"] = _db(float(fp[speech].mean()), float(np.median(noise)))
+        else:  # continuous speech: the noise floor shows in the dips between words
+            v["snr_method"] = "speech_dips"
+            v["snr_db_estimate"] = _dip_snr(fp)
     else:
-        p = frame_rms(m, sr) ** 2
         v["snr_method"] = "percentile"
-        v["snr_db_estimate"] = _db(np.percentile(p, 95), np.percentile(p, 10))
+        v["snr_db_estimate"] = _dip_snr(fp)
     return v
 
 
+def _dip_snr(fp):
+    """Mean frame power over the 5th-percentile frame (digital-silence frames excluded)."""
+    fp = fp[fp > 1e-12]
+    return _db(float(fp.mean()), float(np.percentile(fp, 5))) if len(fp) else None
+
+
 def _silence(m, sr):
-    quiet = frame_rms(m, sr) < _SILENCE_AMP
+    fr = frame_rms(m, sr)
+    loud = fr[fr > _FLOOR_AMP]
+    active = float(np.sqrt(np.mean(loud ** 2))) if len(loud) else 0.0
+    quiet = fr < min(_SILENCE_AMP, max(_FLOOR_AMP, active * 10 ** (-_SILENCE_REL_DB / 20)))
     hop, win, dur = 0.010, 0.025, len(m) / sr
     ivs, i = [], 0
     while i < len(quiet):
@@ -195,6 +239,7 @@ def _rhythm(m, sr):
 _UNITS = {
     "rms": "linear", "rms_dbfs": "dBFS", "peak_amplitude": "linear", "per_channel_peak": "linear",
     "crest_factor_db": "dB", "clipping_ratio": "ratio", "dc_offset": "linear", "snr_db_estimate": "dB",
+    "active_rms_dbfs": "dBFS",
     "silence_ratio": "ratio", "silence_intervals": "seconds",
     "spectral_centroid_hz": "Hz", "spectral_bandwidth_hz": "Hz", "spectral_rolloff_hz": "Hz",
     "spectral_flatness": "ratio", "zero_crossing_rate": "ratio", "band_energy": "ratio",

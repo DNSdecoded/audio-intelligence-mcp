@@ -23,6 +23,9 @@ environment variables `AUDIO_MCP_<NAME>` (list values as JSON, e.g. `AUDIO_MCP_A
 | `device` | `AUDIO_MCP_DEVICE` | `Literal['auto', 'cpu', 'cuda']` | `"auto"` | auto | cpu | cuda |
 | `asr_model` | `AUDIO_MCP_ASR_MODEL` | `str` | `"small"` | faster-whisper model size |
 | `asr_compute_type` | `AUDIO_MCP_ASR_COMPUTE_TYPE` | `str` | `"int8"` | faster-whisper compute type |
+| `vad_threshold` | `AUDIO_MCP_VAD_THRESHOLD` | `float` | `` |  |
+| `vad_min_silence_ms` | `AUDIO_MCP_VAD_MIN_SILENCE_MS` | `int` | `` |  |
+| `vad_speech_pad_ms` | `AUDIO_MCP_VAD_SPEECH_PAD_MS` | `int` | `` |  |
 | `diarization_backend` | `AUDIO_MCP_DIARIZATION_BACKEND` | `Literal['ecapa', 'pyannote']` | `"ecapa"` | ecapa | pyannote |
 | `diarization_threshold` | `AUDIO_MCP_DIARIZATION_THRESHOLD` | `float` | `0.55` | speaker clustering threshold |
 | `max_speakers` | `AUDIO_MCP_MAX_SPEAKERS` | `int` | `8` | upper bound on speakers |

@@ -1,0 +1,185 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "1660.wav",
+      "wer": 0.1111,
+      "ref_units": 18,
+      "language": "de",
+      "hypothesis": "Die Romantik hatte ein starkes, kulturell deterministisches Element, das sich aus Schriftstellern wie Goethe, Vichte und Schlegel sch\u00f6pfte."
+    },
+    {
+      "file": "1661.wav",
+      "wer": 0.1111,
+      "ref_units": 18,
+      "language": "de",
+      "hypothesis": "Er nannte keine Zahl f\u00fcr die K\u00fcrzung, sondern sagte, sie w\u00fcrden auf der Grundlage der Wirtschaftsleistung China's vorgenommen."
+    },
+    {
+      "file": "1662.wav",
+      "wer": 0.0,
+      "ref_units": 21,
+      "language": "de",
+      "hypothesis": "Legierungen sind im Grunde eine Mischung aus zwei oder mehr Metallen. Vergessen Sie nicht, dass es viele Elemente im Periodensystem gibt."
+    },
+    {
+      "file": "1663.wav",
+      "wer": 0.2857,
+      "ref_units": 21,
+      "language": "de",
+      "hypothesis": "Das Cochamotal Chile ist wichtigstes Kletterziel, bekannt als der Josemite National Park von S\u00fcdamerika mit einer Vielzahl von gro\u00dfen Granitw\u00e4nden und Klippen."
+    },
+    {
+      "file": "1664.wav",
+      "wer": 0.0556,
+      "ref_units": 18,
+      "language": "de",
+      "hypothesis": "Mischen Sie die zwei Trockenpulver zusammen und formen sie dann mit sauberen nassen H\u00e4nden zu einem Ball."
+    },
+    {
+      "file": "1665.wav",
+      "wer": 0.2963,
+      "ref_units": 27,
+      "language": "de",
+      "hypothesis": "Dem Liebzufolge zieht sich das Dokument auf den Grenzstreit, in dem die Pal\u00e4stinenser ein Zur\u00fccksetzender Grenze in den Zustand vor dem 6.Tagekrieg von 1967 fordern."
+    },
+    {
+      "file": "1666.wav",
+      "wer": 0.1,
+      "ref_units": 20,
+      "language": "de",
+      "hypothesis": "Sie k\u00f6nnen auch die Ratschl\u00e4ge anderer Regierung als der Ehren konsultieren, deren Hinweise sind jedoch auf ihre eigenen Staatsb\u00fcrger zugeschnitten."
+    },
+    {
+      "file": "1667.wav",
+      "wer": 0.0938,
+      "ref_units": 32,
+      "language": "de",
+      "hypothesis": "Im Allgemeinen k\u00f6nnen sich zwei Verhaltensweisen abzeichnen, wenn Manager beginnen, ihre ehemaligen Kollegen zu leiten. Das eine Ende der Spektrums ist der Versuch einer der Jungs oder eines der M\u00e4dels zu bleiben. SWR 2020"
+    },
+    {
+      "file": "1668.wav",
+      "wer": 0.1667,
+      "ref_units": 24,
+      "language": "de",
+      "hypothesis": "Es kann sich auch lohnen eine Wildcard zu kaufen, die zutritt entweder zu ausgew\u00e4hlten Parks in S\u00fcdafrika oder zu allen s\u00fcdafrikanischen National Parks gew\u00e4hrt."
+    },
+    {
+      "file": "1669.wav",
+      "wer": 0.125,
+      "ref_units": 16,
+      "language": "de",
+      "hypothesis": "Die Polizeipr\u00e4sidentin Chandra Shekar Solanki gab an die Angeklagten sein mit bedeckten Gesichtern vor Gericht erschienen."
+    },
+    {
+      "file": "1670.wav",
+      "wer": 0.0545,
+      "ref_units": 55,
+      "language": "de",
+      "hypothesis": "Ihr thermisches Verhalten ist nicht so gleichm\u00e4\u00dfig wie das gro\u00dfe H\u00f6hlen auf der Erde, die oft eine ziemlich konstante Temperatur haben, aber es stimmt damit \u00fcberein, dass es sich und tiefe L\u00f6cher im Boden handelt, sagte Glenn Cushing vom Astrogeologie Team des United States Geological Survey, USGS, und der Northern Arizona University in Flagstaff, Arizona."
+    },
+    {
+      "file": "1671.wav",
+      "wer": 0.36,
+      "ref_units": 25,
+      "language": "de",
+      "hypothesis": "Der Kongress begann im August 2005 mit der Finanzierung der Anti-Obst-Unit\u00e4ts-Initiative und legte fest, dass das FBI zehn Agenten f\u00fcr die erwachsenen Pornografie einsetzen muss. Copyright WDR 2021"
+    },
+    {
+      "file": "1672.wav",
+      "wer": 0.1364,
+      "ref_units": 22,
+      "language": "de",
+      "hypothesis": "Geben Sie ach, dass der Stoff nicht zu hei\u00df wird. Das kann ihn schrumpfen lassen oder in extremen F\u00e4llen zur Verbrennung f\u00fchren."
+    },
+    {
+      "file": "1673.wav",
+      "wer": 0.0476,
+      "ref_units": 21,
+      "language": "de",
+      "hypothesis": "W\u00e4hrend der Revolutionsk\u00e4mpfe formen die 13 Bundesstaaten auf Basis des Bundesvertrages zuerst eine schwache Zentralregierung, die nur aus dem Kongress bestand."
+    },
+    {
+      "file": "1674.wav",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "de",
+      "hypothesis": "In einigen Gebieten gen\u00fcgt es Wasser, eine Minute lang abzukochen. In anderen m\u00fcssen es mehrere Minuten sein."
+    },
+    {
+      "file": "1675.wav",
+      "wer": 0.0526,
+      "ref_units": 19,
+      "language": "de",
+      "hypothesis": "Alle Substantive beginnen neben dem Wort sie f\u00fcr you, immer mit einem Gro\u00dfbestarben, auch in der Mitte eines Satzes."
+    },
+    {
+      "file": "1676.wav",
+      "wer": 0.0,
+      "ref_units": 11,
+      "language": "de",
+      "hypothesis": "Wie alle s\u00fcdafrikanischen Nationalparks erhebt der Park t\u00e4gliche Schutz- und Eintrittsgeb\u00fchren."
+    },
+    {
+      "file": "1677.wav",
+      "wer": 0.2143,
+      "ref_units": 14,
+      "language": "de",
+      "hypothesis": "Heute sind die Bellen und Eintagsfliegen die einzigen Insekten ihre Fl\u00fcgel nicht zur\u00fcckklappen k\u00f6nnen."
+    },
+    {
+      "file": "1678.wav",
+      "wer": 0.1,
+      "ref_units": 30,
+      "language": "de",
+      "hypothesis": "In seinem Artikel, die Rede des Pr\u00e4sidenten, zeigte Oliver's Sex auf, wie Leute, die wegen eines H\u00f6henchans keine Sprache mehr verstehen k\u00f6nnen, trotzdem die Ehrlichkeit von Menschen richtig einsch\u00e4tzen k\u00f6nnen."
+    },
+    {
+      "file": "1679.wav",
+      "wer": 0.1111,
+      "ref_units": 9,
+      "language": "de",
+      "hypothesis": "Aerosmiths haben die noch ausstehenden Konzerte ihrer Tour abgesagt."
+    },
+    {
+      "file": "1680.wav",
+      "wer": 0.04,
+      "ref_units": 25,
+      "language": "de",
+      "hypothesis": "Als vielseitiger Athlet kann der Tiger klettern, wenn auch nicht besonders gut, schwimmen, gro\u00dfe Str\u00e4ken springen und mit der f\u00fcnffachen Kraft eines starken Menschen ziehen."
+    },
+    {
+      "file": "1682.wav",
+      "wer": 0.2188,
+      "ref_units": 32,
+      "language": "de",
+      "hypothesis": "Sarah ist niemand mit Sicherheit, wer es geschrieben hat. Es ist allerdings bekannt, dass das gro\u00dfe Pergamentdokument, welches 23 \u00be Zoll und 24 \u00bd Zoll misst, zu Beginn seines Lebens zur Aufbewahrung zusammengerollt wurde."
+    },
+    {
+      "file": "1683.wav",
+      "wer": 0.0645,
+      "ref_units": 31,
+      "language": "de",
+      "hypothesis": "Es leben noch viele M\u00e4nner und Frauen, die ihre Zeit hier \u00fcberlebt haben und viele weitere mit Angeh\u00f6rigen, die dort ermordet wurden oder sich zu Tode arbeiteten, Juden und nicht Juden gleicherma\u00dfen."
+    },
+    {
+      "file": "1684.wav",
+      "wer": 0.1429,
+      "ref_units": 21,
+      "language": "de",
+      "hypothesis": "Ab hier ist die auf der Insel Upolu, liegende Hauptstadt von Samoa und wei\u00df eine Einwohnerzahl von knapp unter 40.000 auf."
+    },
+    {
+      "file": "1685.wav",
+      "wer": 0.3,
+      "ref_units": 20,
+      "language": "de",
+      "hypothesis": "Zum Beispiel ist das weltweit am weitest verbreitete Standbildformat 35 mm, was der vorherrschenden vielen Gr\u00f6\u00dfe am Ende der analog-Film-Error entspricht."
+    }
+  ],
+  "aggregate": {
+    "wer": 0.1287,
+    "files": 25,
+    "language_accuracy": 1.0
+  }
+}

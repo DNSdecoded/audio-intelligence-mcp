@@ -12,12 +12,13 @@
       "metrics": {
         "clipping_ratio": 0.0,
         "rms_dbfs": -9.030907493534567,
+        "active_rms_dbfs": -9.03090387033729,
         "silence_ratio": 0.0,
-        "snr_db_estimate": 0.0036567419278631676,
+        "snr_db_estimate": 0.0016980817515568924,
         "dc_offset": -1.525186897675737e-05,
         "hum_excess_db": 217.72816668523103,
-        "echo_autocorr_peak": 0.6239934127530874,
-        "rolloff99_hz": 473.73046875,
+        "echo_cepstral_z": 15.511844752102581,
+        "hf_energy_ratio_db": -92.99050352099812,
         "channels": 2
       },
       "issues": [
@@ -29,18 +30,18 @@
           "threshold": 20
         },
         {
-          "code": "ECHO",
-          "severity": "medium",
-          "message": "Possible echo/reverberation (heuristic indicator).",
-          "measured": 0.623993,
-          "threshold": 0.5
-        },
-        {
           "code": "BANDWIDTH_LIMITED",
           "severity": "high",
-          "message": "Energy is confined below ~3.8 kHz (e.g. telephone-band audio or a narrowband source).",
-          "measured": 473.730469,
-          "threshold": 3800
+          "message": "Almost no energy above 4 kHz (e.g. telephone-band audio or a narrowband source).",
+          "measured": -92.990504,
+          "threshold": -27.0
+        },
+        {
+          "code": "MULTICHANNEL",
+          "severity": "low",
+          "message": "Multichannel audio; models use a mono mix.",
+          "measured": 2.0,
+          "threshold": 1
         }
       ],
       "recommendations": [
@@ -52,7 +53,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.391,
+      "duration_seconds": 0.422,
       "stages_run": [
         "vad",
         "features",

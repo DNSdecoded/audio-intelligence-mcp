@@ -1,0 +1,220 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "1089-134686-0000.flac",
+      "wer": 0.0,
+      "ref_units": 28,
+      "language": "en",
+      "hypothesis": "He hoped there would be stew for dinner, turnips and carrots and bruised potatoes and fat mutton pieces to be ladled out in thick, peppered, flour-fattened sauce."
+    },
+    {
+      "file": "1188-133604-0000.flac",
+      "wer": 0.0526,
+      "ref_units": 19,
+      "language": "en",
+      "hypothesis": "You will find me continually speaking of four men, Titian, Holbein, Turner, and Tintorette in almost the same terms."
+    },
+    {
+      "file": "121-121726-0000.flac",
+      "wer": 0.0588,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "Also a popular condrivens, whereby love-making may be suspended, but not stopped during the picnic season."
+    },
+    {
+      "file": "1221-135766-0000.flac",
+      "wer": 0.0,
+      "ref_units": 37,
+      "language": "en",
+      "hypothesis": "How strange it seemed to the sad woman as she watched the growth and the beauty that became every day more brilliant and the intelligence that threw its quivering sunshine over the tiny features of this child."
+    },
+    {
+      "file": "1284-1180-0000.flac",
+      "wer": 0.0,
+      "ref_units": 24,
+      "language": "en",
+      "hypothesis": "He wore blue silk stockings, blue knee pants with gold buckles, a blue ruffled waist, and a jacket of bright blue braided with gold."
+    },
+    {
+      "file": "1320-122612-0000.flac",
+      "wer": 0.0,
+      "ref_units": 41,
+      "language": "en",
+      "hypothesis": "Since the period of our tale, the active spirit of the country has surrounded it with a belt of rich and thriving settlements, though none but the hunter or the savage is ever known even now to penetrate its wild recesses."
+    },
+    {
+      "file": "1580-141083-0000.flac",
+      "wer": 0.0333,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "I will endeavor in my statement to avoid such terms as would serve to limit the events to any particular place or give a clue as to the people concerned."
+    },
+    {
+      "file": "1995-1826-0000.flac",
+      "wer": 0.0741,
+      "ref_units": 27,
+      "language": "en",
+      "hypothesis": "In the debate between the senior societies, her defense of the 15th Amendment had been not only a notable bit of reasoning, but delivered with real enthusiasm."
+    },
+    {
+      "file": "2094-142345-0000.flac",
+      "wer": 0.0408,
+      "ref_units": 49,
+      "language": "en",
+      "hypothesis": "It is a very final place of red brick, softened by a pale, powdery lichen, which has dispersed itself with happy irregularity, so as to bring the red brick into terms of friendly companionship with the limestone ornaments surrounding the three gables, the windows, and the door place."
+    },
+    {
+      "file": "2300-131720-0000.flac",
+      "wer": 0.0,
+      "ref_units": 13,
+      "language": "en",
+      "hypothesis": "The Paris plant, like that at the Crystal Palace, was a temporary exhibit."
+    },
+    {
+      "file": "237-126133-0000.flac",
+      "wer": 0.0263,
+      "ref_units": 38,
+      "language": "en",
+      "hypothesis": "Here she would stay, comforted and soothed among the lovely plants and rich exotic, rejoicing the heart of old Turner the gardener, who since Polly's first rapturous entrance had taken her into his good graces for all time."
+    },
+    {
+      "file": "260-123286-0000.flac",
+      "wer": 0.0833,
+      "ref_units": 12,
+      "language": "en",
+      "hypothesis": "Saturday, August 15th. The sea unbroken all round. No land in sight."
+    },
+    {
+      "file": "2830-3979-0000.flac",
+      "wer": 0.0476,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "We want you to help us publish some leading work of Luthers for the general American market. Will you do it?"
+    },
+    {
+      "file": "2961-960-0000.flac",
+      "wer": 0.0196,
+      "ref_units": 51,
+      "language": "en",
+      "hypothesis": "He passes abruptly from persons to ideas and numbers, and from ideas and numbers to persons, from the heavens to man, from astronomy to physiology. He confuses, or rather does not distinguish, subject and object, first and final causes, and his dreaming of geometrical figures lost in a flux of sense."
+    },
+    {
+      "file": "3570-5694-0000.flac",
+      "wer": 0.0811,
+      "ref_units": 37,
+      "language": "en",
+      "hypothesis": "But already at a point in economic evolution, far ant-dating, the emergence of the Lady specialized consumption of goods as an evidence of pecuniary strength had begun to work out in a more or less elaborate system."
+    },
+    {
+      "file": "3575-170457-0000.flac",
+      "wer": 0.04,
+      "ref_units": 25,
+      "language": "en",
+      "hypothesis": "And often, as my mother said, while on her lap I laid my head, she feared for time I was not made, but for eternity."
+    },
+    {
+      "file": "3729-6852-0000.flac",
+      "wer": 0.0312,
+      "ref_units": 32,
+      "language": "en",
+      "hypothesis": "To celebrate the arrival of her son, Sylvia gave a splendid supper to which she had invited all her relatives, and it was a good opportunity for me to make their acquaintance."
+    },
+    {
+      "file": "4077-13751-0000.flac",
+      "wer": 0.1154,
+      "ref_units": 26,
+      "language": "en",
+      "hypothesis": "On the 6th of April, 1830, the Church of Jesus Christ of Latter-day Saints was formally organized and thus took on a legal existence."
+    },
+    {
+      "file": "4446-2271-0000.flac",
+      "wer": 0.375,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Main hall like Alexander because he was an engineer."
+    },
+    {
+      "file": "4507-16021-0000.flac",
+      "wer": 0.3333,
+      "ref_units": 3,
+      "language": "en",
+      "hypothesis": "Chapter 1 Origin"
+    },
+    {
+      "file": "4970-29093-0000.flac",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "You'll never dig it out of the Astor Library."
+    },
+    {
+      "file": "4992-23283-0000.flac",
+      "wer": 0.0,
+      "ref_units": 18,
+      "language": "en",
+      "hypothesis": "But the more forgetfulness had then prevailed, the more powerful was the force of remembrance when she awoke."
+    },
+    {
+      "file": "5105-28233-0000.flac",
+      "wer": 0.3,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "Length of service, 14 years, 3 months and 5 days."
+    },
+    {
+      "file": "5142-33396-0000.flac",
+      "wer": 0.2,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "At another time, Harold asked"
+    },
+    {
+      "file": "5639-40744-0000.flac",
+      "wer": 0.0638,
+      "ref_units": 47,
+      "language": "en",
+      "hypothesis": "11 o'clock had struck. It was a fine clear night. There were the only persons on the road, and they sauntered leisurely along to avoid paying the price of fatigue for the recreation provided for the Toledans in the valley or on the banks of their river."
+    },
+    {
+      "file": "5683-32865-0000.flac",
+      "wer": 0.25,
+      "ref_units": 4,
+      "language": "en",
+      "hypothesis": "You know Captain Leakes?"
+    },
+    {
+      "file": "61-70968-0000.flac",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "He began a confused complaint against the wizard, who had vanished behind the curtain on the left."
+    },
+    {
+      "file": "672-122797-0000.flac",
+      "wer": 0.2,
+      "ref_units": 10,
+      "language": "en",
+      "hypothesis": "out in the woods to the nice little fir tree."
+    },
+    {
+      "file": "6829-68769-0000.flac",
+      "wer": 0.0556,
+      "ref_units": 36,
+      "language": "en",
+      "hypothesis": "Kenneth and Beth refrained from telling the other girls or Uncle John of Old Will Rogers visit, but they got Mr. Watson in the library and questioned him closely about the penalty for forging a check."
+    },
+    {
+      "file": "908-157963-0000.flac",
+      "wer": 0.0333,
+      "ref_units": 30,
+      "language": "en",
+      "hypothesis": "to fade away like morning beauty from her mortal day. Down by the river of Adana, her soft voice is heard, and thus her gentle lamentation falls like morning dew."
+    }
+  ],
+  "aggregate": {
+    "wer": 0.0497,
+    "files": 30,
+    "language_accuracy": 1.0
+  }
+}

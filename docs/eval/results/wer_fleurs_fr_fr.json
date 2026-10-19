@@ -1,0 +1,185 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "1660.wav",
+      "wer": 0.4118,
+      "ref_units": 17,
+      "language": "fr",
+      "hypothesis": "Le romantisme pr\u00e9sent\u00e9 un important \u00e9l\u00e9ment de d\u00e9terminisme culturel \u00e9tir\u00e9 d\u00e9crivintes que Got, Fischt et Schl\u00e4ger"
+    },
+    {
+      "file": "1661.wav",
+      "wer": 0.1333,
+      "ref_units": 15,
+      "language": "fr",
+      "hypothesis": "Il n'a pas chiffr\u00e9 ses r\u00e9duction, disant qu'elles seront bas\u00e9es sur la production \u00e9conomique chinoise."
+    },
+    {
+      "file": "1662.wav",
+      "wer": 0.0952,
+      "ref_units": 21,
+      "language": "fr",
+      "hypothesis": "Les alliages sont essentiellement un m\u00e9lange de deux m\u00e9taux au plus, n'oubliez pas que le tableau p\u00e9riodique comporte de nombreuses \u00e9l\u00e9ments."
+    },
+    {
+      "file": "1663.wav",
+      "wer": 0.1154,
+      "ref_units": 26,
+      "language": "fr",
+      "hypothesis": "Valais de Colchamo, la destination d'excellence pour l'escalade au Chili, connu comme le Yosemite d'Am\u00e9rique du Sud avec de nombreuses grandes parois et falaises granitiques diff\u00e9rentes."
+    },
+    {
+      "file": "1664.wav",
+      "wer": 0.0556,
+      "ref_units": 18,
+      "language": "fr",
+      "hypothesis": "M\u00e9langez les deux poudres s\u00e8ches ensemble, puis avec les mains propres et humides, press\u00e9 les en une boule."
+    },
+    {
+      "file": "1665.wav",
+      "wer": 0.0333,
+      "ref_units": 30,
+      "language": "fr",
+      "hypothesis": "D'apr\u00e8s la fuite, le document portera sur le diff\u00e9rent \u00e0 la fronti\u00e8re que la Palestine revendique sur la base des fronti\u00e8res existantes avant la guerre du Moyen-Orient de 1967."
+    },
+    {
+      "file": "1666.wav",
+      "wer": 0.1,
+      "ref_units": 20,
+      "language": "fr",
+      "hypothesis": "Vous pouvez \u00e9galement avoir recours au conseil d'autres gouvernements que le v\u00f4tre mais leurs conseils sont adapt\u00e9s \u00e0 leurs citoyens."
+    },
+    {
+      "file": "1667.wav",
+      "wer": 0.1,
+      "ref_units": 30,
+      "language": "fr",
+      "hypothesis": "De mani\u00e8re g\u00e9n\u00e9rale, deux comportements peuvent \u00e9merger lorsqu'un manager devient le chef d'ancien coll\u00e8gue. D'une, les extr\u00e9mit\u00e9s du spectre \u00e9tant d'essayer de rester le bon copain ou la bonne copine."
+    },
+    {
+      "file": "1668.wav",
+      "wer": 0.1481,
+      "ref_units": 27,
+      "language": "fr",
+      "hypothesis": "Il peut \u00eatre avantageux de se procurer une wildcard qui donne acc\u00e8s \u00e0 certains parcs au sud ainsi qu'\u00e0 tous les parcs nationaux sud africains."
+    },
+    {
+      "file": "1669.wav",
+      "wer": 0.1364,
+      "ref_units": 22,
+      "language": "fr",
+      "hypothesis": "Chandra Chekar, selon qui, commissaire de police, a d\u00e9clar\u00e9 que les personnes accus\u00e9es avaient le visage dissimul\u00e9 lorsqu'elles ont comparu devant le tribunal."
+    },
+    {
+      "file": "1670.wav",
+      "wer": 0.2462,
+      "ref_units": 65,
+      "language": "fr",
+      "hypothesis": "Leur comportement thermique n'est pas aussi stable que celui des grandes grottes de la plan\u00e8te qui maintiennent une temp\u00e9rature constante, mais ils se ressemblent en ce qu'ils sont des trous profonds dans la Terre. Selon Glenn Coaching, membre de l'\u00e9quipage de l'USGS, Centre am\u00e9ricain des \u00e9tudes g\u00e9ologiques, et du personnel de l'universit\u00e9 d'Arizona du Nord situ\u00e9 \u00e0 Flasgdaf en Arizona. de nous."
+    },
+    {
+      "file": "1671.wav",
+      "wer": 0.0294,
+      "ref_units": 34,
+      "language": "fr",
+      "hypothesis": "Le congr\u00e8s a lanc\u00e9 le financement de l'initiative contre la pornographie au cours de l'exercice 2005 tout en pr\u00e9cisant que le FBI s'appr\u00eatait \u00e0 affecter 10 agents \u00e0 la lutte contre la pornographie adulte."
+    },
+    {
+      "file": "1672.wav",
+      "wer": 0.0,
+      "ref_units": 21,
+      "language": "fr",
+      "hypothesis": "\u00c9vitez de ne pas laisser le tissu surchauffer, ce qui peut causer son r\u00e9tr\u00e9cissement ou dans les cas extr\u00eames le br\u00fbler."
+    },
+    {
+      "file": "1673.wav",
+      "wer": 0.2222,
+      "ref_units": 27,
+      "language": "fr",
+      "hypothesis": "Pendant la guerre r\u00e9volutionnaire, les 13 \u00c9tats ont d'abord form\u00e9 un gouvernement central faible. Le congr\u00e8s est en sa seule composante, en vertus d'article de la Conf\u00e9d\u00e9ration."
+    },
+    {
+      "file": "1674.wav",
+      "wer": 0.0476,
+      "ref_units": 21,
+      "language": "fr",
+      "hypothesis": "Dans certaines localit\u00e9s, il suffit de faire bouillir l'eau pendant une minute. Pendant d'autres, il faut le faire pendant plusieurs minutes."
+    },
+    {
+      "file": "1675.wav",
+      "wer": 0.1,
+      "ref_units": 20,
+      "language": "fr",
+      "hypothesis": "Tous les noms suivis du mot si qui signifiez vous commencent toujours par une majuscule m\u00eame au milieu d'une phrase"
+    },
+    {
+      "file": "1676.wav",
+      "wer": 0.05,
+      "ref_units": 20,
+      "language": "fr",
+      "hypothesis": "Comme pour tous les parcs nationaux sud-africains, il existe des droits d'entr\u00e9e et de conservation quotidien pour le parc."
+    },
+    {
+      "file": "1677.wav",
+      "wer": 0.2222,
+      "ref_units": 18,
+      "language": "fr",
+      "hypothesis": "Aujourd'hui, les seuls insectes qui ne peuvent pas repuyer leurs ailes sont les monches tragones et les eph\u00e9m\u00e8res."
+    },
+    {
+      "file": "1679.wav",
+      "wer": 0.1818,
+      "ref_units": 11,
+      "language": "fr",
+      "hypothesis": "Le compagnie Rossmiss a annul\u00e9 les derniers concerts de sa tourn\u00e9e."
+    },
+    {
+      "file": "1680.wav",
+      "wer": 0.2917,
+      "ref_units": 24,
+      "language": "fr",
+      "hypothesis": "A la t\u00eate \u00e9quilibr\u00e9e, le tigre peut grimper mais parfois difficilement, nager, sauter, de grande distance et tracter avec 5 fois la force d'un humain puissant."
+    },
+    {
+      "file": "1682.wav",
+      "wer": 0.1765,
+      "ref_units": 34,
+      "language": "fr",
+      "hypothesis": "Bien que personne ne sache vraiment qui l'est r\u00e9dig\u00e9, on sait qu'\u00e0 un stade pr\u00e9coce de son existence, le grand parchemin, qui mesure d'environ 29 pouces 3,4 sur 24 pouces, est \u00eatre entrepos\u00e9-roul\u00e9."
+    },
+    {
+      "file": "1683.wav",
+      "wer": 0.0526,
+      "ref_units": 38,
+      "language": "fr",
+      "hypothesis": "Il y a encore beaucoup de femmes et d'hommes en vie qui ont surv\u00e9cu \u00e0 leurs s\u00e9joues ici, et beaucoup d'autres qui ont vu leurs proches assassin\u00e9s ou tu\u00e9s par le travail forc\u00e9, juifs ou non-juifs, indiff\u00e9remment."
+    },
+    {
+      "file": "1684.wav",
+      "wer": 0.2727,
+      "ref_units": 22,
+      "language": "fr",
+      "hypothesis": "A Pia et la capitale des Samois, la ville se trouve sur l'\u00eele du Poulu et compte un peu moins de 40.000 habitants."
+    },
+    {
+      "file": "1685.wav",
+      "wer": 0.0323,
+      "ref_units": 31,
+      "language": "fr",
+      "hypothesis": "Par exemple, le format de photographie le plus courant au monde est le 35 mm. C'\u00e9tait le format de p\u00e9dicule le plus r\u00e9pandu \u00e0 la fin de l'\u00e8re des films analogiques."
+    },
+    {
+      "file": "1686.wav",
+      "wer": 0.16,
+      "ref_units": 25,
+      "language": "fr",
+      "hypothesis": "Par cons\u00e9quent, les processus d'une organisation travaillant ensemble pour surmonter un obstacle peut conduire un nouveau processus innovant pour r\u00e9pondre aux besoins du client."
+    }
+  ],
+  "aggregate": {
+    "wer": 0.1366,
+    "files": 25,
+    "language_accuracy": 1.0
+  }
+}

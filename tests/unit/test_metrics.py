@@ -33,3 +33,14 @@ def test_event_prf():
     hyp = [{"label": "dog", "start": 0.1, "end": 1.0}, {"label": "Car", "start": 5, "end": 6}]
     assert event_prf(ref, hyp) == {"precision": .5, "recall": .5, "f1": .5, "tp": 1, "fp": 1, "fn": 1}
     assert event_prf([], []) == {"precision": 0.0, "recall": 0.0, "f1": 0.0, "tp": 0, "fp": 0, "fn": 0}
+    alt = [{"label": "Dog|Bark", "start": 0, "end": 1}]
+    assert event_prf(alt, [{"label": "bark", "start": 0, "end": 1}])["tp"] == 1
+
+
+def test_error_rates_keep_combining_marks_and_count_chars():
+    from audio_mcp.eval.metrics import _words, char_error_rate, word_error_rate
+
+    assert _words("नमस्ते, दुनिया!") == ["नमस्ते", "दुनिया"]
+    assert word_error_rate("नमस्ते दुनिया", "नमस्ते दुनिया") == 0.0
+    assert char_error_rate("你好世界", "你好世间") == 0.25
+    assert _words("It's done.") == ["it's", "done"]

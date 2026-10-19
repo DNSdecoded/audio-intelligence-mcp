@@ -1,0 +1,185 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "1660.wav",
+      "wer": 0.1176,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "Romanticism had a large element of cultural determinism drawn from writers such as Goeth, Fitcht, and Schlegel."
+    },
+    {
+      "file": "1661.wav",
+      "wer": 0.0526,
+      "ref_units": 19,
+      "language": "en",
+      "hypothesis": "He did not set a figure for the cut saying they will be made based on China's economic output."
+    },
+    {
+      "file": "1662.wav",
+      "wer": 0.0476,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "Alloys are basically a mixture of two or more metals. Don't forget there are many elements on the periodic table."
+    },
+    {
+      "file": "1663.wav",
+      "wer": 0.0455,
+      "ref_units": 22,
+      "language": "en",
+      "hypothesis": "Chocomo Valley, Chile's premier climbing destination, known as the Yosemite of South America, with a variety of granite big walls and crags."
+    },
+    {
+      "file": "1664.wav",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "Swirl the two dry powders together and then with clean wet hands, squeeze them into a ball."
+    },
+    {
+      "file": "1665.wav",
+      "wer": 0.0833,
+      "ref_units": 24,
+      "language": "en",
+      "hypothesis": "The document, according to the leak, will refer to the borders dispute, which Palestine wants based on the borders before the 1967 mid-East War."
+    },
+    {
+      "file": "1666.wav",
+      "wer": 0.0,
+      "ref_units": 22,
+      "language": "en",
+      "hypothesis": "You may also wish to consult the advice of governments other than your own, but their advice is designed for their citizens."
+    },
+    {
+      "file": "1667.wav",
+      "wer": 0.0,
+      "ref_units": 29,
+      "language": "en",
+      "hypothesis": "Generally speaking, two behaviors can emerge as managers begin to lead their former peers. One end of the spectrum is trying to remain one of the guys, or gals."
+    },
+    {
+      "file": "1668.wav",
+      "wer": 0.0323,
+      "ref_units": 31,
+      "language": "en",
+      "hypothesis": "It may also be beneficial for one to buy a wild card which provides entries to either selections of parks in South Africa or all of the South African national parks."
+    },
+    {
+      "file": "1669.wav",
+      "wer": 0.1429,
+      "ref_units": 14,
+      "language": "en",
+      "hypothesis": "Police Superintendent Chandra Shankar-Solensky said the accused appeared in court with covered faces."
+    },
+    {
+      "file": "1670.wav",
+      "wer": 0.1731,
+      "ref_units": 52,
+      "language": "en",
+      "hypothesis": "Their formal behavior is not as steady as large caves on earth that often maintain a fairly constant temperature but is consistent with these being deep holes in the ground, static gland cushioning, a United States geological survey, astro geology team, and of Northern Arizona University located in Flagstaff, Arizona."
+    },
+    {
+      "file": "1671.wav",
+      "wer": 0.0952,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "Congress begin funding the obscenity initiative in fiscal 2005 and specify that the FBI must devote 10 agents to adult pornography."
+    },
+    {
+      "file": "1672.wav",
+      "wer": 0.0,
+      "ref_units": 19,
+      "language": "en",
+      "hypothesis": "Be careful not to allow fabric to become too hot which can cause shrinkage or in extreme cases, scorch."
+    },
+    {
+      "file": "1673.wav",
+      "wer": 0.04,
+      "ref_units": 25,
+      "language": "en",
+      "hypothesis": "During the Revolutionary War, the 13 states first formed a weak central government, with the Congress being its only component under the Articles of Confederation."
+    },
+    {
+      "file": "1674.wav",
+      "wer": 0.125,
+      "ref_units": 16,
+      "language": "en",
+      "hypothesis": "In some areas, boiling water for a minute is enough and other several minutes are needed."
+    },
+    {
+      "file": "1675.wav",
+      "wer": 0.0476,
+      "ref_units": 21,
+      "language": "en",
+      "hypothesis": "All nouns alongside the word C for you always begin with a capital letter even in the middle of a sentence."
+    },
+    {
+      "file": "1676.wav",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "en",
+      "hypothesis": "As with all South African national parks, there are daily conservation and entry fees for the park."
+    },
+    {
+      "file": "1677.wav",
+      "wer": 0.1333,
+      "ref_units": 15,
+      "language": "en",
+      "hypothesis": "Today, the only insects that cannot fold back their wings are dragonflies and mayflies."
+    },
+    {
+      "file": "1678.wav",
+      "wer": 0.0,
+      "ref_units": 28,
+      "language": "en",
+      "hypothesis": "Oliver Sacks in his paper The President's Speech indicated how people who are unable to understand speech because of brain damage are nevertheless able to assess sincerity accurately."
+    },
+    {
+      "file": "1679.wav",
+      "wer": 0.0,
+      "ref_units": 9,
+      "language": "en",
+      "hypothesis": "Aerosmith have cancelled their remaining concerts on their tour."
+    },
+    {
+      "file": "1680.wav",
+      "wer": 0.0,
+      "ref_units": 26,
+      "language": "en",
+      "hypothesis": "A well-rounded athlete, the tiger can climb, though not well, swim, leap great distances and pull with five times the force of a strong human."
+    },
+    {
+      "file": "1681.wav",
+      "wer": 0.0,
+      "ref_units": 32,
+      "language": "en",
+      "hypothesis": "It isn't alone, though, experimentation, and an experiment is a test that is used to eliminate one or more of the possible hypotheses, asking questions, and making observations also guide scientific research."
+    },
+    {
+      "file": "1682.wav",
+      "wer": 0.2424,
+      "ref_units": 33,
+      "language": "en",
+      "hypothesis": "While no one knows for certain who wrote it, it is known that early in its life, the large parchment document measures 29 3 fourth inches by 24 and a half inches was rolled up for storage."
+    },
+    {
+      "file": "1683.wav",
+      "wer": 0.0909,
+      "ref_units": 33,
+      "language": "en",
+      "hypothesis": "There are still many men and women alive who survived their time here, and many more who had loved ones who were murdered or worked to death to their Jews or non-Jews alike."
+    },
+    {
+      "file": "1684.wav",
+      "wer": 0.0435,
+      "ref_units": 23,
+      "language": "en",
+      "hypothesis": "Apia is the capital of Samoa. The town is on the island of Upolut and has a population of just under 40,000."
+    }
+  ],
+  "aggregate": {
+    "wer": 0.0666,
+    "files": 25,
+    "language_accuracy": 1.0
+  }
+}

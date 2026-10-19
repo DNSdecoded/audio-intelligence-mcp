@@ -1,0 +1,262 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "6930-75918-0000__aac.aac",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__aiff.aiff",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__flac.flac",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__m4a.m4a",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__mp3.mp3",
+      "wer": 0.125,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concorde returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__ogg.ogg",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__opus.opus",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__wav16k.wav",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__wav48kstereo.wav",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__wav8kmulaw.wav",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__webm.webm",
+      "wer": 0.125,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concorde returned to its place amidst the tents."
+    },
+    {
+      "file": "6930-75918-0000__wma.wma",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "en",
+      "hypothesis": "Concord returned to its place amidst the tents."
+    },
+    {
+      "file": "7021-79730-0000__aac.aac",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__aiff.aiff",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__flac.flac",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__m4a.m4a",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__mp3.mp3",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__ogg.ogg",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__opus.opus",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__wav16k.wav",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__wav48kstereo.wav",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__wav8kmulaw.wav",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__webm.webm",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7021-79730-0000__wma.wma",
+      "wer": 0.0,
+      "ref_units": 5,
+      "language": "en",
+      "hypothesis": "the three modes of management."
+    },
+    {
+      "file": "7127-75946-0000__aac.aac",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__aiff.aiff",
+      "wer": 0.0169,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at 5 o'clock, the King entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__flac.flac",
+      "wer": 0.0169,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at 5 o'clock, the King entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__m4a.m4a",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__mp3.mp3",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__ogg.ogg",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__opus.opus",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__wav16k.wav",
+      "wer": 0.0169,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at 5 o'clock, the King entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__wav48kstereo.wav",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__wav8kmulaw.wav",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__webm.webm",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet, where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination, and had cost so many efforts of thought to the designers and ornament workers of the court."
+    },
+    {
+      "file": "7127-75946-0000__wma.wma",
+      "wer": 0.0,
+      "ref_units": 59,
+      "language": "en",
+      "hypothesis": "At the conclusion of the banquet, which was served at five o'clock, the king entered his cabinet where his tailors were awaiting him for the purpose of trying on the celebrated costume representing spring, which was the result of so much imagination and had cost so many efforts of thought to the designers and ornament workers of the court."
+    }
+  ],
+  "aggregate": {
+    "wer": 0.0058,
+    "files": 36,
+    "language_accuracy": 1.0
+  }
+}

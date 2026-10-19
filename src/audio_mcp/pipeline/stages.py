@@ -218,16 +218,20 @@ def _quality(ctx):
 
 
 def _features_cfg(app, o):
-    return {**_vad_cfg(app, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS)}
+    # "dsp" versions the feature math: bump it when measurements change so cached results are recomputed
+    return {**_vad_cfg(app, o), "groups": list(o.get("feature_groups") or FEATURE_GROUPS), "dsp": 2}
 
 
 def _vad_cfg(app, o):
-    return {"vad": _id(app.backends.vad), "fallback": _id(app.backends.vad_fallback)}
+    s = app.settings
+    return {"vad": _id(app.backends.vad), "fallback": _id(app.backends.vad_fallback),
+            "vad_params": [s.vad_threshold, s.vad_min_silence_ms, s.vad_speech_pad_ms]}
 
 
 def _asr_cfg(app, o):  # also keys `language`, which only reads the transcription result
     return {**_vad_cfg(app, o), "asr": _id(app.backends.asr), "language": o.get("language"),
-            "word_timestamps": o.get("word_timestamps", True), "multilingual": bool(o.get("multilingual"))}
+            "word_timestamps": o.get("word_timestamps", True), "multilingual": bool(o.get("multilingual")),
+            "decode": 2}  # bump when decoding settings change so cached transcripts are recomputed
 
 
 STAGES: dict[str, Stage] = {s.name: s for s in [
@@ -256,7 +260,7 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("audio_embedding", (), _audio_embedding, lambda a, o: {"tagger": _id(a.backends.tagger)}, "tagger"),
     Stage("translation", ("transcription",), _translation, lambda a, o: {**_asr_cfg(a, o), "target": "en"}, "asr"),
     Stage("integrity", ("metadata",), _integrity, lambda a, o: {"rules": 1}),
-    Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 1}),
+    Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 2}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),
     Stage("events", (), _events,

@@ -24,6 +24,12 @@
           "b": "aud_2e130551b6f3fd9a",
           "measured_differences": {
             "features": {
+              "active_rms_dbfs": {
+                "a": -9.03090387033729,
+                "b": -10.61402866863581,
+                "delta": -1.583125,
+                "unit": "dBFS"
+              },
               "clipping_ratio": {
                 "a": 0.0,
                 "b": 0.0,
@@ -103,9 +109,9 @@
                 "unit": "ratio"
               },
               "snr_db_estimate": {
-                "a": 0.0036567419278631676,
-                "b": 54.202304285276625,
-                "delta": 54.198648,
+                "a": 0.0016980817515568924,
+                "b": 54.19667613186359,
+                "delta": 54.194978,
                 "unit": "dB"
               },
               "spectral_bandwidth_hz": {
@@ -217,7 +223,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.468,
+      "duration_seconds": 0.531,
       "stages_run": [
         "aud_8a84c21c384f272e:metadata",
         "aud_8a84c21c384f272e:events",

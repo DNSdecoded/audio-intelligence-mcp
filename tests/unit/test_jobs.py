@@ -117,8 +117,7 @@ def test_new_async_capable_tools(app, speech_en, dialogue, tool, model, params):
         p["source"] = fp(speech_en)
     r = getattr(handlers, tool)(app, getattr(schemas, model)(**p, async_mode="always"))
     assert r["status"] == "processing", r
-    wait_until(lambda: status(app, r["job_id"])["result"]["job_status"] != "running"
-               and status(app, r["job_id"])["result"]["job_status"] != "queued", timeout=60)
+    wait_until(lambda: status(app, r["job_id"])["result"]["job_status"] not in ("running", "queued"), timeout=60)
     s = status(app, r["job_id"])["result"]
     assert s["job_status"] == "done" and s["response"]["status"] == "success", s
 

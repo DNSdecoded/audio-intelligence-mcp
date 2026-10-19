@@ -1,0 +1,38 @@
+{
+  "metric": "der",
+  "per_file": [
+    {
+      "file": "EN2002a.wav",
+      "der": 0.4754,
+      "missed": 0.2826,
+      "false_alarm": 0.0291,
+      "confusion": 0.1636
+    },
+    {
+      "file": "ES2004a.wav",
+      "der": 0.2962,
+      "missed": 0.2217,
+      "false_alarm": 0.0328,
+      "confusion": 0.0417
+    },
+    {
+      "file": "IS1009a.wav",
+      "der": 0.3137,
+      "missed": 0.1559,
+      "false_alarm": 0.0676,
+      "confusion": 0.0902
+    },
+    {
+      "file": "TS3003a.wav",
+      "der": 0.2761,
+      "missed": 0.2096,
+      "false_alarm": 0.0379,
+      "confusion": 0.0285
+    }
+  ],
+  "aggregate": {
+    "der": 0.3822,
+    "files": 4,
+    "collar": 0.0
+  }
+}

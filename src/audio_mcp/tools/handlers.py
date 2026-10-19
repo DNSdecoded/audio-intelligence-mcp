@@ -171,6 +171,8 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
     stages = ["metadata"]  # always report audio_metadata
     for t in tasks:
         stages += [s for s in TASK_TO_STAGES[t] if s not in stages]
+    if "transcription" not in stages and "speaker_assign" in stages:
+        stages.remove("speaker_assign")  # labels transcript words: without a transcript it would force full ASR
     o = req.options
     outcome = run_analysis(app, req.source, order_stages(stages), {
         "language": o.language, "word_timestamps": o.word_level_timestamps, "num_speakers": o.num_speakers,

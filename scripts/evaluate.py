@@ -4,23 +4,23 @@ Usage:
   uv run python scripts/evaluate.py wer    --ref-dir D --audio-dir A        (pairs stem.txt with stem.<audio ext>)
   uv run python scripts/evaluate.py events --labels labels.csv --audio-dir A (CSV columns: file,start,end,label)
   uv run python scripts/evaluate.py der    --rttm-dir R --audio-dir A        (pairs stem.rttm with stem.<audio ext>)
+  uv run python scripts/evaluate.py quality --labels labels.csv --audio-dir A (CSV columns: file,issues; issues "A|B")
 Options: --profile real|fake (default real), --out report.json, --iou 0.5 (events), --collar 0.25 (der).
 The audio directory must be inside allowed_roots (AUDIO_MCP_ALLOWED_ROOTS).
 """
 import argparse
 import csv
 import json
-import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 from audio_mcp.config import load_settings
 from audio_mcp.context import build_app_context
-from audio_mcp.eval.metrics import der, event_prf, load_rttm, word_error_rate
+from audio_mcp.eval.metrics import _words, char_error_rate, der, event_prf, load_rttm, word_error_rate
 from audio_mcp.library.index import SUPPORTED_EXTENSIONS
-from audio_mcp.tools.handlers import analyze_audio, detect_audio_events, transcribe_audio
-from audio_mcp.tools.schemas import AnalyzeRequest, DetectEventsRequest, TranscribeRequest
+from audio_mcp.tools.handlers import analyze_audio, detect_audio_events, inspect_audio_quality, transcribe_audio
+from audio_mcp.tools.schemas import AnalyzeRequest, DetectEventsRequest, InspectQualityRequest, TranscribeRequest
 
 
 def _audio_for(stem: str, audio_dir: Path) -> Path | None:
@@ -38,19 +38,26 @@ def _check(resp: dict, p: Path) -> dict:
 
 
 def eval_wer(app, a) -> dict:
-    rows, edits, words = [], 0.0, 0
+    rate, unit = (char_error_rate, "cer") if a.unit == "char" else (word_error_rate, "wer")
+    rows, edits, words, lang_ok = [], 0.0, 0, 0
     for ref in sorted(Path(a.ref_dir).glob("*.txt")):
         audio = _audio_for(ref.stem, Path(a.audio_dir))
         if audio is None:
             continue
         text = ref.read_text(encoding="utf-8")
         hyp = _check(transcribe_audio(app, TranscribeRequest(source=_src(audio), async_mode="never")), audio)
-        w = word_error_rate(text, hyp["result"]["text"])
-        n = len(re.findall(r"\w+", text))
-        rows.append({"file": audio.name, "wer": round(w, 4), "ref_words": n})
+        w = rate(text, hyp["result"]["text"])
+        n = len("".join(_words(text))) if unit == "cer" else len(_words(text))
+        lang = hyp["result"].get("language")
+        lang = lang.get("primary") if isinstance(lang, dict) else lang
+        lang_ok += lang == a.language
+        rows.append({"file": audio.name, unit: round(w, 4), "ref_units": n, "language": lang,
+                     "hypothesis": hyp["result"]["text"]})
         edits, words = edits + w * n, words + n
-    return {"metric": "wer", "per_file": rows,
-            "aggregate": {"wer": round(edits / words, 4) if words else None, "files": len(rows)}}
+    agg = {unit: round(edits / words, 4) if words else None, "files": len(rows)}
+    if a.language:
+        agg["language_accuracy"] = round(lang_ok / len(rows), 4) if rows else None
+    return {"metric": unit, "per_file": rows, "aggregate": agg}
 
 
 def eval_events(app, a) -> dict:
@@ -58,19 +65,43 @@ def eval_events(app, a) -> dict:
     with open(a.labels, encoding="utf-8", newline="") as fh:
         for r in csv.DictReader(fh):
             ref[r["file"]].append({"label": r["label"], "start": float(r["start"]), "end": float(r["end"])})
-    rows, tot = [], {"tp": 0, "fp": 0, "fn": 0}
+    rows, tot, top1 = [], {"tp": 0, "fp": 0, "fn": 0}, 0
     for name, events in sorted(ref.items()):
         audio = Path(a.audio_dir) / name
         hyp = _check(detect_audio_events(app, DetectEventsRequest(source=_src(audio), async_mode="never")), audio)
-        m = event_prf(events, hyp["result"]["events"], iou=a.iou)
-        rows.append({"file": name, **m})
+        hyp_ev = hyp["result"]["events"]
+        m = event_prf(events, hyp_ev, iou=a.iou)
+        best = max(hyp_ev, key=lambda e: e.get("confidence", 0.0))["label"] if hyp_ev else None
+        hit = best is not None and any(best.lower() in e["label"].lower().split("|") for e in events)
+        top1 += hit
+        rows.append({"file": name, **m, "top1": best, "top1_hit": hit})
         for k in tot:
             tot[k] += m[k]
     p = tot["tp"] / (tot["tp"] + tot["fp"]) if tot["tp"] + tot["fp"] else 0.0
     r = tot["tp"] / (tot["tp"] + tot["fn"]) if tot["tp"] + tot["fn"] else 0.0
     f1 = 2 * p * r / (p + r) if p + r else 0.0
     return {"metric": "events", "per_file": rows,
-            "aggregate": {"precision": round(p, 4), "recall": round(r, 4), "f1": round(f1, 4), **tot, "iou": a.iou}}
+            "aggregate": {"precision": round(p, 4), "recall": round(r, 4), "f1": round(f1, 4), **tot, "iou": a.iou,
+                          "top1_accuracy": round(top1 / len(rows), 4) if rows else None, "files": len(rows)}}
+
+
+def eval_quality(app, a) -> dict:
+    with open(a.labels, encoding="utf-8", newline="") as fh:
+        ref = {r["file"]: {c for c in r["issues"].split("|") if c} for r in csv.DictReader(fh)}
+    rows, per = [], defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
+    for name, want in sorted(ref.items()):
+        audio = Path(a.audio_dir) / name
+        resp = _check(inspect_audio_quality(app, InspectQualityRequest(source=_src(audio), async_mode="never")), audio)
+        got = {i["code"] for i in resp["result"]["issues"]} - {"MULTICHANNEL"}
+        for c in want | got:
+            per[c]["tp" if c in want and c in got else "fn" if c in want else "fp"] += 1
+        rows.append({"file": name, "expected": sorted(want), "detected": sorted(got), "exact": want == got})
+    codes = {c: {**v, "precision": round(v["tp"] / (v["tp"] + v["fp"]), 4) if v["tp"] + v["fp"] else None,
+                 "recall": round(v["tp"] / (v["tp"] + v["fn"]), 4) if v["tp"] + v["fn"] else None}
+             for c, v in sorted(per.items())}
+    return {"metric": "quality", "per_file": rows, "per_issue": codes,
+            "aggregate": {"exact_match": round(sum(r["exact"] for r in rows) / len(rows), 4) if rows else None,
+                          "files": len(rows)}}
 
 
 def eval_der(app, a) -> dict:
@@ -94,25 +125,29 @@ def eval_der(app, a) -> dict:
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("wer", "events", "der"):
+    for name in ("wer", "events", "der", "quality"):
         p = sub.add_parser(name)
         p.add_argument("--audio-dir", required=True)
         p.add_argument("--profile", choices=["real", "fake"], default="real")
         p.add_argument("--out")
     sub.choices["wer"].add_argument("--ref-dir", required=True)
+    sub.choices["wer"].add_argument("--unit", choices=["word", "char"], default="word")
+    sub.choices["wer"].add_argument("--language", help="expected language code; reports detection accuracy")
     sub.choices["events"].add_argument("--labels", required=True)
     sub.choices["events"].add_argument("--iou", type=float, default=0.5)
     sub.choices["der"].add_argument("--rttm-dir", required=True)
     sub.choices["der"].add_argument("--collar", type=float, default=0.25)
+    sub.choices["quality"].add_argument("--labels", required=True)
     a = ap.parse_args(argv)
+    out, sys.stdout = sys.stdout, sys.stderr  # model libraries print on load; keep stdout pure JSON
     settings = load_settings()
     settings.backend_profile = a.profile
     app = build_app_context(settings)
-    report = {"wer": eval_wer, "events": eval_events, "der": eval_der}[a.cmd](app, a)
+    report = {"wer": eval_wer, "events": eval_events, "der": eval_der, "quality": eval_quality}[a.cmd](app, a)
     text = json.dumps(report, indent=2)
     if a.out:
         Path(a.out).write_text(text, encoding="utf-8")
-    sys.stdout.write(text + "\n")
+    out.write(text + "\n")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,185 @@
+{
+  "metric": "wer",
+  "per_file": [
+    {
+      "file": "1660.wav",
+      "wer": 0.1053,
+      "ref_units": 19,
+      "language": "es",
+      "hypothesis": "El elemento del determinismo cultural se encontraba muy presente en el romanticismo, seg\u00fan estudiosos como Goethe, Fichte y Schegel."
+    },
+    {
+      "file": "1661.wav",
+      "wer": 0.0,
+      "ref_units": 20,
+      "language": "es",
+      "hypothesis": "No mencion\u00f3 una cifra para los recortes y manifest\u00f3 que se har\u00e1n en base a la producci\u00f3n econ\u00f3mica de China."
+    },
+    {
+      "file": "1662.wav",
+      "wer": 0.0526,
+      "ref_units": 19,
+      "language": "es",
+      "hypothesis": "Las alaciones son b\u00e1sicamente una combinaci\u00f3n de dos o m\u00e1s metales. Recuerde que la tabla peri\u00f3dica tiene muchos elementos."
+    },
+    {
+      "file": "1663.wav",
+      "wer": 0.0667,
+      "ref_units": 30,
+      "language": "es",
+      "hypothesis": "El valle de Cochamor es el destino para escalar m\u00e1s popular de Chile y es conocido como el Yosemite de Sudam\u00e9rica, con variedad de extensos muros y r\u00edgicos de granito."
+    },
+    {
+      "file": "1664.wav",
+      "wer": 0.05,
+      "ref_units": 20,
+      "language": "es",
+      "hypothesis": "Agite ambos polvos secos juntos y despu\u00e9s hacerlo con las manos higienizadas y h\u00famedas, expr\u00edmalos para formar una bola."
+    },
+    {
+      "file": "1665.wav",
+      "wer": 0.0,
+      "ref_units": 33,
+      "language": "es",
+      "hypothesis": "Seg\u00fan la informaci\u00f3n que se filtr\u00f3, el documento tratar\u00e1 sobre el conflicto fronterizo que Palestina pretende resolver bas\u00e1ndose en los l\u00edmites vigentes en forma previa a la Guerra del Medio Oriente de 1967."
+    },
+    {
+      "file": "1666.wav",
+      "wer": 0.0,
+      "ref_units": 17,
+      "language": "es",
+      "hypothesis": "Es posible que quiera consultar las recomendaciones de otros gobiernos, pero est\u00e1n pensadas para sus propios ciudadanos."
+    },
+    {
+      "file": "1667.wav",
+      "wer": 0.0571,
+      "ref_units": 35,
+      "language": "es",
+      "hypothesis": "En general pueden darse dos tipos de comportamientos cuando los gerentes comienzan a liderar a sus antiguos compa\u00f1eros. De un lado el espectro est\u00e1 el intento de continuar siendo uno de los muchachos o muchachas."
+    },
+    {
+      "file": "1668.wav",
+      "wer": 0.0385,
+      "ref_units": 26,
+      "language": "es",
+      "hypothesis": "Tambi\u00e9n puede ser conveniente comprar una Wild Car que permite la entrada a selecciones de parques en Sud\u00e1frica o a todos los parques nacionales del pa\u00eds."
+    },
+    {
+      "file": "1669.wav",
+      "wer": 0.0952,
+      "ref_units": 21,
+      "language": "es",
+      "hypothesis": "Seg\u00fan manifestar\u00e1 el superintendente de la polic\u00eda Chandra Chekar Solanki, los acusados se presentaron ante el tribunal con sus rostros cubiertos."
+    },
+    {
+      "file": "1670.wav",
+      "wer": 0.0727,
+      "ref_units": 55,
+      "language": "es",
+      "hypothesis": "Si bien su comportamiento t\u00e9rnico no est\u00e1 regular como las grandes cuevas en nuestro planeta que suelen sostener una temperatura bastante estable, es consistente con estas profundas cavidades en el suelo. Sostuvo Glenn Cushing, del Equipo de Arqueolog\u00eda del Servicio Geol\u00f3gico estadounidense USGS y de la Universidad del Norte de Arizona en Flagstaff, Arizona."
+    },
+    {
+      "file": "1671.wav",
+      "wer": 0.0,
+      "ref_units": 35,
+      "language": "es",
+      "hypothesis": "En el a\u00f1o fiscal 2005 el Congreso inici\u00f3 la financiaci\u00f3n de la campa\u00f1a contra la obscenidad y dio la instrucci\u00f3n de que el FBI debe asignar 10 agentes a ocuparse de la pornograf\u00eda para adultos."
+    },
+    {
+      "file": "1672.wav",
+      "wer": 0.1667,
+      "ref_units": 18,
+      "language": "es",
+      "hypothesis": "Procure no dejar que la tela se caliente demasiado ya que podr\u00edan cogerse o en algunos casos extremos quemarse."
+    },
+    {
+      "file": "1673.wav",
+      "wer": 0.0312,
+      "ref_units": 32,
+      "language": "es",
+      "hypothesis": "Durante la guerra de la revoluci\u00f3n, los tres estados formaron en un principio un gobierno central endeble bajo los art\u00edculos de la confederaci\u00f3n, en el que el Congreso era su \u00fanico componente."
+    },
+    {
+      "file": "1674.wav",
+      "wer": 0.0,
+      "ref_units": 16,
+      "language": "es",
+      "hypothesis": "En algunos lugares basta con hervir agua durante un minuto, en otros son necesarios varios m\u00e1s."
+    },
+    {
+      "file": "1675.wav",
+      "wer": 0.1154,
+      "ref_units": 26,
+      "language": "es",
+      "hypothesis": "Todos los sustantivos, as\u00ed como el vocablo C para significar a usted, llevan siempre su letra inicial may\u00fascula, aunque est\u00e9n ubicados en el medio de la oraci\u00f3n."
+    },
+    {
+      "file": "1676.wav",
+      "wer": 0.0,
+      "ref_units": 19,
+      "language": "es",
+      "hypothesis": "Como en todas las reservas naturales de Sud\u00e1frica, existen tarifas diarias para la conservaci\u00f3n y de acceso al parque."
+    },
+    {
+      "file": "1677.wav",
+      "wer": 0.2,
+      "ref_units": 15,
+      "language": "es",
+      "hypothesis": "Actualmente los alizopteros y los efemeropteros son los \u00fanicos insectos capaces de doblar sus alas."
+    },
+    {
+      "file": "1678.wav",
+      "wer": 0.0286,
+      "ref_units": 35,
+      "language": "es",
+      "hypothesis": "Oliver Sacks, en su art\u00edculo el discurso del presidente, explic\u00f3 la forma en que aquellos que no pueden comprender el habla a causa de un da\u00f1o cerebral pueden obstante evaluar la sinceridad con precisi\u00f3n."
+    },
+    {
+      "file": "1679.wav",
+      "wer": 0.0,
+      "ref_units": 8,
+      "language": "es",
+      "hypothesis": "Aerosmith cancel\u00f3 los conciertos pendientes de su gira."
+    },
+    {
+      "file": "1680.wav",
+      "wer": 0.037,
+      "ref_units": 27,
+      "language": "es",
+      "hypothesis": "Atleta integral, el tigre tiene la habilidad de tepar, pero no demasiado bien, nadar, dar extensos saltos y jalar cinco veces m\u00e1s fuerte que una persona robusta."
+    },
+    {
+      "file": "1681.wav",
+      "wer": 0.0,
+      "ref_units": 32,
+      "language": "es",
+      "hypothesis": "No se trata, sin embargo, de una experimentaci\u00f3n. Es una prueba que se usa para descartar una o m\u00e1s de las posibles hip\u00f3tesis haciendo preguntas y observaciones que gu\u00edan la investigaci\u00f3n cient\u00edfica."
+    },
+    {
+      "file": "1682.wav",
+      "wer": 0.1935,
+      "ref_units": 31,
+      "language": "es",
+      "hypothesis": "Aunque se desconoce la ciencia cierta, quien lo redact\u00f3, se sabe que apenas fue confeccionado el enorme documento de pergamino, mide 29 \u00be pulgadas por 24 \u00be pulgadas, fue enrollado para ser guardado."
+    },
+    {
+      "file": "1683.wav",
+      "wer": 0.0789,
+      "ref_units": 38,
+      "language": "es",
+      "hypothesis": "Aunque dan muchos hombres y mujeres con vida que sobrevieron a su estad\u00eda en este lugar y muchos m\u00e1s que tuvieron seres queridos a los que asesinaron o trabajaron all\u00ed hasta su muerte, tanto jud\u00edos como no jud\u00edos."
+    },
+    {
+      "file": "1684.wav",
+      "wer": 0.0435,
+      "ref_units": 23,
+      "language": "es",
+      "hypothesis": "Capital de Samoa, la ciudad de Apia se ubica en la isla de Uphol\u00fa y cuenta con poco menos de 40.000 habitantes."
+    }
+  ],
+  "aggregate": {
+    "wer": 0.0569,
+    "files": 25,
+    "language_accuracy": 1.0
+  }
+}

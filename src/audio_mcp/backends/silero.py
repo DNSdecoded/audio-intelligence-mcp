@@ -7,8 +7,11 @@ from audio_mcp.types import Interval
 class SileroVAD:
     info = ModelInfo(stage="vad", name="silero-vad", version="5")
 
-    def __init__(self):
+    def __init__(self, settings=None):
         self._model = None
+        self._params = {} if settings is None else {
+            "threshold": settings.vad_threshold, "min_silence_duration_ms": settings.vad_min_silence_ms,
+            "speech_pad_ms": settings.vad_speech_pad_ms}
 
     def available(self):
         from audio_mcp.backends.base import _importable
@@ -33,5 +36,5 @@ class SileroVAD:
 
         self.load()
         x = torch.from_numpy(np.ascontiguousarray(mono16k, dtype=np.float32))
-        ts = get_speech_timestamps(x, self._model, sampling_rate=16000, return_seconds=True)
+        ts = get_speech_timestamps(x, self._model, sampling_rate=16000, return_seconds=True, **self._params)
         return [Interval(start=t["start"], end=t["end"]) for t in ts]
