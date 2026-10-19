@@ -106,3 +106,25 @@ def test_backends_selected(settings, monkeypatch):
     settings.llm_provider, settings.llm_model, settings.llm_base_url = "anthropic", "claude-opus-5-5", None
     llm = build_backends(settings).llm
     assert isinstance(llm, AnthropicLLM) and llm.is_remote is True
+
+
+@pytest.mark.parametrize("out", [
+    '{"sentences":[{"sentence":"no text key","evidence_ids":["seg_0001"]}],"topics":7}',
+    '{"sentences":[{"text":"nested ids","evidence_ids":[["seg_0001"]]}]}',
+    '{"sentences":"not a list","topics":[{"a":1}]}',
+])
+def test_summarize_wrong_shapes_are_dropped_not_raised(out):
+    res = llm_summarize({"transcription": {"segments": []}}, PACK, StubLLM(out), "short", None)
+    assert res["sentences"] == [] and res["topics"] == []
+
+
+@pytest.mark.parametrize("out", ['{"answer":"x","claims":5}', '{"answer":"x","claims":[{"evidence_ids":"seg_0001"}]}'])
+def test_answer_wrong_shapes_are_insufficient(out):
+    assert llm_answer("q?", PACK, StubLLM(out))["support"] == "insufficient"
+
+
+def test_interpret_wrong_shapes():
+    from audio_mcp.reasoning.llm_grounded import llm_interpret
+
+    assert llm_interpret({}, StubLLM('{"interpretations":{"statement":"x"}}')) == []
+    assert llm_interpret({}, StubLLM('{"interpretations":[{"statement":"maybe","based_on":7}]}'))[0]["based_on"] == []

@@ -40,14 +40,24 @@ def _parse(out: str) -> dict:
     return obj
 
 
+def _list(v) -> list:
+    """LLM JSON is untrusted: a field that should be a list may be anything."""
+    return v if isinstance(v, list) else []
+
+
+def _cites(item, ids) -> bool:
+    """A dict whose non-empty evidence_ids are all strings naming evidence in the pack."""
+    v = item.get("evidence_ids") if isinstance(item, dict) else None
+    return isinstance(v, list) and bool(v) and all(isinstance(i, str) and i in ids for i in v)
+
+
 def llm_answer(question: str, pack: list[Evidence], llm) -> dict:
     prompt = (f"Evidence (JSON lines):\n{_lines(pack)}\n\nQuestion: {question}\n\nReply as JSON: "
               '{"answer": str, "claims": [{"text": str, "evidence_ids": [str], "kind": "detected"|"interpretation"}], '
               '"insufficient": bool}')
     obj = _parse(llm.complete(_SYSTEM, prompt))
     by_id = {e.id: e for e in pack}
-    claims = [c for c in obj.get("claims") or []
-              if isinstance(c, dict) and c.get("evidence_ids") and all(i in by_id for i in c["evidence_ids"])]
+    claims = [c for c in _list(obj.get("claims")) if _cites(c, by_id)]
     cited = list(dict.fromkeys(i for c in claims for i in c["evidence_ids"]))
     if obj.get("insufficient") or not claims:
         support = "insufficient"
@@ -72,9 +82,9 @@ def llm_summarize(results: dict, pack: list[Evidence], llm, length: str, focus: 
               '{"sentences": [{"text": str, "evidence_ids": [str]}], "topics": [str]}')
     obj = _parse(llm.complete(_SYSTEM, prompt))
     ids = {e.id for e in pack}
-    sentences = [{"text": str(s["text"]), "evidence_ids": s["evidence_ids"]} for s in obj.get("sentences") or []
-                 if isinstance(s, dict) and s.get("evidence_ids") and all(i in ids for i in s["evidence_ids"])]
-    topics = [{"label": str(t), "evidence_ids": []} for t in obj.get("topics") or []][:5]
+    sentences = [{"text": s["text"], "evidence_ids": s["evidence_ids"]} for s in _list(obj.get("sentences"))
+                 if _cites(s, ids) and isinstance(s.get("text"), str) and s["text"].strip()]
+    topics = [{"label": t, "evidence_ids": []} for t in _list(obj.get("topics")) if isinstance(t, str)][:5]
     return {"text": " ".join(s["text"] for s in sentences), "sentences": sentences, "topics": topics,
             "key_moments": _key_moments(results, _segments(results)), "method": "llm"}
 
@@ -84,6 +94,6 @@ def llm_interpret(measured_differences: dict, llm) -> list[dict]:
               "Suggest at most 3 possible, clearly hedged interpretations. Reply as JSON: "
               '{"interpretations": [{"statement": str, "based_on": [str]}]}')
     obj = _parse(llm.complete(_SYSTEM, prompt))
-    return [{"statement": str(i["statement"]), "based_on": list(i.get("based_on") or []), "kind": "interpretation",
-             "source": "llm"} for i in (obj.get("interpretations") or [])[:3]
-            if isinstance(i, dict) and i.get("statement")]
+    return [{"statement": i["statement"], "based_on": [b for b in _list(i.get("based_on")) if isinstance(b, str)],
+             "kind": "interpretation", "source": "llm"} for i in _list(obj.get("interpretations"))[:3]
+            if isinstance(i, dict) and isinstance(i.get("statement"), str) and i["statement"].strip()]
