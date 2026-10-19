@@ -4,6 +4,10 @@
 ![Python 3.12 | 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
 ![Platforms: Windows | macOS | Linux](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
 
+<video src="https://github.com/DNSdecoded/audio-intelligence-mcp/raw/main/docs/media/launch.mp4" poster="https://github.com/DNSdecoded/audio-intelligence-mcp/raw/main/docs/media/launch-poster.jpg" controls muted playsinline width="100%"></video>
+
+[![Watch the 29-second overview](https://github.com/DNSdecoded/audio-intelligence-mcp/raw/main/docs/media/launch-poster.jpg)](https://github.com/DNSdecoded/audio-intelligence-mcp/raw/main/docs/media/launch.mp4)
+
 A local-first [Model Context Protocol](https://modelcontextprotocol.io) server that lets AI agents analyze audio:
 transcripts with word timings, speakers, sound events, acoustic measurements, quality diagnosis, timelines,
 evidence-grounded answers, comparisons, library search, streaming, and exports.
