@@ -7,7 +7,7 @@
 
 [![29-second overview of Audio Intelligence MCP](https://github.com/DNSdecoded/audio-intelligence-mcp/raw/main/docs/media/launch.gif)](https://cdn.jsdelivr.net/gh/DNSdecoded/audio-intelligence-mcp@main/docs/media/launch.mp4)
 
-▶ [Watch with sound (MP4, 29 s)](https://cdn.jsdelivr.net/gh/DNSdecoded/audio-intelligence-mcp@main/docs/media/launch.mp4)
+Latest release notes: [CHANGELOG.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/CHANGELOG.md) · ▶ [Watch with sound (MP4, 29 s)](https://cdn.jsdelivr.net/gh/DNSdecoded/audio-intelligence-mcp@main/docs/media/launch.mp4)
 
 A local-first [Model Context Protocol](https://modelcontextprotocol.io) server that lets AI agents analyze audio:
 transcripts with word timings, speakers, sound events, acoustic measurements, quality diagnosis, timelines,
@@ -169,10 +169,13 @@ TOML file (`AUDIO_MCP_CONFIG=/path/config.toml`, see `config.example.toml`) and/
 | Setting | Default | |
 |---|---|---|
 | `allowed_roots` | home dir | folders audio may be read from |
+| `data_dir` / `temp_dir` / `export_dir` / `models_dir` | platform user-data dir; others under it | storage locations (a blank value means the default) |
 | `max_file_mb` / `max_upload_mb` / `max_duration_seconds` | 500 / 50 / 7200 | input limits |
 | `allow_url_fetch` | false | URL sources (private/loopback/metadata IPs always blocked) |
 | `asr_model` | `small` | faster-whisper size (`tiny` … `large-v3`) |
 | `async_threshold_seconds` | 600 | longer audio runs as a job (`async_mode: "auto"`) |
+| `vad_threshold` / `vad_min_silence_ms` / `vad_speech_pad_ms` | 0.35 / 300 / 150 | speech detection (tuned on AMI dev meetings; see Evaluation) |
+| `max_concurrent_jobs` | 1 | analyses running models at once (sync calls, jobs and stream pushes share it) |
 | `retention` / `retention_ttl_hours` | `ttl` / 24 | stored audio and results are deleted after the TTL |
 | `llm_provider` | `none` | `anthropic`, `openai_compatible`, or `ollama` (text only, opt-in) |
 | `redact_outputs` | false | redact emails, phone numbers, card numbers (+ your patterns) in all outputs |
@@ -249,8 +252,9 @@ uv run pytest -m long                      # 30-minute file / async path
 uv run python scripts/gen_tool_docs.py --write-examples   # refresh docs/tools.md + examples
 ```
 
-Releasing: bump `version` in `pyproject.toml`, then push a `vX.Y.Z` tag. `.github/workflows/publish.yml` builds
-the package and uploads it to PyPI through trusted publishing (no API token stored).
+Releasing: bump the version in `pyproject.toml` and `src/audio_mcp/__init__.py`, add a `CHANGELOG.md` entry, then
+push a `vX.Y.Z` tag. `.github/workflows/publish.yml` builds the package and uploads it to PyPI through trusted
+publishing (no API token stored). Release notes: [CHANGELOG.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/CHANGELOG.md).
 
 Evaluation and benchmarks: [docs/evaluation.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/evaluation.md). Design spec, implementation plan, and build
 notes (design rulings and known limits): [docs/superpowers/](https://github.com/DNSdecoded/audio-intelligence-mcp/tree/main/docs/superpowers).
