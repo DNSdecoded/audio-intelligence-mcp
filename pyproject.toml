@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "audio-intelligence-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local-first Audio Intelligence MCP server"
 readme = "README.md"
 keywords = ["mcp", "audio", "speech-to-text", "diarization", "sound-event-detection", "whisper"]
