@@ -1,6 +1,6 @@
 # Audio Intelligence MCP Server
 
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/LICENSE)
 ![Python 3.12 | 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
 ![Platforms: Windows | macOS | Linux](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
 
@@ -115,8 +115,8 @@ included, before the check.
 | `export_audio_analysis` | json, markdown, srt, vtt, csv, rttm (optional redaction) |
 | `get_job` | Status/progress/cancel for async jobs (long audio runs as a job automatically) |
 
-Full schemas and example success/error responses: [docs/tools.md](docs/tools.md). What is implemented,
-partial, or future: [docs/capabilities.md](docs/capabilities.md).
+Full schemas and example success/error responses: [docs/tools.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/tools.md). What is implemented,
+partial, or future: [docs/capabilities.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/capabilities.md).
 
 ## Example workflows
 
@@ -144,7 +144,7 @@ provisional vs final results.
 ## Configuration
 
 TOML file (`AUDIO_MCP_CONFIG=/path/config.toml`, see `config.example.toml`) and/or env vars
-`AUDIO_MCP_<NAME>`. Full table: [docs/configuration.md](docs/configuration.md). Key settings:
+`AUDIO_MCP_<NAME>`. Full table: [docs/configuration.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/configuration.md). Key settings:
 
 | Setting | Default | |
 |---|---|---|
@@ -189,8 +189,8 @@ Language coverage follows Whisper (≈ 99 languages); translation is to English 
 ## Evaluation
 
 Measured on public datasets with the default local models on a 4-core CPU (Whisper small int8, PANNs CNN14,
-ECAPA). Full tables, per-file JSON and before/after numbers: [docs/eval/RESULTS.md](docs/eval/RESULTS.md); method,
-datasets and caveats: [docs/evaluation.md](docs/evaluation.md).
+ECAPA). Full tables, per-file JSON and before/after numbers: [docs/eval/RESULTS.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/eval/RESULTS.md); method,
+datasets and caveats: [docs/evaluation.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/evaluation.md).
 
 | Capability | Dataset | Result |
 |---|---|---|
@@ -232,8 +232,8 @@ uv run python scripts/gen_tool_docs.py --write-examples   # refresh docs/tools.m
 Releasing: bump `version` in `pyproject.toml`, then push a `vX.Y.Z` tag. `.github/workflows/publish.yml` builds
 the package and uploads it to PyPI through trusted publishing (no API token stored).
 
-Evaluation and benchmarks: [docs/evaluation.md](docs/evaluation.md). Design spec, implementation plan, and build
-notes (design rulings and known limits): [docs/superpowers/](docs/superpowers/).
+Evaluation and benchmarks: [docs/evaluation.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/evaluation.md). Design spec, implementation plan, and build
+notes (design rulings and known limits): [docs/superpowers/](https://github.com/DNSdecoded/audio-intelligence-mcp/tree/main/docs/superpowers).
 
 Project layout:
 
@@ -261,17 +261,17 @@ tests/              unit, integration, e2e (stdio)
 - Malformed tool arguments are rejected by the MCP layer before the server sees them, so they come back as MCP
   tool errors rather than the JSON envelope.
 
-Full list: [docs/capabilities.md](docs/capabilities.md) and
-[docs/superpowers/build-notes.md](docs/superpowers/build-notes.md).
+Full list: [docs/capabilities.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/capabilities.md) and
+[docs/superpowers/build-notes.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/superpowers/build-notes.md).
 
 ## License
 
-The code in this repository is released under the [Apache License 2.0](LICENSE) (see also [NOTICE](NOTICE)).
+The code in this repository is released under the [Apache License 2.0](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/LICENSE) (see also [NOTICE](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/NOTICE)).
 
 Third-party models and data keep their own licenses, which the Apache License does not cover:
 faster-whisper (MIT) and Whisper weights (MIT); PANNs code (MIT) and CNN14 weights (CC BY 4.0, trained on
 AudioSet); SpeechBrain (Apache-2.0) and spkrec-ecapa-voxceleb (Apache-2.0); all-MiniLM-L6-v2 (Apache-2.0);
 silero-vad (MIT); pyannote.audio (MIT) with gated model terms; AudioSet ontology labels (CC BY 4.0). Test
 fixtures: `speech_es.ogg` is a LibriVox public-domain excerpt; the English fixtures are synthesized locally;
-details in [tests/fixtures/audio/SOURCES.md](tests/fixtures/audio/SOURCES.md). Check each model's terms before
+details in [tests/fixtures/audio/SOURCES.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/tests/fixtures/audio/SOURCES.md). Check each model's terms before
 commercial use.
