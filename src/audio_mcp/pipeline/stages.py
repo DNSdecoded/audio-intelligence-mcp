@@ -244,7 +244,9 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("timeline", ("metadata", "features"), _timeline,
           lambda a, o: {**_asr_cfg(a, o), **_diar_cfg(a, o), "tagger": _id(a.backends.tagger),
                         "threshold": _threshold(a, o), "diarize": bool(o.get("diarize")),
-                        "include": sorted(o.get("timeline_include") or [])},
+                        "include": sorted(o.get("timeline_include") or []),
+                        # speaker labels exist only when speaker_assign ran (analyze_audio drops it without ASR)
+                        "with": [s for s in ("diarization", "speaker_assign") if s in o.get("_stages", [])]},
           soft_deps=("vad", "transcription", "events"), reads_all=True),
     Stage("uncertainty", ("transcription", "vad"), _uncertainty,
           lambda a, o: {**_asr_cfg(a, o), "budget": o.get("budget"), "low": a.settings.low_confidence_threshold,

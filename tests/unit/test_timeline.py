@@ -65,3 +65,13 @@ def test_timeline_survives_missing_asr(app, speech_en):
 def test_analyze_timeline(app, speech_en):
     r = analyze_audio(app, AnalyzeRequest(source=fp(speech_en), tasks=["timeline", "speaker_diarization"]))
     assert any(n["type"] == "speaker_turn" for n in r["analysis"]["timeline"]["nodes"])
+
+
+def test_timeline_cache_key_tracks_speaker_assign(app, dialogue):
+    from audio_mcp.tools.handlers import get_audio_timeline
+    from audio_mcp.tools.schemas import TimelineRequest
+
+    analyze_audio(app, AnalyzeRequest(source=fp(dialogue), tasks=["speaker_diarization", "timeline"]))
+    r = get_audio_timeline(app, TimelineRequest(source=fp(dialogue), diarize=True))
+    speech = [n for n in r["result"]["nodes"] if n["type"] == "speech_segment"]
+    assert speech and all(n.get("speaker_id") for n in speech)  # not the cached speaker-less timeline
