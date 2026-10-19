@@ -1,7 +1,8 @@
 # Audio Intelligence MCP Server
 
+[![PyPI](https://img.shields.io/pypi/v/audio-intelligence-mcp)](https://pypi.org/project/audio-intelligence-mcp/)
+[![Python](https://img.shields.io/pypi/pyversions/audio-intelligence-mcp)](https://pypi.org/project/audio-intelligence-mcp/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/LICENSE)
-![Python 3.12 | 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
 ![Platforms: Windows | macOS | Linux](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
 
 [![29-second overview of Audio Intelligence MCP](https://github.com/DNSdecoded/audio-intelligence-mcp/raw/main/docs/media/launch.gif)](https://cdn.jsdelivr.net/gh/DNSdecoded/audio-intelligence-mcp@main/docs/media/launch.mp4)
@@ -46,10 +47,22 @@ with `confidence_kind` (`model_probability` or `heuristic`; none are calibrated)
 
 ## Install
 
-From PyPI (once released):
+From [PyPI](https://pypi.org/project/audio-intelligence-mcp/) with `uv pip`, into a virtual environment:
 
 ```bash
-pip install "audio-intelligence-mcp[models]"     # or run without installing: uvx --from "audio-intelligence-mcp[models]" audio-mcp
+uv venv --python 3.12
+uv pip install "audio-intelligence-mcp[models]"            # local models (faster-whisper, PANNs, SpeechBrain, silero-vad, MiniLM)
+uv pip install "audio-intelligence-mcp[models,llm]"        # + optional Claude backend (anthropic SDK)
+uv pip install "audio-intelligence-mcp[models,pyannote]"   # + optional pyannote diarization (needs HF_TOKEN)
+```
+
+Then start the server with `.venv/bin/audio-mcp` (macOS/Linux) or `.venv\Scripts\audio-mcp` (Windows), or activate
+the environment first and run `audio-mcp`. Plain `pip install "audio-intelligence-mcp[models]"` works the same way.
+
+Run without installing anything (uv fetches and caches the package):
+
+```bash
+uvx --from "audio-intelligence-mcp[models]" audio-mcp
 ```
 
 From source:
@@ -70,7 +83,7 @@ reason, and the DSP tools (features, quality, integrity, comparison) work.
 
 ## Connect a client
 
-Claude Code (PyPI release):
+Claude Code (from PyPI, no install step):
 
 ```bash
 claude mcp add audio-intel -- uvx --from "audio-intelligence-mcp[models]" audio-mcp
@@ -82,19 +95,22 @@ Claude Code (source checkout):
 claude mcp add audio-intel -- uv --directory /path/to/audio-intelligence-mcp run audio-mcp
 ```
 
-Claude Desktop (`claude_desktop_config.json`):
+Claude Desktop (`claude_desktop_config.json`), from PyPI:
 
 ```json
 {
   "mcpServers": {
     "audio-intel": {
-      "command": "uv",
-      "args": ["--directory", "/path/to/audio-intelligence-mcp", "run", "audio-mcp"],
+      "command": "uvx",
+      "args": ["--from", "audio-intelligence-mcp[models]", "audio-mcp"],
       "env": {"AUDIO_MCP_ALLOWED_ROOTS": "[\"/path/to/your/audio\"]"}
     }
   }
 }
 ```
+
+From a source checkout, use `"command": "uv"` with
+`"args": ["--directory", "/path/to/audio-intelligence-mcp", "run", "audio-mcp"]` instead.
 
 On Windows, use forward slashes or escaped backslashes in JSON paths (`"C:/audio"` or `"C:\audio"`).
 
