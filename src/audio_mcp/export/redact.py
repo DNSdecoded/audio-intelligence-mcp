@@ -4,7 +4,7 @@ import re
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 _CARD = re.compile(r"(?<!\d)(?:\d[ -]?){12,18}\d(?!\d)")
 _PHONE = re.compile(r"\+?\d[\d\s().-]{7,}\d")
-_TEXT_KEYS = {"text", "excerpt", "translation", "answer", "statement", "description"}
+_TEXT_KEYS = {"text", "excerpt", "translation", "answer", "statement", "description", "label"}  # label: timeline speech nodes carry the transcript
 
 
 def _luhn(digits: str) -> bool:
@@ -15,10 +15,18 @@ def _luhn(digits: str) -> bool:
     return total % 10 == 0
 
 
+def _rules(extra_patterns):
+    yield _EMAIL, "[EMAIL]", lambda m: True
+    yield _CARD, "[CARD]", lambda m: _luhn(re.sub(r"\D", "", m.group(0)))
+    yield _PHONE, "[PHONE]", lambda m: True
+    for p in extra_patterns:
+        yield re.compile(p, re.IGNORECASE), "[REDACTED]", lambda m: True
+
+
 def redact_text(text: str, extra_patterns=()) -> tuple[str, int]:
     count = 0
 
-    def sub(rx, repl, s, keep=lambda m: True):
+    def sub(rx, repl, s, keep):
         def f(m):
             nonlocal count
             if not keep(m):
@@ -27,12 +35,32 @@ def redact_text(text: str, extra_patterns=()) -> tuple[str, int]:
             return repl
         return rx.sub(f, s)
 
-    text = sub(_EMAIL, "[EMAIL]", text)
-    text = sub(_CARD, "[CARD]", text, lambda m: _luhn(re.sub(r"\D", "", m.group(0))))
-    text = sub(_PHONE, "[PHONE]", text)
-    for p in extra_patterns:
-        text = sub(re.compile(p, re.IGNORECASE), "[REDACTED]", text)
+    for rx, repl, keep in _rules(extra_patterns):
+        text = sub(rx, repl, text, keep)
     return text, count
+
+
+def _redact_words(words: list, extra_patterns) -> int:
+    """Per-word text would never match a number spoken as several words ("555 123 4567"): match on the joined
+    sequence, then replace every word that overlaps a match. Mutates the (already copied) word dicts."""
+    spans, pos = [], 0
+    for w in words:
+        t = w.get("text") if isinstance(w, dict) else None
+        if isinstance(t, str):
+            lead = len(t) - len(t.lstrip())
+            spans.append((w, pos + lead, pos + len(t.rstrip())))
+            pos += len(t.rstrip()) + 1
+    joined = " ".join(w["text"].strip() for w, _, _ in spans)
+    count = 0
+    for rx, repl, keep in _rules(extra_patterns):
+        for m in rx.finditer(joined):
+            if not keep(m):
+                continue
+            count += 1
+            for w, a, b in spans:
+                if a < m.end() and b > m.start():
+                    w["text"] = repl
+    return count
 
 
 def redact_analysis(obj, extra_patterns=()):
@@ -45,6 +73,8 @@ def redact_analysis(obj, extra_patterns=()):
             else:
                 out[k], c = redact_analysis(v, extra_patterns)
             n += c
+        if isinstance(out.get("words"), list):
+            n += _redact_words(out["words"], extra_patterns)
         return out, n
     if isinstance(obj, list):
         items = [redact_analysis(v, extra_patterns) for v in obj]
