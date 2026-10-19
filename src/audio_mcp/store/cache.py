@@ -22,15 +22,22 @@ class ResultCache:
     def get(self, audio_id: str, stage: str, cfg_hash: str) -> dict | None:
         try:
             return json.loads(self._path(audio_id, stage, cfg_hash).read_text(encoding="utf-8"))
-        except (FileNotFoundError, json.JSONDecodeError):
-            return None
+        except (FileNotFoundError, PermissionError, json.JSONDecodeError):
+            return None  # PermissionError: Windows, another thread is replacing the file; recompute (a miss)
 
     def put(self, audio_id: str, stage: str, cfg_hash: str, value: dict) -> None:
         p = self._path(audio_id, stage, cfg_hash)
         p.parent.mkdir(parents=True, exist_ok=True)
         tmp = p.with_name(f".{uuid.uuid4().hex}.tmp")
-        tmp.write_text(json.dumps(value), encoding="utf-8")
-        os.replace(tmp, p)
+        try:
+            tmp.write_text(json.dumps(value), encoding="utf-8")
+            try:
+                os.replace(tmp, p)
+            except PermissionError:  # Windows: target open; a concurrent put of the same key already landed
+                if not p.exists():
+                    raise
+        finally:
+            tmp.unlink(missing_ok=True)
 
     def clear(self, audio_id: str) -> None:
         shutil.rmtree(self.root / audio_id, ignore_errors=True)

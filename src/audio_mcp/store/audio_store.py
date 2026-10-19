@@ -55,6 +55,18 @@ def _atomic_place(write, final: Path) -> None:
         tmp.unlink(missing_ok=True)
 
 
+def _read_text(path: Path, tries: int = 50) -> str:
+    """Windows denies opening a file for a few ms while another thread os.replace()s it; retry that window."""
+    for i in range(tries):
+        try:
+            return path.read_text(encoding="utf-8")
+        except PermissionError:
+            if os.name != "nt" or i == tries - 1:
+                raise
+            time.sleep(0.01)
+    raise AssertionError("unreachable")
+
+
 _TOUCH_INTERVAL = 60.0  # seconds; bounds meta.json rewrites
 
 
@@ -115,7 +127,7 @@ class AudioStore:
         """touch=True records use (retention sweeps on last_used); sweeps read with touch=False."""
         d = self._dir(audio_id)
         try:
-            meta = json.loads((d / "meta.json").read_text(encoding="utf-8"))
+            meta = json.loads(_read_text(d / "meta.json"))
         except FileNotFoundError:
             raise AudioMCPError(ErrorCode.AUDIO_NOT_FOUND, "unknown audio_id") from None
         now = time.time()

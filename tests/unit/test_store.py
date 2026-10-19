@@ -86,3 +86,38 @@ def test_concurrent_ingest_same_file(settings, speech_en):  # I5
         t.join(30)
     assert errs == [] and len(ids) == 6 and len(set(ids)) == 1
     assert not list(store._dir(ids[0]).glob("*.tmp"))
+
+
+def test_meta_read_retries_windows_sharing_violation(monkeypatch, tmp_path):
+    """Windows briefly denies opening a file another thread is os.replace()-ing; the read must retry, not fail."""
+    from pathlib import Path
+
+    from audio_mcp.store import audio_store
+
+    p = tmp_path / "meta.json"
+    p.write_text("{}", encoding="utf-8")
+    real, calls = Path.read_text, {"n": 0}
+
+    def flaky(self, *a, **k):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise PermissionError(13, "Permission denied")
+        return real(self, *a, **k)
+
+    monkeypatch.setattr(audio_store.os, "name", "nt")
+    monkeypatch.setattr(audio_store.time, "sleep", lambda s: None)
+    monkeypatch.setattr(Path, "read_text", flaky)
+    assert audio_store._read_text(p) == "{}" and calls["n"] == 3
+
+
+def test_cache_tolerates_concurrent_replace(monkeypatch, settings):
+    import os
+
+    from audio_mcp.store.cache import ResultCache
+
+    c = ResultCache(settings)
+    c.put("aud_0123456789abcdef", "vad", "h", {"a": 1})
+    monkeypatch.setattr(os, "replace", lambda *a: (_ for _ in ()).throw(PermissionError(13, "Permission denied")))
+    c.put("aud_0123456789abcdef", "vad", "h", {"a": 1})  # lost the race to an identical write: no error, no tmp left
+    assert c.get("aud_0123456789abcdef", "vad", "h") == {"a": 1}
+    assert not list((settings.data_dir / "results" / "aud_0123456789abcdef").glob("*.tmp"))
