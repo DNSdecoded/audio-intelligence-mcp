@@ -47,7 +47,9 @@ def plan_auto(app, record, audio, *, goal: str | None, budget: str) -> list[dict
     from audio_mcp.ingest.sources import AudioIdSource
     from audio_mcp.pipeline.runner import run_analysis  # runner imports this module
 
-    vad = run_analysis(app, AudioIdSource(type="audio_id", audio_id=record.audio_id), ["vad"], {}).results["vad"]
+    # a no-op progress keeps this pre-run from reporting into the enclosing job (it would show 1/1 = 0.99)
+    vad = run_analysis(app, AudioIdSource(type="audio_id", audio_id=record.audio_id), ["vad"], {},
+                       progress=lambda done, total: None).results["vad"]
     ratio, dur, g = vad["speech_ratio"], audio.duration, (goal or "").lower()
     speech = ratio >= app.settings.speech_ratio_threshold
     plan = [{"task": "acoustic_features", "reason": "cheap; always run"},

@@ -47,3 +47,19 @@ def test_recovery_when_enabled(app, speech_en, tmp_path):
     rec = analyze_audio(app, req)["analysis"]["recovery"]
     assert rec["triggered_by"] == ["DC_OFFSET"] and "remove_dc" in rec["ops"]
     assert {"before", "after", "note"} <= rec.keys()
+
+
+def test_plan_auto_does_not_report_job_progress(app, speech_en):
+    import threading
+
+    from audio_mcp.jobs import JOB_CONTEXT
+    from audio_mcp.pipeline.planner import plan_auto
+
+    rec = app.store.ingest(FilePathSource(type="file_path", path=str(speech_en)))
+    seen = []
+    token = JOB_CONTEXT.set((threading.Event(), lambda d, t: seen.append((d, t))))
+    try:
+        plan_auto(app, rec, app.store.load(rec.audio_id), goal=None, budget="balanced")
+    finally:
+        JOB_CONTEXT.reset(token)
+    assert seen == []
