@@ -12,10 +12,13 @@ _MIN_SCORE = 0.35
 _WINDOW = 5.0  # seconds before/after an event that count as "immediately"
 
 _INTENTS = [
-    ("unusual", re.compile(r"unusual|strange|odd|anomal|unexpected")),
+    ("unusual", re.compile(r"unusual|strange|\bodd\b|anomal|unexpected")),
     ("speakers", re.compile(r"how many (speakers|people|voices)|who (speaks|talks)")),
     ("time_of_mention", re.compile(
         r"when (?:does|did|is|do) .*?(?:mention|says|say|talk about|discuss)(?:es)? (?P<topic>.+?)\??$")),
+    ("time_of_mention", re.compile(  # passive: "when is the deadline mentioned (in the call)?"
+        r"(?:when|at what time) (?:is|was|are|were) (?P<topic>.+?) "
+        r"(?:mentioned|discussed|said|talked about|brought up|raised)\b.*$")),
     ("relative_to_event", re.compile(
         r"(?P<rel>before|after|during|while) (?:the )?(?P<target>[a-z ,]+?)"
         r"(?: sound| sounds| starts| begins| goes off| rings)?\??$")),

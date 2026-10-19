@@ -1,3 +1,5 @@
+import pytest
+
 from conftest import fp
 from audio_mcp.reasoning.ask import classify_intent, resolve_labels
 from audio_mcp.tools.handlers import ask_audio, extract_audio_features
@@ -81,3 +83,19 @@ def FeaturesRequest_(p):
     from audio_mcp.tools.schemas import FeaturesRequest
 
     return FeaturesRequest(source=fp(p))
+
+
+@pytest.mark.parametrize("q,topic", [
+    ("When is the deployment deadline mentioned?", "the deployment deadline"),
+    ("When was the budget discussed in the call?", "the budget"),
+    ("When is the release brought up?", "the release"),
+    ("At what time is the deadline mentioned?", "the deadline"),
+    ("When does someone mention the deadline?", "the deadline"),  # active form unchanged
+])
+def test_time_of_mention_active_and_passive(q, topic):
+    assert classify_intent(q) == ("time_of_mention", {"topic": topic})
+
+
+def test_odd_is_an_unusual_question_but_not_inside_words():
+    assert classify_intent("Is there anything odd in the background?")[0] == "unusual"
+    assert classify_intent("Is there a doddering noise?")[0] != "unusual"  # \bodd\b, not a substring
