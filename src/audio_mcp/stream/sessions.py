@@ -17,6 +17,7 @@ from audio_mcp.envelope import AudioMCPError, ErrorCode
 from audio_mcp.eval.metrics import word_error_rate
 from audio_mcp.ingest.decode import decode, probe, resample
 from audio_mcp.ingest.sources import check_path_allowed
+from audio_mcp.pipeline.runner import model_slot
 
 _ASR_WINDOW = 30.0
 _IOU = 0.3
@@ -130,14 +131,15 @@ class StreamSessions:
                "provisional": True, "features": extract_features(x, s.sr, ["level"])["values"], "events": []}
         b = self.app.backends
         mono = resample(x.mean(axis=0), s.sr, 16000) if s.sr != 16000 else x.mean(axis=0)
-        if b.tagger.available()[0]:
-            ev = frames_to_events(b.tagger.tag_windows(mono), duration=t1 - t0,
-                                  threshold=self.app.settings.event_threshold)
-            out["events"] = [{**e.model_dump(exclude_none=True), "start": round(e.start + t0, 3),
-                              "end": round(e.end + t0, 3)} for e in ev]
-            s.provisional_events += out["events"]
-        if b.asr.available()[0]:
-            out["transcript_window"] = self._asr_window(s)
+        with model_slot(self.app):  # per-chunk tagging and ASR count against max_concurrent_jobs
+            if b.tagger.available()[0]:
+                ev = frames_to_events(b.tagger.tag_windows(mono), duration=t1 - t0,
+                                      threshold=self.app.settings.event_threshold)
+                out["events"] = [{**e.model_dump(exclude_none=True), "start": round(e.start + t0, 3),
+                                  "end": round(e.end + t0, 3)} for e in ev]
+                s.provisional_events += out["events"]
+            if b.asr.available()[0]:
+                out["transcript_window"] = self._asr_window(s)
         return out
 
     def _asr_window(self, s: Session) -> dict:

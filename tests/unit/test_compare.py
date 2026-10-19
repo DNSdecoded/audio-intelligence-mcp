@@ -61,3 +61,9 @@ def test_aspects_filter(app, synth):
     c = compare_audio(app, CompareRequest(sources=[fp(synth["sine"]), fp(synth["noise"])],
                                           aspects=["features"]))["result"]["comparisons"][0]
     assert set(c["measured_differences"]) == {"features", "bands"}
+
+
+def test_compare_baseline_mode_runs_only_metadata(app, synth):
+    r = compare_audio(app, CompareRequest(sources=[fp(synth["alarm"])], baseline=[fp(synth["sine"])]))
+    assert r["status"] == "success" and r["result"]["baseline"]
+    assert r["processing"]["stages_run"] and all(s.endswith(":metadata") for s in r["processing"]["stages_run"])

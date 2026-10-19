@@ -16,7 +16,7 @@ from audio_mcp.envelope import AudioMCPError, ErrorCode, ProcessingInfo, build_r
 from audio_mcp.pipeline.planner import TASK_TO_STAGES, plan_auto
 from audio_mcp.ingest.sources import AudioIdSource, FilePathSource, check_path_allowed
 from audio_mcp.library.index import SUPPORTED_EXTENSIONS
-from audio_mcp.pipeline.runner import run_analysis
+from audio_mcp.pipeline.runner import model_slot, run_analysis
 from audio_mcp.reasoning.ask import answer_question, classify_intent
 from audio_mcp.reasoning.llm_grounded import build_evidence_pack, llm_answer, llm_interpret, llm_summarize
 from audio_mcp.tools.schemas import (
@@ -257,8 +257,9 @@ def compare_preprocessed_asr(app, record, audio, ops) -> dict:
     y16 = resample(y.mean(axis=0), sr, 16000) if sr != 16000 else y.mean(axis=0)
     offset = next((t["params"].get("offset_seconds", 0.0) for t in transforms if t["op"] == "trim_silence"), 0.0)
     low = app.settings.low_confidence_threshold
-    before = asr.transcribe(audio.mono16k).segments
-    after = asr.transcribe(y16).segments
+    with model_slot(app):  # two full transcriptions outside run_analysis still count against the cap
+        before = asr.transcribe(audio.mono16k).segments
+        after = asr.transcribe(y16).segments
     return {"before": _asr_stats(before, low), "after": _asr_stats(after, low), "time_offset_seconds": offset,
             "note": "measured comparison only; not a claim of improved accuracy"}
 
@@ -385,7 +386,10 @@ def _bundle(outcome, duration) -> dict:
 @async_capable("compare_audio", auto=lambda app, req: len(req.sources) + len(req.baseline or []) > 3)
 def compare_audio(app, req: CompareRequest) -> dict:
     aspects = set(req.aspects or ["features", "events", "embedding"])
-    stages = ["metadata", "features", "events", "audio_embedding"] + (["transcription"] if "transcript" in aspects else [])
+    if req.baseline:  # baseline mode only uses window_features() on the decoded audio
+        stages = ["metadata"]
+    else:
+        stages = ["metadata", "features", "events", "audio_embedding"] + (["transcription"] if "transcript" in aspects else [])
     outs = [run_analysis(app, s, stages, {}) for s in req.sources]
     warns = [{**w, "audio_id": o.record.audio_id} for o in outs for w in o.warnings]
     errors = [{**e, "audio_id": o.record.audio_id} for o in outs for e in o.errors]

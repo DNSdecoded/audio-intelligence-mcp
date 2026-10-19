@@ -78,3 +78,22 @@ def test_concurrent_pushes_and_close(app):  # M4
     stream(app, action="cancel", session_id=sid)
     with pytest.raises(AudioMCPError):  # a late push after close never writes into a deleted session
         app.streams.push(sid, part)
+
+
+def test_push_waits_for_a_model_slot(app, speech_en):
+    import threading
+
+    x, sr = sf.read(speech_en, dtype="int16")
+    sid = stream(app, action="start", chunk_format="pcm", sample_rate_hz=sr, channels=1,
+                 sample_format="s16le")["result"]["session_id"]
+    held = [app.slots.acquire(blocking=False) for _ in range(app.settings.max_concurrent_jobs)]
+    assert all(held)  # every slot taken, e.g. by long async jobs
+    done = threading.Event()
+    t = threading.Thread(target=lambda: (stream(app, action="push", session_id=sid,
+                                                data=base64.b64encode(x[:sr].tobytes()).decode()), done.set()))
+    t.start()
+    assert not done.wait(0.5)  # the push's model work queues behind the cap
+    for _ in held:
+        app.slots.release()
+    assert done.wait(30)
+    t.join()

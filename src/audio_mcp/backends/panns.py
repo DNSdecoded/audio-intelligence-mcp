@@ -28,6 +28,7 @@ class PannsTagger:
         self.info = ModelInfo(stage="events", name="panns-cnn14", version="mAP0.431")
         self._model = None
         self._lock = threading.Lock()
+        self._last = None  # (buffer key, TagResult): the events and audio_embedding stages share one pass
 
     def available(self):
         from audio_mcp.backends.base import _importable
@@ -74,7 +75,21 @@ class PannsTagger:
             except Exception as e:
                 raise AudioMCPError(ErrorCode.MODEL_UNAVAILABLE, f"panns failed to load: {e}") from e
 
+    @staticmethod
+    def _key(a: np.ndarray):
+        return (a.__array_interface__["data"][0], a.size, float(a[:: max(1, a.size // 64)].sum()))
+
     def tag_windows(self, mono16k) -> TagResult:
+        a = np.asarray(mono16k, dtype=np.float32)
+        key = self._key(a)
+        last = self._last
+        if last is not None and last[0] == key:
+            return last[1]
+        result = self._tag(a)
+        self._last = (key, result)
+        return result
+
+    def _tag(self, mono16k) -> TagResult:
         self.load()
         import torch
 

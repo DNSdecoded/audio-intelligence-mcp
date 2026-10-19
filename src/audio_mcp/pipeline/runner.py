@@ -2,6 +2,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 from audio_mcp.context import AppContext
@@ -26,18 +27,25 @@ class AnalysisOutcome:
 _held = threading.local()  # per-thread slot depth: nested run_analysis calls reuse the outer slot
 
 
-def run_analysis(app: AppContext, source: AudioSource, stages: list[str], options: dict, *,
-                 cancel_event=None, progress=None) -> AnalysisOutcome:
+@contextmanager
+def model_slot(app: AppContext):
+    """Hold one max_concurrent_jobs slot while models run; re-entrant per thread (nested calls reuse it)."""
     depth = getattr(_held, "depth", 0)
     if depth == 0 and app.slots is not None:
         app.slots.acquire()  # max_concurrent_jobs bounds sync calls and job threads alike
     _held.depth = depth + 1
     try:
-        return _run_analysis(app, source, stages, options, cancel_event, progress)
+        yield
     finally:
         _held.depth = depth
         if depth == 0 and app.slots is not None:
             app.slots.release()
+
+
+def run_analysis(app: AppContext, source: AudioSource, stages: list[str], options: dict, *,
+                 cancel_event=None, progress=None) -> AnalysisOutcome:
+    with model_slot(app):
+        return _run_analysis(app, source, stages, options, cancel_event, progress)
 
 
 def _run_analysis(app, source, stages, options, cancel_event, progress) -> AnalysisOutcome:
