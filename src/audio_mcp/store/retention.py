@@ -42,8 +42,8 @@ def _remove(p: Path) -> int:
 
 def cleanup_temp(settings, *, own: bool = False) -> int:
     """own=True (shutdown): remove this instance's temp dir only. Otherwise (startup): remove temp dirs of
-    instances that are gone (owner pid dead, or untouched for 24 h) and loose legacy files; never a live
-    instance's files."""
+    instances that are gone (owner pid dead, or untouched for 24 h). Anything that is not a proc_<pid>_<tag>
+    dir is left alone, so a temp_dir pointing at a shared folder never loses unrelated files."""
     if own:
         d = settings.resolved_temp_dir / settings._instance_tag
         return _remove(d) if d.exists() else 0
@@ -55,14 +55,14 @@ def cleanup_temp(settings, *, own: bool = False) -> int:
         if p.name == settings._instance_tag:
             continue
         parts = p.name.split("_")
-        if p.is_dir() and len(parts) == 3 and parts[0] == "proc" and parts[1].isdigit():
-            try:
-                stale = not _pid_alive(int(parts[1])) or now - p.stat().st_mtime > _STALE_SECONDS
-            except OSError:
-                continue
-            if not stale:
-                continue
-        n += _remove(p)
+        if not (p.is_dir() and len(parts) == 3 and parts[0] == "proc" and parts[1].isdigit()):
+            continue
+        try:
+            stale = not _pid_alive(int(parts[1])) or now - p.stat().st_mtime > _STALE_SECONDS
+        except (OSError, OverflowError):  # OverflowError: pid beyond the platform's range, so not ours
+            continue
+        if stale:
+            n += _remove(p)
     return n
 
 
@@ -88,8 +88,8 @@ def sweep(app, *, now: float | None = None, final: bool = False) -> dict:
                 out["results_deleted"] += 1
         results = app.cache.root
         if s.retention == "ttl" and results.exists():  # orphaned result dirs (audio already gone)
-            for d in results.iterdir():
-                if d.is_dir() and d.stat().st_mtime < cutoff:
+            for d in results.iterdir():  # results whose audio is gone; live audio keeps its cache however old
+                if d.is_dir() and not (app.store.root / d.name / "meta.json").exists() and d.stat().st_mtime < cutoff:
                     shutil.rmtree(d, ignore_errors=True)
                     out["results_deleted"] += 1
     if app.streams is not None:

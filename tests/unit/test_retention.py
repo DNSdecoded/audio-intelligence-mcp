@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 
 import pytest
 
@@ -42,12 +43,25 @@ def test_library_survives_sweep(app, speech_en):
     assert sweep(app, now=time.time() + LATER)["library_rows_deleted"] == 1
 
 
-def test_cleanup_temp(settings):
+def test_cleanup_temp_only_removes_dead_instance_dirs(settings):
     t = settings.resolved_temp_dir
-    (t / "a.bin").write_bytes(b"x")
+    (t / "a.bin").write_bytes(b"x")  # unrelated files (temp_dir may be a shared folder) are never touched
     (t / "sub").mkdir()
     (t / "sub" / "b.bin").write_bytes(b"y")
-    assert cleanup_temp(settings) == 2 and not any(t.iterdir())
+    dead = t / "proc_999999999_deadbeef"
+    dead.mkdir()
+    (dead / "z.bin").write_bytes(b"z")
+    assert cleanup_temp(settings) == 1 and not dead.exists()
+    assert (t / "a.bin").exists() and (t / "sub" / "b.bin").exists()
+
+
+@pytest.mark.parametrize("field", ["temp_dir", "export_dir", "models_dir", "ffmpeg_path", "ffprobe_path"])
+def test_blank_path_settings_mean_default(field, monkeypatch):
+    from audio_mcp.config import Settings
+
+    monkeypatch.setenv("AUDIO_MCP_" + field.upper(), "")
+    s = Settings()
+    assert getattr(s, field) is None and s.resolved_temp_dir != Path(".")
 
 
 def test_reuse_refreshes_last_used(app, speech_en, monkeypatch):  # I7
@@ -85,3 +99,18 @@ def test_instances_sharing_data_dir(settings, speech_en, dialogue):  # I6
     assert b.store.get(idb).audio_id == idb
     with pytest.raises(AudioMCPError):
         a.store.get(ida)
+
+
+def test_sweep_keeps_old_results_of_live_audio(app, speech_en):
+    import os
+
+    aid = _ingest(app, speech_en)
+    extract_audio_features(app, FeaturesRequest(source={"type": "audio_id", "audio_id": aid}))
+    rdir = app.cache.root / aid
+    old = time.time() - 3 * 24 * 3600
+    os.utime(rdir, (old, old))  # results untouched for 3 days, but the audio is still in use
+    orphan = app.cache.root / "aud_0000000000000000"
+    orphan.mkdir()
+    os.utime(orphan, (old, old))
+    out = sweep(app)
+    assert rdir.exists() and any(rdir.iterdir()) and not orphan.exists() and out["results_deleted"] == 1

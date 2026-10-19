@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Literal
 
 import platformdirs
-from pydantic import PrivateAttr, model_validator
+from pydantic import PrivateAttr, field_validator, model_validator
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -77,6 +77,12 @@ class Settings(BaseSettings):
 
     # per server instance, so instances sharing data_dir never clean up each other's temp files
     _instance_tag: str = PrivateAttr(default_factory=lambda: f"proc_{os.getpid()}_{uuid.uuid4().hex[:8]}")
+
+    @field_validator("temp_dir", "export_dir", "models_dir", "ffmpeg_path", "ffprobe_path", mode="before")
+    @classmethod
+    def _blank_path_is_default(cls, v):
+        # "" would become Path("."), i.e. the working directory, which startup cleanup then empties
+        return None if isinstance(v, str) and not v.strip() else v
 
     @model_validator(mode="after")
     def _check_llm(self) -> "Settings":
