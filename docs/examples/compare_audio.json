@@ -3,11 +3,11 @@
     "sources": [
       {
         "type": "file_path",
-        "path": "./samples\\sine.wav"
+        "path": "./samples/sine.wav"
       },
       {
         "type": "file_path",
-        "path": "./samples\\alarm.wav"
+        "path": "./samples/alarm.wav"
       }
     ]
   },
@@ -55,7 +55,7 @@
                 "unit": "Hz"
               },
               "f0_mean_hz": {
-                "a": 440.10844348156735,
+                "a": 440.1084434815673,
                 "b": 511.0355843048559,
                 "delta": 70.927141,
                 "unit": "Hz"
@@ -73,7 +73,7 @@
                 "unit": "Hz"
               },
               "f0_std_hz": {
-                "a": 0.0025761553884446112,
+                "a": 0.0025761553884481097,
                 "b": 33.50455725299295,
                 "delta": 33.501981,
                 "unit": "Hz"
@@ -115,8 +115,8 @@
                 "unit": "dB"
               },
               "spectral_bandwidth_hz": {
-                "a": 246.96479328948786,
-                "b": 2714.547334980393,
+                "a": 246.96479328948624,
+                "b": 2714.547334980387,
                 "delta": 2467.582542,
                 "unit": "Hz"
               },
@@ -127,8 +127,8 @@
                 "unit": "Hz"
               },
               "spectral_flatness": {
-                "a": 0.0004533049813041949,
-                "b": 0.4513854257402206,
+                "a": 0.00045330498130418317,
+                "b": 0.45138542574022056,
                 "delta": 0.450932,
                 "unit": "ratio"
               },
@@ -223,7 +223,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.531,
+      "duration_seconds": 0.201,
       "stages_run": [
         "aud_8a84c21c384f272e:metadata",
         "aud_8a84c21c384f272e:events",

@@ -11,17 +11,17 @@
     "result": {
       "indexed": [
         {
-          "path": "./samples\\alarm.wav",
+          "path": "./samples/alarm.wav",
           "audio_id": "aud_2e130551b6f3fd9a",
           "segments": 4
         },
         {
-          "path": "./samples\\dialogue_2spk.wav",
+          "path": "./samples/dialogue_2spk.wav",
           "audio_id": "aud_0fb68437fd577a5c",
           "segments": 9
         },
         {
-          "path": "./samples\\sine.wav",
+          "path": "./samples/sine.wav",
           "audio_id": "aud_8a84c21c384f272e",
           "segments": 1
         }
@@ -31,7 +31,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 1.063,
+      "duration_seconds": 0.408,
       "stages_run": [
         "aud_2e130551b6f3fd9a:transcription",
         "aud_2e130551b6f3fd9a:language",

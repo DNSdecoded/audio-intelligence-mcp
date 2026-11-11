@@ -2,7 +2,7 @@
   "request": {
     "source": {
       "type": "file_path",
-      "path": "./samples\\dialogue_2spk.wav"
+      "path": "./samples/dialogue_2spk.wav"
     },
     "tasks": "auto",
     "goal": "meeting"
@@ -255,23 +255,23 @@
           "spectral_centroid_hz": 1616.6726237651321,
           "spectral_bandwidth_hz": 1481.8134043832556,
           "spectral_rolloff_hz": 3146.25,
-          "spectral_flatness": 0.23362024038731743,
+          "spectral_flatness": 0.2336202403873175,
           "zero_crossing_rate": 0.08945879933153361,
-          "f0_mean_hz": 158.63788447587868,
-          "f0_median_hz": 169.0226191763237,
+          "f0_mean_hz": 158.6378844758787,
+          "f0_median_hz": 169.02261917632376,
           "f0_min_hz": 74.28771285294061,
           "f0_max_hz": 615.3846153846154,
-          "f0_std_hz": 77.55207931717752,
+          "f0_std_hz": 77.5520793171775,
           "voiced_ratio": 0.25496688741721857,
           "tempo_bpm": 267.85714285714283,
           "onset_rate_per_s": 1.9539661012591514,
           "band_energy": {
             "0-250": 0.4715005228918294,
-            "250-500": 0.318287505548476,
+            "250-500": 0.31828750554847596,
             "500-1000": 0.12135417881934098,
             "1000-2000": 0.049783783804859066,
-            "2000-4000": 0.018397408657133456,
-            "4000-8000": 0.02067660027836128
+            "2000-4000": 0.018397408657133452,
+            "4000-8000": 0.020676600278361275
           }
         }
       },
@@ -284,7 +284,7 @@
           "snr_db_estimate": null,
           "dc_offset": 0.010997789110417664,
           "hum_excess_db": -7.1622612650552195,
-          "echo_cepstral_z": 10.490420897219929,
+          "echo_cepstral_z": 10.490420897219016,
           "hf_energy_ratio_db": -13.312005480328144,
           "channels": 1
         },
@@ -437,7 +437,7 @@
           }
         ],
         "f0_range_hz": 541.1,
-        "f0_std_hz": 77.55207931717752,
+        "f0_std_hz": 77.5520793171775,
         "notes": "emotion and tone are not inferred",
         "per_speaker": {
           "speaker_1": {
@@ -455,7 +455,7 @@
     ],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.469,
+      "duration_seconds": 0.257,
       "stages_run": [
         "metadata",
         "features",
