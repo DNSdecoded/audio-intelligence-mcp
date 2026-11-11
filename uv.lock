@@ -225,7 +225,7 @@ requires-dist = [
     { name = "httpx" },
     { name = "jiwer", marker = "extra == 'dev'" },
     { name = "librosa", marker = "extra == 'models'" },
-    { name = "mcp", specifier = ">=1.9,<2" },
+    { name = "mcp", specifier = ">=1.23,<2" },
     { name = "numpy" },
     { name = "panns-inference", marker = "extra == 'models'" },
     { name = "platformdirs" },

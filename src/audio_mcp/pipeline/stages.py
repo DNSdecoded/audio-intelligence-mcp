@@ -96,9 +96,10 @@ def _transcription(ctx):
                        per_chunk_language=multi, chunks=regions if multi else None,
                        hotwords=" ".join(o.get("hotwords") or []) or None)
     ctx.models_used.append(asr.info)
-    if r.language in _WEAK_ASR_LANGS and ctx.app.settings.asr_model in _SMALL_ASR:
+    detected = {r.language, *(run["language"] for run in r.languages)}  # multilingual runs list several
+    if detected & _WEAK_ASR_LANGS and ctx.app.settings.asr_model in _SMALL_ASR:
         ctx.warnings.append(warning("LOW_RESOURCE_LANGUAGE", (
-            f"language '{r.language}' is poorly served by asr_model='{ctx.app.settings.asr_model}' "
+            f"language(s) {sorted(detected & _WEAK_ASR_LANGS)} poorly served by asr_model='{ctx.app.settings.asr_model}' "
             "(measured WER 38-103%); use asr_model='large-v3' and pass `language`")))
     if r.dropped_low_speech:
         ctx.warnings.append(warning("LOW_SPEECH_DROPPED", f"dropped {r.dropped_low_speech} low-speech segments"))
@@ -241,7 +242,7 @@ def _vad_cfg(app, o):
 def _asr_cfg(app, o):  # also keys `language`, which only reads the transcription result
     return {**_vad_cfg(app, o), "asr": _id(app.backends.asr), "language": o.get("language"),
             "word_timestamps": o.get("word_timestamps", True), "multilingual": bool(o.get("multilingual")),
-            "hotwords": sorted(o.get("hotwords") or []),
+            "hotwords": list(o.get("hotwords") or []),  # order matters: the decoder reads them as a prompt
             "decode": 2}  # bump when decoding settings change so cached transcripts are recomputed
 
 

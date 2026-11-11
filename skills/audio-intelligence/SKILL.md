@@ -74,7 +74,8 @@ get_job {"job_id": "job_0123456789ab"}
 ## Reading results
 
 - Success envelopes carry `status`, `audio_id`, `result` (`analysis` for `analyze_audio`), `warnings`, `errors` and `processing`. Bad arguments come back as `{"status": "error", "error": {"code", "message", "retryable"}}` instead.
-- Read `warnings` and `processing.stages_skipped` first. A skipped stage means that model was unavailable, not that nothing was found.
+- Read `warnings`, `errors` and `processing.stages_skipped` first, and report each skipped stage's own `reason` (missing model, failed dependency, timeout). A skipped stage means that stage produced nothing; it does not mean nothing was found.
+- `hotwords` apply only to that `transcribe_audio` call. Later calls on the same `audio_id` (ask, summarize, export) use a transcript made without them unless you transcribe again with the same `hotwords`.
 - Cached stages are reused only when the options match, and stored audio expires after `retention_ttl_hours` (24 by default). If `AUDIO_NOT_FOUND` comes back for an old `audio_id`, send the file again.
 - `LOW_RESOURCE_LANGUAGE` (Arabic, Hindi, Telugu on a small model): tell the user the server needs `asr_model = "large-v3"` and pass `language`. `OVERLAP_UNSUPPORTED`: the default diarizer cannot see talk-over; say so instead of implying there was none.
 - `use_llm` on `ask_audio` and `summarize_audio`: leave it unset to follow the server config. `true` fails with `LLM_DISABLED` when no LLM is configured; you cannot enable one from a call. `processing.data_sent_off_machine` reports when text left the machine.

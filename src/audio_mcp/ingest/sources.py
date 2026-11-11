@@ -121,8 +121,9 @@ def _make_client(timeout: float) -> httpx.Client:
 
 
 def _pin(parsed, ip: str) -> str:
+    userinfo, at, _ = parsed.netloc.rpartition("@")  # keep credentials embedded in the URL
     netloc = f"[{ip}]" if ":" in ip else ip
-    return parsed._replace(netloc=netloc + (f":{parsed.port}" if parsed.port else "")).geturl()
+    return parsed._replace(netloc=userinfo + at + netloc + (f":{parsed.port}" if parsed.port else "")).geturl()
 
 
 def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
@@ -140,15 +141,20 @@ def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
     # connect to the vetted IP, not the hostname, so a second DNS lookup cannot rebind to a blocked address;
     # Host header and TLS SNI/certificate check keep using the original hostname
     ips = list(dict.fromkeys(i[4][0].split("%")[0] for i in infos))  # all vetted; tried in order like a normal connect
-    host_header = parsed.hostname + (f":{parsed.port}" if parsed.port else "")
+    host = parsed.hostname.encode("idna").decode("ascii")  # Host header and SNI are ASCII (IDNA) names
+    host_header = (f"[{host}]" if ":" in host else host) + (f":{parsed.port}" if parsed.port else "")
     ext = Path(parsed.path).suffix
     ext = ext if _EXT_RE.fullmatch(ext) else ".bin"
     out = settings.process_temp_dir / f"{uuid.uuid4().hex}{ext}"
     deadline = time.monotonic() + settings.url_timeout_seconds
     for ip in ips:
+        remaining = deadline - time.monotonic()  # the overall budget is shared by every address tried
+        if remaining <= 0:
+            out.unlink(missing_ok=True)
+            raise AudioMCPError(ErrorCode.URL_FETCH_FAILED, "download timed out", retryable=True)
         try:
-            with _make_client(settings.url_timeout_seconds) as client, client.stream(
-                "GET", _pin(parsed, ip), headers={"Host": host_header}, extensions={"sni_hostname": parsed.hostname}
+            with _make_client(remaining) as client, client.stream(
+                "GET", _pin(parsed, ip), headers={"Host": host_header}, extensions={"sni_hostname": host}
             ) as r:
                 if 300 <= r.status_code < 400:
                     raise AudioMCPError(
@@ -170,10 +176,10 @@ def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
                                 ErrorCode.URL_FETCH_FAILED, "download timed out", retryable=True
                             )
                         fh.write(chunk)
-        except httpx.ConnectError:
+        except (httpx.ConnectError, httpx.ConnectTimeout):
             out.unlink(missing_ok=True)
             if ip == ips[-1]:
-                raise AudioMCPError(ErrorCode.URL_FETCH_FAILED, "fetch failed (ConnectError)", retryable=True) from None
+                raise AudioMCPError(ErrorCode.URL_FETCH_FAILED, "fetch failed (could not connect)", retryable=True) from None
             continue  # next vetted address (e.g. IPv6 unreachable, IPv4 fine)
         except AudioMCPError:
             out.unlink(missing_ok=True)

@@ -72,3 +72,26 @@ def test_low_resource_language_warning(settings, speech_en, lang, model, warned)
     out = handlers.transcribe_audio(app, _req(speech_en))
     codes = [w["code"] for w in out["warnings"]]
     assert ("LOW_RESOURCE_LANGUAGE" in codes) is warned
+
+
+def test_low_resource_warning_for_multilingual_runs(settings, speech_en):
+    app, _ = _app(settings, asr_model="small")
+    real = app.backends.asr.transcribe
+
+    def forced(*a, **kw):
+        r = real(*a, **kw)
+        runs = [{"language": "en", "start": 0.0, "end": 1.0, "probability": 0.9},
+                {"language": "hi", "start": 1.0, "end": 2.0, "probability": 0.9}]
+        return ASRResult(r.segments, "en", 0.9, runs, r.dropped_low_speech)  # top language is fine, one run is not
+
+    app.backends.asr.transcribe = forced
+    out = handlers.transcribe_audio(app, _req(speech_en, multilingual=True))
+    assert "LOW_RESOURCE_LANGUAGE" in [w["code"] for w in out["warnings"]]
+
+
+def test_hotword_order_changes_cache_key(settings, speech_en):
+    app, seen = _app(settings)
+    handlers.transcribe_audio(app, _req(speech_en, hotwords=["alpha", "beta"]))
+    n = len(seen)
+    handlers.transcribe_audio(app, _req(speech_en, hotwords=["beta", "alpha"]))
+    assert len(seen) == n + 1 and seen[-1]["hotwords"] == "beta alpha"

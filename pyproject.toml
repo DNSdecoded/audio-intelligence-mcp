@@ -22,7 +22,7 @@ license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Sanjay Sakhinala" }]
 dependencies = [
-  "mcp>=1.9,<2",
+  "mcp>=1.23,<2",
   "pydantic>=2",
   "pydantic-settings>=2",
   "numpy",

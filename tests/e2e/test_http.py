@@ -3,7 +3,6 @@ import os
 import socket
 import subprocess
 import sys
-import time
 
 import anyio
 import httpx
@@ -28,13 +27,14 @@ async def test_http_server_serves_tools_with_token(tmp_path):
     try:
         url = f"http://127.0.0.1:{port}/mcp"
         with anyio.fail_after(60):
-            while True:  # wait for the listener
-                try:
-                    assert httpx.post(url, timeout=2).status_code == 401  # no token
-                    break
-                except httpx.TransportError:
-                    assert proc.poll() is None, "server exited"
-                    time.sleep(0.3)
+            async with httpx.AsyncClient(timeout=2) as probe:
+                while True:  # wait for the listener without blocking the event loop
+                    try:
+                        assert (await probe.post(url)).status_code == 401  # no token
+                        break
+                    except httpx.TransportError:
+                        assert proc.poll() is None, "server exited"
+                        await anyio.sleep(0.3)
             async with streamablehttp_client(url, headers={"Authorization": "Bearer tok"}) as (r, w, _):
                 async with ClientSession(r, w) as sess:
                     await sess.initialize()
