@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 — 2026-11-11
 
 ### Added
 - `transcribe_audio` `hotwords`: names and jargon the decoder should favour (part of the transcript cache key).
