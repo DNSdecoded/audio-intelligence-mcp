@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     ffmpeg_path: Path | None = None
     ffprobe_path: Path | None = None
 
+    transport: Literal["stdio", "streamable-http"] = "stdio"
+    http_host: str = "127.0.0.1"
+    http_port: int = 8765
+    http_auth_token_env: str = "AUDIO_MCP_HTTP_TOKEN"  # env var holding the bearer token (never put it in the file)
+
     backend_profile: Literal["real", "fake"] = "real"
     device: Literal["auto", "cpu", "cuda"] = "auto"
 

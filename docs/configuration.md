@@ -19,6 +19,10 @@ environment variables `AUDIO_MCP_<NAME>` (list values as JSON, e.g. `AUDIO_MCP_A
 | `url_timeout_seconds` | `AUDIO_MCP_URL_TIMEOUT_SECONDS` | `float` | `30` | URL fetch timeout |
 | `ffmpeg_path` | `AUDIO_MCP_FFMPEG_PATH` | `Path \| None` | `""` | explicit ffmpeg binary (default: PATH) |
 | `ffprobe_path` | `AUDIO_MCP_FFPROBE_PATH` | `Path \| None` | `""` | explicit ffprobe binary (default: PATH) |
+| `transport` | `AUDIO_MCP_TRANSPORT` | `Literal['stdio', 'streamable-http']` | `"stdio"` | stdio | streamable-http (HTTP needs allowed_roots set and a bearer token in http_auth_token_env) |
+| `http_host` | `AUDIO_MCP_HTTP_HOST` | `str` | `"127.0.0.1"` | HTTP bind address (one token = one trust domain; put TLS in front of non-loopback binds) |
+| `http_port` | `AUDIO_MCP_HTTP_PORT` | `int` | `8765` | HTTP port |
+| `http_auth_token_env` | `AUDIO_MCP_HTTP_AUTH_TOKEN_ENV` | `str` | `"AUDIO_MCP_HTTP_TOKEN"` | name of the env var holding the HTTP bearer token |
 | `backend_profile` | `AUDIO_MCP_BACKEND_PROFILE` | `Literal['real', 'fake']` | `"real"` | "real" models or deterministic "fake" backends |
 | `device` | `AUDIO_MCP_DEVICE` | `Literal['auto', 'cpu', 'cuda']` | `"auto"` | auto | cpu | cuda |
 | `asr_model` | `AUDIO_MCP_ASR_MODEL` | `str` | `"small"` | faster-whisper model size |

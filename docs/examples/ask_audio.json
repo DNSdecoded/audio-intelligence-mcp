@@ -18,7 +18,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.0,
+      "duration_seconds": 0.003,
       "stages_run": [
         "timeline",
         "uncertainty"

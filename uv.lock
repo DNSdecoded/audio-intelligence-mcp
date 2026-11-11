@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12, <3.14"
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'win32'",
@@ -181,7 +181,7 @@ wheels = [
 
 [[package]]
 name = "audio-intelligence-mcp"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
@@ -221,11 +221,11 @@ pyannote = [
 [package.metadata]
 requires-dist = [
     { name = "anthropic", marker = "extra == 'llm'", specifier = ">=1.15" },
-    { name = "faster-whisper", marker = "extra == 'models'" },
+    { name = "faster-whisper", marker = "extra == 'models'", specifier = ">=1.1" },
     { name = "httpx" },
     { name = "jiwer", marker = "extra == 'dev'" },
     { name = "librosa", marker = "extra == 'models'" },
-    { name = "mcp", specifier = ">=1.9,<2" },
+    { name = "mcp", specifier = ">=1.23,<2" },
     { name = "numpy" },
     { name = "panns-inference", marker = "extra == 'models'" },
     { name = "platformdirs" },

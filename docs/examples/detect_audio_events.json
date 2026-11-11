@@ -2,7 +2,7 @@
   "request": {
     "source": {
       "type": "file_path",
-      "path": "./samples\\alarm.wav"
+      "path": "./samples/alarm.wav"
     },
     "categories": [
       "alarm"
@@ -28,7 +28,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.328,
+      "duration_seconds": 0.09,
       "stages_run": [
         "events"
       ],

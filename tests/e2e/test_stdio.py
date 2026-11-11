@@ -23,7 +23,7 @@ async def session(tmp_path, roots, profile="fake"):
         **os.environ, "AUDIO_MCP_BACKEND_PROFILE": profile, "AUDIO_MCP_DATA_DIR": str(tmp_path / "data"),
         "AUDIO_MCP_ALLOWED_ROOTS": json.dumps([str(r) for r in roots])})
     async with stdio_client(params) as (r, w), ClientSession(r, w) as s:
-        await s.initialize()
+        s.init = await s.initialize()
         yield s
 
 
@@ -46,6 +46,7 @@ def samples_dir(tmp_path, synth):
 async def test_stdio_roundtrip(tmp_path):
     with anyio.fail_after(60):
         async with session(tmp_path, [FIXTURES_DIR]) as s:
+            assert "get_job" in s.init.instructions and "audio_id" in s.init.instructions
             tools = (await s.list_tools()).tools
             assert {t.name for t in tools} == EXPECTED_TOOLS
             assert all(t.inputSchema["type"] == "object" and t.description for t in tools)

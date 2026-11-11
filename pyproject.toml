@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "audio-intelligence-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Local-first Audio Intelligence MCP server"
 readme = "README.md"
 keywords = ["mcp", "audio", "speech-to-text", "diarization", "sound-event-detection", "whisper"]
@@ -22,7 +22,7 @@ license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Sanjay Sakhinala" }]
 dependencies = [
-  "mcp>=1.9,<2",
+  "mcp>=1.23,<2",
   "pydantic>=2",
   "pydantic-settings>=2",
   "numpy",
@@ -34,7 +34,7 @@ dependencies = [
 
 [project.optional-dependencies]
 models = [
-  "faster-whisper",
+  "faster-whisper>=1.1",
   "silero-vad",
   "panns-inference",
   "torch",

@@ -239,3 +239,88 @@ def test_url_deadline(fetch, settings, monkeypatch):
     with pytest.raises(AudioMCPError) as e:
         fetch(lambda r: httpx.Response(200, content=b"x"))
     assert e.value.retryable and not any(f.is_file() for f in settings.resolved_temp_dir.rglob("*"))
+
+
+def test_url_pins_vetted_ip(fetch, monkeypatch):
+    import httpx
+
+    from audio_mcp.ingest import sources
+
+    monkeypatch.setattr(sources.socket, "getaddrinfo", lambda *a, **k: [(2, 1, 6, "", ("93.184.216.34", 80))])
+    seen = []
+
+    def handler(r):
+        seen.append(r)
+        return httpx.Response(200, content=b"d")
+
+    fetch(handler, url="http://example.org:8080/clip.mp3")
+    r = seen[0]
+    assert r.url.host == "93.184.216.34" and r.url.port == 8080  # connects to the vetted address
+    assert r.headers["host"] == "example.org:8080"  # origin sees the real host
+    assert r.extensions["sni_hostname"] == "example.org"  # TLS verifies against the hostname, not the IP
+
+
+def test_url_falls_back_to_next_vetted_ip(fetch, monkeypatch):
+    import httpx
+
+    from audio_mcp.ingest import sources
+
+    monkeypatch.setattr(sources.socket, "getaddrinfo", lambda *a, **k: [
+        (10, 1, 6, "", ("2606:2800:220:1:248:1893:25c8:1946", 80, 0, 0)), (2, 1, 6, "", ("93.184.216.34", 80))])
+
+    def handler(r):
+        if r.url.host != "93.184.216.34":
+            raise httpx.ConnectError("v6 unreachable")
+        return httpx.Response(200, content=b"ok")
+
+    assert fetch(handler).path.read_bytes() == b"ok"
+
+
+def test_url_all_ips_unreachable(fetch, monkeypatch):
+    import httpx
+
+    from audio_mcp.ingest import sources
+
+    monkeypatch.setattr(sources.socket, "getaddrinfo", lambda *a, **k: [
+        (2, 1, 6, "", ("93.184.216.34", 80)), (2, 1, 6, "", ("93.184.216.35", 80))])
+    tried = []
+
+    def handler(r):
+        tried.append(r.url.host)
+        raise httpx.ConnectTimeout("slow")  # timeouts fall through to the next address too
+
+    with pytest.raises(AudioMCPError) as e:
+        fetch(handler)
+    assert tried == ["93.184.216.34", "93.184.216.35"]
+    assert e.value.code == ErrorCode.URL_FETCH_FAILED and e.value.retryable
+
+
+def test_url_pin_keeps_userinfo_ipv6_and_idna_host(fetch, monkeypatch):
+    import httpx
+
+    from audio_mcp.ingest import sources
+
+    seen = []
+
+    def handler(r):
+        seen.append(r)
+        return httpx.Response(200, content=b"d")
+
+    fetch(handler, url="http://user:pw@bücher.example/clip.mp3")
+    assert seen[-1].headers["host"] == "xn--bcher-kva.example" and seen[-1].url.username == "user"
+    monkeypatch.setattr(sources.socket, "getaddrinfo", lambda *a, **k: [(10, 1, 6, "", ("2606:2800::1", 80, 0, 0))])
+    fetch(handler, url="http://[2606:2800::1]:8080/clip.mp3")
+    assert seen[-1].headers["host"] == "[2606:2800::1]:8080"
+
+
+def test_url_deadline_shared_across_addresses(fetch, settings, monkeypatch):
+    import httpx
+
+    from audio_mcp.ingest import sources
+
+    monkeypatch.setattr(sources.socket, "getaddrinfo", lambda *a, **k: [
+        (2, 1, 6, "", ("93.184.216.34", 80)), (2, 1, 6, "", ("93.184.216.35", 80))])
+    settings.url_timeout_seconds = 0
+    with pytest.raises(AudioMCPError) as e:
+        fetch(lambda r: httpx.Response(200, content=b"d"))
+    assert e.value.code == ErrorCode.URL_FETCH_FAILED and e.value.retryable

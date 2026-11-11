@@ -80,6 +80,11 @@ def _features(ctx):
     return extract_features(ctx.audio.native, ctx.audio.native_sr, groups, _regions(ctx))
 
 
+# FLEURS measurements with Whisper small (docs/eval/RESULTS.md): ar 37.7 %, hi 58.8 %, te 103 % WER
+_WEAK_ASR_LANGS = {"ar", "hi", "te"}
+_SMALL_ASR = {"tiny", "base", "small", "tiny.en", "base.en", "small.en"}
+
+
 def _transcription(ctx):
     regions = _regions(ctx)
     if not regions:
@@ -88,8 +93,14 @@ def _transcription(ctx):
     asr, o = ctx.app.backends.asr, ctx.options
     multi = bool(o.get("multilingual"))
     r = asr.transcribe(ctx.audio.mono16k, language=o.get("language"), word_timestamps=o.get("word_timestamps", True),
-                       per_chunk_language=multi, chunks=regions if multi else None)
+                       per_chunk_language=multi, chunks=regions if multi else None,
+                       hotwords=" ".join(o.get("hotwords") or []) or None)
     ctx.models_used.append(asr.info)
+    detected = {r.language, *(run["language"] for run in r.languages)}  # multilingual runs list several
+    if detected & _WEAK_ASR_LANGS and ctx.app.settings.asr_model in _SMALL_ASR:
+        ctx.warnings.append(warning("LOW_RESOURCE_LANGUAGE", (
+            f"language(s) {sorted(detected & _WEAK_ASR_LANGS)} poorly served by asr_model='{ctx.app.settings.asr_model}' "
+            "(measured WER 38-103%); use asr_model='large-v3' and pass `language`")))
     if r.dropped_low_speech:
         ctx.warnings.append(warning("LOW_SPEECH_DROPPED", f"dropped {r.dropped_low_speech} low-speech segments"))
     segs = [s.model_dump(exclude_none=True) for s in r.segments]
@@ -231,6 +242,7 @@ def _vad_cfg(app, o):
 def _asr_cfg(app, o):  # also keys `language`, which only reads the transcription result
     return {**_vad_cfg(app, o), "asr": _id(app.backends.asr), "language": o.get("language"),
             "word_timestamps": o.get("word_timestamps", True), "multilingual": bool(o.get("multilingual")),
+            "hotwords": list(o.get("hotwords") or []),  # order matters: the decoder reads them as a prompt
             "decode": 2}  # bump when decoding settings change so cached transcripts are recomputed
 
 

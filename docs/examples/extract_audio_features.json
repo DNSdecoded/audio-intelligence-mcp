@@ -2,7 +2,7 @@
   "request": {
     "source": {
       "type": "file_path",
-      "path": "./samples\\speech_en.wav"
+      "path": "./samples/speech_en.wav"
     },
     "feature_groups": [
       "level",
@@ -65,7 +65,7 @@
     "warnings": [],
     "errors": [],
     "processing": {
-      "duration_seconds": 0.313,
+      "duration_seconds": 0.088,
       "stages_run": [
         "metadata",
         "vad",

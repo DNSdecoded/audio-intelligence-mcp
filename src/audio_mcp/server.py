@@ -1,4 +1,6 @@
+import hmac
 import logging
+import os
 import sys
 import threading
 from contextlib import asynccontextmanager
@@ -6,11 +8,14 @@ from typing import Any, Literal
 
 import anyio
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import ValidationError
+from starlette.responses import Response
 
 from audio_mcp.config import load_settings
 from audio_mcp.context import AppContext, build_app_context
 from audio_mcp.ingest.sources import AudioSource
+from audio_mcp.jobs import JOB_CONTEXT
 from audio_mcp.logging_setup import setup_logging
 from audio_mcp.store.retention import cleanup_temp, sweep
 from audio_mcp.tools import handlers
@@ -20,11 +25,12 @@ from audio_mcp.tools.schemas import (
 )
 
 _app: AppContext | None = None
+_refs = 0  # live lifespan entries; HTTP runs one per MCP session plus one for the whole server, stdio just one
+_stop_app = None
 
 
-@asynccontextmanager
-async def lifespan(_server):
-    global _app
+def _start_app() -> None:
+    global _app, _stop_app
     settings = load_settings()
     setup_logging(settings)
     # the stdio transport already holds the real stdout; stray library prints (panns_inference prints on load)
@@ -41,17 +47,67 @@ async def lifespan(_server):
             log.info("retention sweep: %s", sweep(_app))
 
     threading.Thread(target=hourly, name="audio-mcp-retention", daemon=True).start()
-    try:
-        yield
-    finally:
+
+    def stop_app():
+        global _app
         stop.set()
         _app.jobs.shutdown()
         sweep(_app, final=True)
         cleanup_temp(settings, own=True)
         sys.stdout = real_stdout
+        _app = None
+
+    _stop_app = stop_app
 
 
-mcp = FastMCP("audio-intelligence", lifespan=lifespan)
+@asynccontextmanager
+async def lifespan(_server):
+    global _refs
+    if _refs == 0:
+        _start_app()
+    _refs += 1
+    try:
+        yield
+    finally:
+        _refs -= 1
+        if _refs == 0:
+            _stop_app()
+
+
+INSTRUCTIONS = """\
+Local audio analysis. Every source is {"type": "file_path"|"base64"|"url"|"audio_id", ...}.
+- Unsure what a recording holds: analyze_audio (tasks "auto", goal e.g. "meeting"). It returns an audio_id.
+- Reuse that audio_id as the source for ask_audio, summarize_audio, get_audio_timeline and export_audio_analysis;
+  stored audio expires after retention_ttl_hours (then re-send the file).
+- Transcript/speakers/translation: transcribe_audio (hotwords for names and jargon). Sound events: detect_audio_events.
+  Levels, noise, clipping: inspect_audio_quality / extract_audio_features.
+- Differences from normal: compare_audio with baseline. Many files: search_audio_library (index, then search).
+- status "processing" with a job_id means long audio: poll get_job.
+- Read warnings and processing.stages_skipped before trusting a result; confidence values are uncalibrated.
+"""
+
+mcp = FastMCP("audio-intelligence", instructions=INSTRUCTIONS, lifespan=lifespan)
+
+
+def _progress_reporter():
+    """Callback for the runner that sends MCP progress notifications (no-op when the client sent no
+    progressToken). The count of finished stages only grows, as the spec requires."""
+    try:
+        ctx = mcp.get_context()
+        ctx.request_context  # raises outside a request
+    except ValueError:
+        return None
+    sent = 0
+
+    def report(_done, _total):
+        nonlocal sent
+        sent += 1
+        try:
+            anyio.from_thread.run(ctx.report_progress, sent)
+        except Exception:  # progress is best effort; never fail the analysis over it
+            pass
+
+    return report
 
 
 async def _run(handler, model, params: dict) -> dict[str, Any]:
@@ -59,7 +115,14 @@ async def _run(handler, model, params: dict) -> dict[str, Any]:
         req = model(**params)
     except ValidationError as e:
         return handlers.invalid_input(e)
-    return await anyio.to_thread.run_sync(lambda: handler(_app, req))
+    progress = _progress_reporter()
+
+    def call():
+        if progress is not None:  # the runner reads this, as it does for async jobs
+            JOB_CONTEXT.set((None, progress))
+        return handler(_app, req)
+
+    return await anyio.to_thread.run_sync(call)
 
 
 @mcp.tool(name="analyze_audio", description=(
@@ -90,11 +153,12 @@ async def transcribe_audio(
     diarize: bool = False,
     translate_to_en: bool = False,
     multilingual: bool = False,
+    hotwords: list[str] | None = None,
     async_mode: AsyncMode = "auto",
 ) -> dict:
     return await _run(handlers.transcribe_audio, TranscribeRequest, dict(
         source=source, language=language, word_timestamps=word_timestamps, diarize=diarize,
-        translate_to_en=translate_to_en, multilingual=multilingual, async_mode=async_mode))
+        translate_to_en=translate_to_en, multilingual=multilingual, hotwords=hotwords, async_mode=async_mode))
 
 
 @mcp.tool(name="detect_audio_events", description=(
@@ -255,5 +319,50 @@ async def export_audio_analysis(
         audio_id=audio_id, format=format, tasks=tasks, redact=redact, async_mode=async_mode))
 
 
+class _BearerAuth:
+    """Pure ASGI middleware: every HTTP request needs `Authorization: Bearer <token>` (SSE streams stay unbuffered)."""
+
+    def __init__(self, app, token: str):
+        self.app, self.expected = app, f"Bearer {token}".encode()
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            given = dict(scope["headers"]).get(b"authorization", b"")
+            if not hmac.compare_digest(given, self.expected):
+                await Response("unauthorized", 401, headers={"WWW-Authenticate": "Bearer"})(scope, receive, send)
+                return
+        await self.app(scope, receive, send)
+
+
+def http_app(token: str, host: str = "127.0.0.1"):
+    """Streamable-HTTP ASGI app behind bearer auth. One token = one trust domain: every client holding it shares
+    the audio store, result cache, jobs and library (no per-client isolation)."""
+    if host not in ("127.0.0.1", "localhost", "::1"):  # FastMCP's Host allow-list only knows loopback
+        mcp.settings.transport_security = TransportSecuritySettings(enable_dns_rebinding_protection=False)
+    app = mcp.streamable_http_app()
+    inner = app.router.lifespan_context
+
+    @asynccontextmanager
+    async def serve_lifespan(a):  # one app context for the server's life, not one per MCP session
+        async with lifespan(None), inner(a):
+            yield
+
+    app.router.lifespan_context = serve_lifespan
+    app.add_middleware(_BearerAuth, token=token)
+    return app
+
+
 def main() -> None:
-    mcp.run()
+    s = load_settings()
+    if s.transport == "stdio":
+        mcp.run()
+        return
+    import uvicorn
+
+    token = os.environ.get(s.http_auth_token_env)
+    if not token:
+        raise SystemExit(f"HTTP transport needs a bearer token in ${s.http_auth_token_env}")
+    if "allowed_roots" not in s.model_fields_set:
+        raise SystemExit("HTTP transport needs allowed_roots set explicitly; the default (home directory) "
+                         "would expose it to every client holding the token")
+    uvicorn.run(http_app(token, s.http_host), host=s.http_host, port=s.http_port, log_level="warning")

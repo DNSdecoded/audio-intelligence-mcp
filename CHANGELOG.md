@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.2 — 2026-11-11
+
+### Added
+- `transcribe_audio` `hotwords`: names and jargon the decoder should favour (part of the transcript cache key).
+  Needs faster-whisper >= 1.1.
+- `LOW_RESOURCE_LANGUAGE` warning when Arabic, Hindi or Telugu is detected with a tiny/base/small Whisper model.
+- MCP progress notifications (stage count) for synchronous tool calls when the client sends a progress token.
+- Streamable-HTTP transport: `transport = "streamable-http"`, `http_host`, `http_port`, bearer token from
+  `http_auth_token_env`. Refuses to start without a token or without an explicit `allowed_roots`.
+
+### Security
+- URL fetch connects to the vetted IP address instead of re-resolving the hostname (closes the DNS-rebinding window).
+
 ## 0.1.1 — 2026-10-19
 
 Bug-fix release. Upgrading is recommended, especially on Windows and for anyone who sets `temp_dir`.
