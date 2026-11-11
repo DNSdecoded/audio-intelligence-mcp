@@ -74,6 +74,7 @@ class FasterWhisperASR:
             # not conditioning on earlier text stops one looping segment from seeding the next
             temperature=decode_kwargs.get("temperature", _TEMPERATURES),
             condition_on_previous_text=False,
+            hotwords=decode_kwargs.get("hotwords"),
         )
         segments, dropped = [], 0
         for s in gen:

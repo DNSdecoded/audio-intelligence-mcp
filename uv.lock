@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12, <3.14"
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'win32'",
@@ -221,7 +221,7 @@ pyannote = [
 [package.metadata]
 requires-dist = [
     { name = "anthropic", marker = "extra == 'llm'", specifier = ">=1.15" },
-    { name = "faster-whisper", marker = "extra == 'models'" },
+    { name = "faster-whisper", marker = "extra == 'models'", specifier = ">=1.1" },
     { name = "httpx" },
     { name = "jiwer", marker = "extra == 'dev'" },
     { name = "librosa", marker = "extra == 'models'" },

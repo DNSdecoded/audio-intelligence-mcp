@@ -83,7 +83,7 @@ LLM
   deleted by the first instance's `retention="none"` final sweep; crashed-instance audio under "none" never swept;
   a huge pid in a proc dir name aborts startup cleanup.
 - Abandoned timed-out stage threads briefly exceed the concurrency cap.
-- URL fetch (off by default) has a DNS-rebinding window (host re-resolved at connect).
+- URL fetch (off by default) connects to the vetted IP (DNS-rebinding window closed in 0.1.2); a redirect is never followed.
 
 ## Deferred minors (not fixed)
 

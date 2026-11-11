@@ -34,7 +34,7 @@ dependencies = [
 
 [project.optional-dependencies]
 models = [
-  "faster-whisper",
+  "faster-whisper>=1.1",
   "silero-vad",
   "panns-inference",
   "torch",

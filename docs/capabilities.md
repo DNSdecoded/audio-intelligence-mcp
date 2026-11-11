@@ -35,6 +35,11 @@ Implemented or Partial, the server does not do it.
 - Async jobs (auto for long audio), progress, cancellation, per-stage timeouts, `get_job`
 - Chunked streaming sessions with provisional results and final reconciliation
 - Exports: json, markdown, srt, vtt, csv, rttm
+- Vocabulary hints (`hotwords`) for transcription; progress notifications for synchronous calls; a
+  `LOW_RESOURCE_LANGUAGE` warning for Arabic/Hindi/Telugu on small Whisper models
+- Optional streamable-HTTP transport (`transport = "streamable-http"`) behind a bearer token. One token is one
+  trust domain: clients sharing it share the audio store, cache, jobs and library. Put TLS in front of any
+  non-loopback bind
 - Optional LLM (Anthropic SDK, OpenAI-compatible, Ollama) for answers, summaries and interpretations, limited to
   an evidence pack, uncited claims dropped, off-machine use reported
 - Retention sweeps, temp cleanup, redaction (email/phone/Luhn-checked cards/custom), log hygiene
@@ -42,10 +47,11 @@ Implemented or Partial, the server does not do it.
 
 ## Partial
 
-- **URL sources** — off by default; blocks private/loopback/link-local/CGNAT/metadata addresses, but the
-  hostname is re-resolved at connect time (DNS-rebinding window).
+- **URL sources** — off by default; blocks private/loopback/link-local/CGNAT/metadata addresses and connects
+  to the vetted IP (Host header and TLS name check use the hostname), so DNS rebinding cannot swap the address.
 - **Overlap detection** — only with the optional pyannote backend; the default ECAPA path reports
-  `OVERLAP_UNSUPPORTED`.
+  `OVERLAP_UNSUPPORTED`. No validated detector exists for the default path (PANNs/VAD disagreement does not
+  detect overlap).
 - **Diarization accuracy** — windows shorter than 0.8 s join the nearest speaker cluster, so a speaker with only
   very short utterances can be merged into another.
 - **Translation** — English target only (Whisper translate task, per segment, timestamps preserved).
@@ -65,4 +71,4 @@ Implemented or Partial, the server does not do it.
 - Approximate-nearest-neighbour index (FAISS / sqlite-vec) for very large libraries
 - Non-English translation targets
 - GPU-specific tuning and batching
-- Multi-tenant authentication and remote (HTTP) transport hardening
+- Multi-tenant isolation (per-client stores and tokens) for the HTTP transport

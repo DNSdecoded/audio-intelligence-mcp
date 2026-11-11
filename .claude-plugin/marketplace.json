@@ -1,0 +1,12 @@
+{
+  "name": "audio-intelligence-marketplace",
+  "owner": { "name": "Sanjay Sakhinala" },
+  "description": "Marketplace for the Audio Intelligence plugin",
+  "plugins": [
+    {
+      "name": "audio-intelligence",
+      "source": "./",
+      "description": "Audio analysis skill and MCP server"
+    }
+  ]
+}

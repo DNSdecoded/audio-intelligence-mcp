@@ -120,6 +120,11 @@ def _make_client(timeout: float) -> httpx.Client:
     return httpx.Client(follow_redirects=False, timeout=timeout, trust_env=False)
 
 
+def _pin(parsed, ip: str) -> str:
+    netloc = f"[{ip}]" if ":" in ip else ip
+    return parsed._replace(netloc=netloc + (f":{parsed.port}" if parsed.port else "")).geturl()
+
+
 def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
     if not settings.allow_url_fetch:
         raise AudioMCPError(ErrorCode.URL_FETCH_DISABLED, "URL fetching is disabled")
@@ -132,41 +137,53 @@ def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
         raise AudioMCPError(ErrorCode.URL_FETCH_FAILED, "could not resolve host", retryable=True) from None
     if any(_blocked(i[4][0]) for i in infos):
         raise AudioMCPError(ErrorCode.URL_FETCH_FAILED, "blocked address")
-    # shortcut: httpx re-resolves the host (DNS-rebinding window); pin the vetted IP if this threat matters.
+    # connect to the vetted IP, not the hostname, so a second DNS lookup cannot rebind to a blocked address;
+    # Host header and TLS SNI/certificate check keep using the original hostname
+    ips = list(dict.fromkeys(i[4][0].split("%")[0] for i in infos))  # all vetted; tried in order like a normal connect
+    host_header = parsed.hostname + (f":{parsed.port}" if parsed.port else "")
     ext = Path(parsed.path).suffix
     ext = ext if _EXT_RE.fullmatch(ext) else ".bin"
     out = settings.process_temp_dir / f"{uuid.uuid4().hex}{ext}"
     deadline = time.monotonic() + settings.url_timeout_seconds
-    try:
-        with _make_client(settings.url_timeout_seconds) as client, client.stream("GET", src.url) as r:
-            if 300 <= r.status_code < 400:
-                raise AudioMCPError(
-                    ErrorCode.URL_FETCH_FAILED, f"HTTP {r.status_code}: redirects are not followed"
-                )
-            if r.status_code != 200:
-                raise AudioMCPError(
-                    ErrorCode.URL_FETCH_FAILED,
-                    f"unexpected HTTP status {r.status_code}",
-                    retryable=r.status_code >= 500,
-                )
-            total = 0
-            with out.open("wb") as fh:
-                for chunk in r.iter_bytes():
-                    total += len(chunk)
-                    _check_size(total, settings.max_file_mb)
-                    if time.monotonic() > deadline:
-                        raise AudioMCPError(
-                            ErrorCode.URL_FETCH_FAILED, "download timed out", retryable=True
-                        )
-                    fh.write(chunk)
-    except AudioMCPError:
-        out.unlink(missing_ok=True)
-        raise
-    except httpx.HTTPError as exc:
-        out.unlink(missing_ok=True)
-        raise AudioMCPError(
-            ErrorCode.URL_FETCH_FAILED, f"fetch failed ({type(exc).__name__})", retryable=True
-        ) from None
+    for ip in ips:
+        try:
+            with _make_client(settings.url_timeout_seconds) as client, client.stream(
+                "GET", _pin(parsed, ip), headers={"Host": host_header}, extensions={"sni_hostname": parsed.hostname}
+            ) as r:
+                if 300 <= r.status_code < 400:
+                    raise AudioMCPError(
+                        ErrorCode.URL_FETCH_FAILED, f"HTTP {r.status_code}: redirects are not followed"
+                    )
+                if r.status_code != 200:
+                    raise AudioMCPError(
+                        ErrorCode.URL_FETCH_FAILED,
+                        f"unexpected HTTP status {r.status_code}",
+                        retryable=r.status_code >= 500,
+                    )
+                total = 0
+                with out.open("wb") as fh:
+                    for chunk in r.iter_bytes():
+                        total += len(chunk)
+                        _check_size(total, settings.max_file_mb)
+                        if time.monotonic() > deadline:
+                            raise AudioMCPError(
+                                ErrorCode.URL_FETCH_FAILED, "download timed out", retryable=True
+                            )
+                        fh.write(chunk)
+        except httpx.ConnectError:
+            out.unlink(missing_ok=True)
+            if ip == ips[-1]:
+                raise AudioMCPError(ErrorCode.URL_FETCH_FAILED, "fetch failed (ConnectError)", retryable=True) from None
+            continue  # next vetted address (e.g. IPv6 unreachable, IPv4 fine)
+        except AudioMCPError:
+            out.unlink(missing_ok=True)
+            raise
+        except httpx.HTTPError as exc:
+            out.unlink(missing_ok=True)
+            raise AudioMCPError(
+                ErrorCode.URL_FETCH_FAILED, f"fetch failed ({type(exc).__name__})", retryable=True
+            ) from None
+        break
     return MaterializedSource(out, Path(parsed.path).name or out.name, True)
 
 

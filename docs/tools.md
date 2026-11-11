@@ -301,7 +301,7 @@ Run a multi-task analysis of an audio source (transcription, language, sound eve
 {
   "source": {
     "type": "file_path",
-    "path": "./samples\\dialogue_2spk.wav"
+    "path": "./samples/dialogue_2spk.wav"
   },
   "tasks": "auto",
   "goal": "meeting"
@@ -559,23 +559,23 @@ Run a multi-task analysis of an audio source (transcription, language, sound eve
         "spectral_centroid_hz": 1616.6726237651321,
         "spectral_bandwidth_hz": 1481.8134043832556,
         "spectral_rolloff_hz": 3146.25,
-        "spectral_flatness": 0.23362024038731743,
+        "spectral_flatness": 0.2336202403873175,
         "zero_crossing_rate": 0.08945879933153361,
-        "f0_mean_hz": 158.63788447587868,
-        "f0_median_hz": 169.0226191763237,
+        "f0_mean_hz": 158.6378844758787,
+        "f0_median_hz": 169.02261917632376,
         "f0_min_hz": 74.28771285294061,
         "f0_max_hz": 615.3846153846154,
-        "f0_std_hz": 77.55207931717752,
+        "f0_std_hz": 77.5520793171775,
         "voiced_ratio": 0.25496688741721857,
         "tempo_bpm": 267.85714285714283,
         "onset_rate_per_s": 1.9539661012591514,
         "band_energy": {
           "0-250": 0.4715005228918294,
-          "250-500": 0.318287505548476,
+          "250-500": 0.31828750554847596,
           "500-1000": 0.12135417881934098,
           "1000-2000": 0.049783783804859066,
-          "2000-4000": 0.018397408657133456,
-          "4000-8000": 0.02067660027836128
+          "2000-4000": 0.018397408657133452,
+          "4000-8000": 0.020676600278361275
         }
       }
     },
@@ -588,7 +588,7 @@ Run a multi-task analysis of an audio source (transcription, language, sound eve
         "snr_db_estimate": null,
         "dc_offset": 0.010997789110417664,
         "hum_excess_db": -7.1622612650552195,
-        "echo_cepstral_z": 10.490420897219929,
+        "echo_cepstral_z": 10.490420897219016,
         "hf_energy_ratio_db": -13.312005480328144,
         "channels": 1
       },
@@ -741,7 +741,7 @@ Run a multi-task analysis of an audio source (transcription, language, sound eve
         }
       ],
       "f0_range_hz": 541.1,
-      "f0_std_hz": 77.55207931717752,
+      "f0_std_hz": 77.5520793171775,
       "notes": "emotion and tone are not inferred",
       "per_speaker": {
         "speaker_1": {
@@ -759,7 +759,7 @@ Run a multi-task analysis of an audio source (transcription, language, sound eve
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.469,
+    "duration_seconds": 0.257,
     "stages_run": [
       "metadata",
       "features",
@@ -991,6 +991,21 @@ Transcribe speech in an audio source with segment and optional word timestamps. 
       "title": "Multilingual",
       "type": "boolean"
     },
+    "hotwords": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Hotwords"
+    },
     "async_mode": {
       "default": "auto",
       "enum": [
@@ -1188,7 +1203,7 @@ Transcribe speech in an audio source with segment and optional word timestamps. 
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.016,
+    "duration_seconds": 0.002,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -1424,7 +1439,7 @@ Detect sound events (alarms, impacts, music, animals, ...) in an audio source, o
 {
   "source": {
     "type": "file_path",
-    "path": "./samples\\alarm.wav"
+    "path": "./samples/alarm.wav"
   },
   "categories": [
     "alarm"
@@ -1455,7 +1470,7 @@ Detect sound events (alarms, impacts, music, animals, ...) in an audio source, o
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.328,
+    "duration_seconds": 0.09,
     "stages_run": [
       "events"
     ],
@@ -1674,7 +1689,7 @@ Compute acoustic features (level, silence, spectral, pitch, rhythm, bands) for a
 {
   "source": {
     "type": "file_path",
-    "path": "./samples\\speech_en.wav"
+    "path": "./samples/speech_en.wav"
   },
   "feature_groups": [
     "level",
@@ -1742,7 +1757,7 @@ Compute acoustic features (level, silence, spectral, pitch, rhythm, bands) for a
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.313,
+    "duration_seconds": 0.088,
     "stages_run": [
       "metadata",
       "vad",
@@ -1969,7 +1984,7 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
 {
   "source": {
     "type": "file_path",
-    "path": "./samples\\sine.wav"
+    "path": "./samples/sine.wav"
   }
 }
 ```
@@ -1988,9 +2003,9 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
       "silence_ratio": 0.0,
       "snr_db_estimate": 0.0016980817515568924,
       "dc_offset": -1.525186897675737e-05,
-      "hum_excess_db": 217.72816668523103,
-      "echo_cepstral_z": 15.511844752102581,
-      "hf_energy_ratio_db": -92.99050352099812,
+      "hum_excess_db": 217.44192873320858,
+      "echo_cepstral_z": 15.5118447521122,
+      "hf_energy_ratio_db": -92.99050352099829,
       "channels": 2
     },
     "issues": [
@@ -1998,7 +2013,7 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
         "code": "HUM",
         "severity": "high",
         "message": "Mains hum at 50/60 Hz detected.",
-        "measured": 217.728167,
+        "measured": 217.441929,
         "threshold": 20
       },
       {
@@ -2025,7 +2040,7 @@ Diagnose recording quality (clipping, low level, silence, noise, hum, echo, band
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.422,
+    "duration_seconds": 0.187,
     "stages_run": [
       "vad",
       "features",
@@ -2324,7 +2339,7 @@ Build a chronological event graph of an audio source: speech segments, speaker t
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.203,
+    "duration_seconds": 0.048,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -2558,7 +2573,7 @@ Answer a natural-language question about an audio source (e.g. when something is
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.0,
+    "duration_seconds": 0.003,
     "stages_run": [
       "timeline",
       "uncertainty"
@@ -2862,7 +2877,7 @@ Summarize an audio source extractively: key sentences, topics and key moments, e
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.016,
+    "duration_seconds": 0.003,
     "stages_run": [
       "summary"
     ],
@@ -3135,11 +3150,11 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
   "sources": [
     {
       "type": "file_path",
-      "path": "./samples\\sine.wav"
+      "path": "./samples/sine.wav"
     },
     {
       "type": "file_path",
-      "path": "./samples\\alarm.wav"
+      "path": "./samples/alarm.wav"
     }
   ]
 }
@@ -3192,7 +3207,7 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
               "unit": "Hz"
             },
             "f0_mean_hz": {
-              "a": 440.10844348156735,
+              "a": 440.1084434815673,
               "b": 511.0355843048559,
               "delta": 70.927141,
               "unit": "Hz"
@@ -3210,7 +3225,7 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
               "unit": "Hz"
             },
             "f0_std_hz": {
-              "a": 0.0025761553884446112,
+              "a": 0.0025761553884481097,
               "b": 33.50455725299295,
               "delta": 33.501981,
               "unit": "Hz"
@@ -3252,8 +3267,8 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
               "unit": "dB"
             },
             "spectral_bandwidth_hz": {
-              "a": 246.96479328948786,
-              "b": 2714.547334980393,
+              "a": 246.96479328948624,
+              "b": 2714.547334980387,
               "delta": 2467.582542,
               "unit": "Hz"
             },
@@ -3264,8 +3279,8 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
               "unit": "Hz"
             },
             "spectral_flatness": {
-              "a": 0.0004533049813041949,
-              "b": 0.4513854257402206,
+              "a": 0.00045330498130418317,
+              "b": 0.45138542574022056,
               "delta": 0.450932,
               "unit": "ratio"
             },
@@ -3360,7 +3375,7 @@ Compare two or more recordings (feature, band, event, transcript and embedding d
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.531,
+    "duration_seconds": 0.201,
     "stages_run": [
       "aud_8a84c21c384f272e:metadata",
       "aud_8a84c21c384f272e:events",
@@ -3751,17 +3766,17 @@ Index audio files/folders into a persistent local library (transcripts, sound ev
   "result": {
     "indexed": [
       {
-        "path": "./samples\\alarm.wav",
+        "path": "./samples/alarm.wav",
         "audio_id": "aud_2e130551b6f3fd9a",
         "segments": 4
       },
       {
-        "path": "./samples\\dialogue_2spk.wav",
+        "path": "./samples/dialogue_2spk.wav",
         "audio_id": "aud_0fb68437fd577a5c",
         "segments": 9
       },
       {
-        "path": "./samples\\sine.wav",
+        "path": "./samples/sine.wav",
         "audio_id": "aud_8a84c21c384f272e",
         "segments": 1
       }
@@ -3771,7 +3786,7 @@ Index audio files/folders into a persistent local library (transcripts, sound ev
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 1.063,
+    "duration_seconds": 0.408,
     "stages_run": [
       "aud_2e130551b6f3fd9a:transcription",
       "aud_2e130551b6f3fd9a:language",
@@ -3980,7 +3995,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
 ```json
 {
   "action": "finish",
-  "session_id": "str_3641f8237430",
+  "session_id": "str_b365eb36d15d",
   "tasks": [
     "transcription"
   ]
@@ -3996,7 +4011,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
   "warnings": [],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.188,
+    "duration_seconds": 0.044,
     "stages_run": [
       "metadata",
       "vad",
@@ -4103,7 +4118,7 @@ Chunked streaming sessions (raw PCM or self-contained audio files per chunk): st
         ]
       }
     },
-    "session_id": "str_3641f8237430",
+    "session_id": "str_b365eb36d15d",
     "reconciliation": {
       "transcript_word_difference_rate": 0.0,
       "events_confirmed": [],
@@ -4237,7 +4252,7 @@ Export the analysis of a previously ingested audio_id to json, markdown, srt, vt
   "status": "success",
   "audio_id": "aud_0fb68437fd577a5c",
   "result": {
-    "path": "<data_dir>\\exports\\aud_0fb68437fd577a5c-20261019T091256.srt",
+    "path": "<data_dir>/exports/aud_0fb68437fd577a5c-20261111T130005.srt",
     "format": "srt",
     "size_bytes": 435,
     "sha256": "90947b76cf3d1e2d45609712e5569768ac4a6525aa64a40b0653f941b71e90e4",
@@ -4251,7 +4266,7 @@ Export the analysis of a previously ingested audio_id to json, markdown, srt, vt
   ],
   "errors": [],
   "processing": {
-    "duration_seconds": 0.218,
+    "duration_seconds": 0.049,
     "stages_run": [],
     "stages_skipped": [],
     "cache_hits": [
@@ -4324,7 +4339,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
 
 ```json
 {
-  "job_id": "job_ce328ee2c56d"
+  "job_id": "job_33e5ad634a27"
 }
 ```
 
@@ -4333,7 +4348,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
 ```json
 {
   "status": "success",
-  "job_id": "job_ce328ee2c56d",
+  "job_id": "job_33e5ad634a27",
   "result": {
     "job_status": "done",
     "progress": 1.0,
@@ -4423,7 +4438,7 @@ Check the status/progress of an async analysis job (returned as job_id with stat
       "warnings": [],
       "errors": [],
       "processing": {
-        "duration_seconds": 0.172,
+        "duration_seconds": 0.047,
         "stages_run": [],
         "stages_skipped": [],
         "cache_hits": [

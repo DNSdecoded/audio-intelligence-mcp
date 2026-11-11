@@ -1,4 +1,4 @@
-from typing import Literal, get_args
+from typing import Annotated, Literal, get_args
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -57,6 +57,7 @@ class TranscribeRequest(_Req):
     diarize: bool = False
     translate_to_en: bool = False
     multilingual: bool = False
+    hotwords: list[Annotated[str, Field(min_length=1, max_length=100)]] | None = Field(None, max_length=50)  # names/jargon the decoder should favour
     async_mode: AsyncMode = "auto"
 
 

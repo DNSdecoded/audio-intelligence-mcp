@@ -11,6 +11,10 @@ allow_url_fetch = false        # allow fetching audio from URLs
 url_timeout_seconds = 30       # URL fetch timeout
 # ffmpeg_path = ""             # explicit ffmpeg binary (default: PATH)
 # ffprobe_path = ""            # explicit ffprobe binary (default: PATH)
+transport = "stdio"            # stdio | streamable-http (HTTP needs allowed_roots set and a bearer token in http_auth_token_env)
+http_host = "127.0.0.1"        # HTTP bind address (one token = one trust domain; put TLS in front of non-loopback binds)
+http_port = 8765               # HTTP port
+http_auth_token_env = "AUDIO_MCP_HTTP_TOKEN"  # name of the env var holding the HTTP bearer token
 backend_profile = "real"       # "real" models or deterministic "fake" backends
 device = "auto"                # auto | cpu | cuda
 asr_model = "small"            # faster-whisper model size

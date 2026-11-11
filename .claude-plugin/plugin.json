@@ -1,0 +1,12 @@
+{
+  "name": "audio-intelligence",
+  "description": "Analyze, transcribe, search and compare audio files through the Audio Intelligence MCP server",
+  "version": "0.1.1",
+  "author": { "name": "Sanjay Sakhinala" },
+  "mcpServers": {
+    "audio-intelligence": {
+      "command": "uvx",
+      "args": ["--from", "audio-intelligence-mcp[models]", "audio-mcp"]
+    }
+  }
+}

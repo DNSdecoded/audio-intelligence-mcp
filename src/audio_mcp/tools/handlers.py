@@ -198,7 +198,8 @@ def transcribe_audio(app, req: TranscribeRequest) -> dict:
     stages = ["transcription", "language"] + (["diarization", "speaker_assign"] if req.diarize else [])
     stages += ["translation"] if req.translate_to_en else []
     outcome = run_analysis(app, req.source, stages, {
-        "language": req.language, "word_timestamps": req.word_timestamps, "multilingual": req.multilingual})
+        "language": req.language, "word_timestamps": req.word_timestamps, "multilingual": req.multilingual,
+        "hotwords": req.hotwords})
     warns = [warning("TRANSLATION_TARGET_LIMITED", "only English translation is supported locally")
              ] if req.translate_to_en else []
     r = outcome.results

@@ -89,6 +89,15 @@ Claude Code (from PyPI, no install step):
 claude mcp add audio-intel -- uvx --from "audio-intelligence-mcp[models]" audio-mcp
 ```
 
+Claude Code plugin (server plus a skill that teaches the model which tool to call and in what order):
+
+```bash
+/plugin install audio-intelligence --marketplace DNSdecoded/audio-intelligence-mcp
+```
+
+Other MCP clients (Claude Desktop, etc.) get a short routing summary from the server's own `instructions`; the
+plugin's skill (`skills/audio-intelligence/SKILL.md`) has the full version with worked call sequences.
+
 Claude Code (source checkout):
 
 ```bash
@@ -114,6 +123,12 @@ From a source checkout, use `"command": "uv"` with
 
 On Windows, use forward slashes or escaped backslashes in JSON paths (`"C:/audio"` or `"C:\audio"`).
 
+Remote/shared use (streamable HTTP): set `transport = "streamable-http"` (or `AUDIO_MCP_TRANSPORT`), an explicit
+`allowed_roots`, and a bearer token in `AUDIO_MCP_HTTP_TOKEN`, then run `audio-mcp`; clients connect to
+`http://<http_host>:<http_port>/mcp` with `Authorization: Bearer <token>`. One token is one trust domain: everyone holding it
+shares the audio store, cache, jobs and library, and `file_path` reads the server's disk. Put TLS in front of any
+non-loopback bind.
+
 Only files under `allowed_roots` can be read (default: your home directory). Paths are resolved, symlinks
 included, before the check.
 
@@ -122,7 +137,7 @@ included, before the check.
 | Tool | What it does |
 |---|---|
 | `analyze_audio` | Task list or `"auto"` (plans from speech ratio, duration, goal text and budget; plan returned with reasons) |
-| `transcribe_audio` | Segments + word timestamps, language runs, optional speakers, code-switching, English translation |
+| `transcribe_audio` | Segments + word timestamps, language runs, optional speakers, code-switching, English translation, `hotwords` vocabulary hints |
 | `detect_audio_events` | AudioSet sound events (PANNs) as time intervals, filterable by category or label |
 | `extract_audio_features` | Level, silence, SNR estimate, spectral shape, bands, pitch, tempo/onsets, with units |
 | `inspect_audio_quality` | Clipping, low level, silence, noise, hum, echo, bandwidth, DC; optional preprocessed variant |
@@ -133,7 +148,7 @@ included, before the check.
 | `search_audio_library` | Persistent SQLite FTS5 + vector library: index files/folders, search by text/filters/example clip |
 | `analyze_audio_stream` | Chunked sessions (PCM or self-contained files), provisional results, final reconciliation |
 | `export_audio_analysis` | json, markdown, srt, vtt, csv, rttm (optional redaction) |
-| `get_job` | Status/progress/cancel for async jobs (long audio runs as a job automatically) |
+| `get_job` | Status/progress/cancel for async jobs (long audio runs as a job automatically). Synchronous calls send MCP progress notifications instead when the client supplies a progress token |
 
 Full schemas and example success/error responses: [docs/tools.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/tools.md). What is implemented,
 partial, or future: [docs/capabilities.md](https://github.com/DNSdecoded/audio-intelligence-mcp/blob/main/docs/capabilities.md).
@@ -173,6 +188,7 @@ TOML file (`AUDIO_MCP_CONFIG=/path/config.toml`, see `config.example.toml`) and/
 | `max_file_mb` / `max_upload_mb` / `max_duration_seconds` | 500 / 50 / 7200 | input limits |
 | `allow_url_fetch` | false | URL sources (private/loopback/metadata IPs always blocked) |
 | `asr_model` | `small` | faster-whisper size (`tiny` … `large-v3`) |
+| `transport` / `http_host` / `http_port` | `stdio` / 127.0.0.1 / 8765 | `streamable-http` serves MCP over HTTP behind a bearer token (see Connect a client) |
 | `async_threshold_seconds` | 600 | longer audio runs as a job (`async_mode: "auto"`) |
 | `vad_threshold` / `vad_min_silence_ms` / `vad_speech_pad_ms` | 0.35 / 300 / 150 | speech detection (tuned on AMI dev meetings; see Evaluation) |
 | `max_concurrent_jobs` | 1 | analyses running models at once (sync calls, jobs and stream pushes share it) |
@@ -238,6 +254,7 @@ pass `language`.
 | `stages_skipped` with a model load error | First-run download failed (network/proxy); check `models_dir` is writable and retry |
 | SpeechBrain symlink / privilege error on Windows | Already handled (models are copied, not symlinked); update and retry |
 | PANNs tries to run `wget` | The server pre-seeds `~/panns_data/class_labels_indices.csv`; make sure the home dir is writable |
+| `LOW_RESOURCE_LANGUAGE` warning | Arabic, Hindi or Telugu was detected with a tiny/base/small Whisper model: set `asr_model = "large-v3"` and pass `language` |
 | Slow on CPU | Use `asr_model = "base"` or `"tiny"`, `budget: "fast"`, or a CUDA GPU; long files run as jobs |
 | `PATH_NOT_ALLOWED` | Add the folder to `allowed_roots` |
 | Client reports a broken connection | Nothing may print to stdout; the server redirects stray library prints to stderr — report any that leak |
@@ -272,7 +289,9 @@ src/audio_mcp/
   dsp/              features, quality, preprocessing, integrity, speech characteristics
   analysis/ timeline/ reasoning/ compare/ library/ stream/ export/ eval/
 scripts/            benchmark, evaluate, docs generator
-tests/              unit, integration, e2e (stdio)
+skills/             Claude Code skill that routes requests to the right tool (shipped by the plugin)
+.claude-plugin/     plugin + marketplace manifests (server and skill install together)
+tests/              unit, integration, e2e (stdio and HTTP)
 ```
 
 ## Known limitations
@@ -282,6 +301,8 @@ tests/              unit, integration, e2e (stdio)
 - Accuracy on low-resource languages with the default `small` model is poor (see Evaluation).
 - Translation is to English only (Whisper).
 - Integrity indicators are signal heuristics, not a deepfake or tamper detector.
+- The HTTP transport has one trust domain per bearer token: clients sharing a token share the audio store, cache,
+  jobs and library.
 - Malformed tool arguments are rejected by the MCP layer before the server sees them, so they come back as MCP
   tool errors rather than the JSON envelope.
 
