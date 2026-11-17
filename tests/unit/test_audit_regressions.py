@@ -1,7 +1,6 @@
 """Regression tests for confirmed audit findings (BUG-01 through BUG-11)."""
 import asyncio
 import base64
-import threading
 import time
 from pathlib import Path
 
@@ -20,6 +19,7 @@ from audio_mcp.envelope import AudioMCPError, ErrorCode
 from audio_mcp.ingest.sources import FilePathSource, UrlSource, _blocked, materialize_source
 from audio_mcp.jobs import JOB_CONTEXT
 from audio_mcp.library.index import Library
+from audio_mcp.pipeline import runner as runner_mod
 from audio_mcp.pipeline.runner import run_analysis
 from audio_mcp.pipeline.stages import STAGES, Stage
 from audio_mcp.reasoning.ask import _tokens
@@ -118,10 +118,7 @@ def test_bug03_multilingual_tokens_and_fts_combining_marks(tmp_path):
 
 def test_bug04_abandoned_thread_cannot_poison_next_stage_cache(app, speech_en, monkeypatch):
     """BUG-04: An abandoned timed-out stage thread must not mutate StageContext of later stages."""
-    entered = threading.Event()
-
     def slow_leaky(ctx):
-        entered.set()
         time.sleep(0.20)
         ctx.warnings.append({"code": "GHOST_WARNING", "message": "from abandoned thread"})
         ctx.no_cache = True
@@ -133,17 +130,11 @@ def test_bug04_abandoned_thread_cannot_poison_next_stage_cache(app, speech_en, m
 
     monkeypatch.setitem(STAGES, "events", Stage("events", (), slow_leaky, lambda a, o: {"k": 1}))
     monkeypatch.setitem(STAGES, "features", Stage("features", (), next_stage, lambda a, o: {"k": 2}))
-    app.settings.stage_timeout_seconds = 0.08
-
-    def restore_timeout():
-        entered.wait(1.0)
-        app.settings.stage_timeout_seconds = 2.0
-
-    t = threading.Thread(target=restore_timeout)
-    t.start()
+    real = runner_mod._call_with_timeout  # short timeout for events only, long for features, no shared settings
+    monkeypatch.setattr(runner_mod, "_call_with_timeout",
+                        lambda fn, ctx, timeout: real(fn, ctx, 0.08 if fn is slow_leaky else 2.0))
     src = FilePathSource(type="file_path", path=str(speech_en))
     o = run_analysis(app, src, ["events", "features"], {})
-    t.join()
     assert "features" in o.results
     assert all(w["code"] != "GHOST_WARNING" for w in o.warnings)
     o2 = run_analysis(app, src, ["features"], {})
@@ -308,3 +299,11 @@ def test_review_followups(app, dialogue, tmp_path):
                                           options={"identify_speakers": False}))
     assert "speakers" not in r["analysis"]
     assert "speaker_assign" not in r["processing"]["stages_run"]
+
+
+def test_uncertainty_cache_key_tracks_quality_rules(app):
+    """PR review: uncertainty reads quality, so its key includes quality's config only when quality ran."""
+    cfg = STAGES["uncertainty"].cfg
+    base = cfg(app, {})
+    assert cfg(app, {"_stages": ["quality"]}) != cfg(app, {"_stages": ["events"]}) != base
+    assert "quality" not in cfg(app, {"_stages": ["events"]})
