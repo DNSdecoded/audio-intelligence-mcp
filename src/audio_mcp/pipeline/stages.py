@@ -263,6 +263,7 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("uncertainty", ("transcription", "vad"), _uncertainty,
           lambda a, o: {**_asr_cfg(a, o), "budget": o.get("budget"), "low": a.settings.low_confidence_threshold,
                         "with": [s for s in ("events", "quality") if s in o.get("_stages", [])],
+                        **({"quality": STAGES["quality"].cfg(a, o)} if "quality" in o.get("_stages", []) else {}),
                         "tagger": _id(a.backends.tagger), "threshold": _threshold(a, o)}, reads_all=True),
     Stage("summary", ("timeline",), _summary,
           lambda a, o: {**STAGES["timeline"].cfg(a, o), "text": _id(a.backends.text),

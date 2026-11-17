@@ -67,12 +67,15 @@ class Library:
         with self._lock:
             row = self._db.execute("SELECT sql FROM sqlite_master WHERE name='segments_fts'").fetchone()
             stale = row is not None and "categories" not in row[0]  # index built with the default tokenizer
-            if stale:
-                self._db.execute("DROP TABLE segments_fts")
-            self._db.executescript(_SCHEMA)
-            if stale:
-                self._db.execute("INSERT INTO segments_fts(segments_fts) VALUES('rebuild')")
-                self._db.commit()
+            # one transaction: a failed rebuild rolls back to the old index instead of leaving none
+            drop, rebuild = (("DROP TABLE segments_fts;", "INSERT INTO segments_fts(segments_fts) VALUES('rebuild');")
+                             if stale else ("", ""))
+            try:
+                self._db.executescript(f"BEGIN IMMEDIATE;{drop}{_SCHEMA}{rebuild}COMMIT;")
+            except Exception:
+                if self._db.in_transaction:
+                    self._db.execute("ROLLBACK")
+                raise
 
     def close(self):
         self._db.close()
