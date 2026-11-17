@@ -171,11 +171,13 @@ def analyze_audio(app, req: AnalyzeRequest) -> dict:
     if req.tasks == "auto":
         record = app.store.ingest(req.source)
         plan = plan_auto(app, record, app.store.load(record.audio_id), goal=req.goal, budget=req.budget)
-        if not o.identify_speakers:
-            plan = [p for p in plan if p["task"] != "speaker_diarization"]
         tasks = [p["task"] for p in plan]
     else:
         tasks = req.tasks
+    if not o.identify_speakers:
+        tasks = [t for t in tasks if t != "speaker_diarization"]
+        if plan is not None:
+            plan = [p for p in plan if p["task"] != "speaker_diarization"]
     stages = ["metadata"]  # always report audio_metadata
     req_stages = []
     for t in tasks:

@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS recordings(audio_id TEXT PRIMARY KEY, path TEXT, sha2
 CREATE TABLE IF NOT EXISTS segments(rowid INTEGER PRIMARY KEY, id TEXT UNIQUE, audio_id TEXT, kind TEXT, start REAL,
   end REAL, text TEXT, label TEXT, speaker_id TEXT, embedding BLOB);
 CREATE INDEX IF NOT EXISTS segments_audio ON segments(audio_id);
-CREATE VIRTUAL TABLE IF NOT EXISTS segments_fts USING fts5(text, content='segments', content_rowid='rowid');
+CREATE VIRTUAL TABLE IF NOT EXISTS segments_fts USING fts5(text, content='segments', content_rowid='rowid',
+  tokenize="unicode61 categories 'L* N* Co M*'");  -- keep combining marks (का vs कि)
 CREATE TRIGGER IF NOT EXISTS segments_ai AFTER INSERT ON segments BEGIN
   INSERT INTO segments_fts(rowid, text) VALUES (new.rowid, new.text); END;
 CREATE TRIGGER IF NOT EXISTS segments_ad AFTER DELETE ON segments BEGIN
@@ -64,7 +65,14 @@ class Library:
         self._db = sqlite3.connect(self.db_path, check_same_thread=False)
         self._db.row_factory = sqlite3.Row
         with self._lock:
+            row = self._db.execute("SELECT sql FROM sqlite_master WHERE name='segments_fts'").fetchone()
+            stale = row is not None and "categories" not in row[0]  # index built with the default tokenizer
+            if stale:
+                self._db.execute("DROP TABLE segments_fts")
             self._db.executescript(_SCHEMA)
+            if stale:
+                self._db.execute("INSERT INTO segments_fts(segments_fts) VALUES('rebuild')")
+                self._db.commit()
 
     def close(self):
         self._db.close()
