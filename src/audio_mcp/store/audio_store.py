@@ -170,7 +170,19 @@ class AudioStore:
         vdir.mkdir(parents=True, exist_ok=True)
         out = vdir / f"{name}.flac"
         data = np.asarray(native, dtype=np.float32).T
-        _atomic_place(lambda t: sf.write(str(t), data, sr, format="FLAC"), out)
+        tmp = out.with_name(f".{out.name}.{uuid.uuid4().hex}.tmp")
+        try:  # unlike _atomic_place, never keep the old FLAC: the JSON below must describe the file on disk
+            sf.write(str(tmp), data, sr, format="FLAC")
+            for i in range(50):
+                try:
+                    os.replace(tmp, out)
+                    break
+                except PermissionError:  # Windows: briefly held open by a reader
+                    if os.name != "nt" or i == 49:
+                        raise
+                    time.sleep(0.01)
+        finally:
+            tmp.unlink(missing_ok=True)
         meta_json = json.dumps({"sample_rate_hz": sr, "transforms": transforms})
         _atomic_place(lambda t: t.write_text(meta_json, encoding="utf-8"), vdir / f"{name}.json")
         return out

@@ -19,7 +19,7 @@ def _pid_alive(pid: int) -> bool:
         k32 = ctypes.WinDLL("kernel32", use_last_error=True)
         try:
             h = k32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
-        except (ctypes.ArgumentError, OverflowError, ValueError):
+        except (ctypes.ArgumentError, ValueError):
             return False
         if not h:
             return ctypes.get_last_error() == 5  # ERROR_ACCESS_DENIED: exists, owned by someone else

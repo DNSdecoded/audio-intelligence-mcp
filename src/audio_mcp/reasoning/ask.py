@@ -40,10 +40,11 @@ def classify_intent(q: str) -> tuple[str, dict]:
 
 def _tokens(text: str) -> set[str]:
     out = set()
-    cleaned = "".join(" " if unicodedata.category(c)[0] in "PSZ" and c != "'" else c for c in text.lower())
+    text = unicodedata.normalize("NFC", text.lower())  # same form for query and segment text
+    cleaned = "".join(" " if unicodedata.category(c)[0] in "PSZ" and c != "'" else c for c in text)
     for w in cleaned.split():
         w = w.strip("'")
-        if w in _STOP or len(w) < 2:
+        if w in _STOP or (w.isascii() and len(w) < 2):  # a single CJK character is a word
             continue
         out.add(re.sub(r"(ing|ed|es|s)$", "", w) if (w.isascii() and len(w) > 4) else w)
     return out

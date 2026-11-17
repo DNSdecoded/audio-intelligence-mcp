@@ -267,7 +267,7 @@ def test_bug10_server_run_resets_job_context(monkeypatch, tmp_path, speech_en):
 def test_bug11_llm_parse_with_surrounding_braces_and_config_regex_validation():
     """BUG-11: _parse handles prose braces around JSON; Settings rejects invalid regex; _pid_alive(0) is False."""
     out = 'Here is the analysis for {seg_0001}:\n{"answer": "Friday", "claims": [], "insufficient": false}\nDone {ok}.'
-    parsed = _parse(out)
+    parsed = _parse(out, ("answer",))
     assert parsed["answer"] == "Friday"
 
     with pytest.raises(Exception):
@@ -275,3 +275,36 @@ def test_bug11_llm_parse_with_surrounding_braces_and_config_regex_validation():
 
     assert _pid_alive(0) is False
     assert _pid_alive(-5) is False
+
+
+def test_review_followups(app, dialogue, tmp_path):
+    """PR review: NAT64 local-use, FTS marks + migration, NFC/CJK tokens, echoed-evidence parse, explicit tasks."""
+    assert _blocked("64:ff9b:1::808:808")  # RFC 8215 local-use prefix embedding public 8.8.8.8
+    assert not _blocked("64:ff9b::808:808")  # RFC 6052 prefix still unwraps to the (public) IPv4
+
+    assert _tokens("\u0915\u093e") != _tokens("\u0915\u093f")
+    assert _tokens("e\u0301cole") == _tokens("\u00e9cole")  # NFC: same word either way
+    assert _tokens("\u732b")  # single CJK character survives
+
+    with pytest.raises(ValueError):  # echoed evidence object is not a response
+        _parse('{"id": "seg_0001", "start": 0.0, "text": "hi"} then {"answer": "x"} ', ("sentences",))
+    assert _parse('{"id": "seg_0001", "start": 0} {"answer": "x"}', ("answer",)) == {"answer": "x"}
+
+    # an index built with the default tokenizer is rebuilt, and kept marks distinguish ka / ki
+    import sqlite3
+    db = tmp_path / "lib.db"
+    con = sqlite3.connect(db)
+    con.executescript("""CREATE TABLE segments(rowid INTEGER PRIMARY KEY, id TEXT UNIQUE, audio_id TEXT, kind TEXT,
+      start REAL, end REAL, text TEXT, label TEXT, speaker_id TEXT, embedding BLOB);
+      CREATE VIRTUAL TABLE segments_fts USING fts5(text, content='segments', content_rowid='rowid');
+      INSERT INTO segments(id,audio_id,kind,text) VALUES ('a','x','speech','\u0915\u093e'), ('b','x','speech','\u0915\u093f');
+      INSERT INTO segments_fts(rowid,text) VALUES (1,'\u0915\u093e'), (2,'\u0915\u093f');""")
+    con.commit(); con.close()
+    lib = Library(db)
+    assert list(lib._fts("\u0915\u093e")) == [1]
+    lib.close()
+
+    r = analyze_audio(app, AnalyzeRequest(source=fp(dialogue), tasks=["transcription", "speaker_diarization"],
+                                          options={"identify_speakers": False}))
+    assert "speakers" not in r["analysis"]
+    assert "speaker_assign" not in r["processing"]["stages_run"]
