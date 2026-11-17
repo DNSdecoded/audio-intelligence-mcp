@@ -4,6 +4,7 @@ import json
 import sqlite3
 import threading
 import time
+import unicodedata
 from pathlib import Path
 
 import numpy as np
@@ -124,7 +125,8 @@ class Library:
         return recs
 
     def _fts(self, query: str) -> dict[int, float]:
-        toks = "".join(c if c.isalnum() else " " for c in query.lower()).split()
+        # Keep letters, digits, and Unicode combining marks (e.g. Devanagari/Telugu/Arabic vowel signs)
+        toks = "".join(c if unicodedata.category(c)[0] in ("L", "N", "M") else " " for c in query.lower()).split()
         if not toks:
             return {}
         q = " OR ".join(f'"{t}"' for t in toks)

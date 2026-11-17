@@ -1,4 +1,5 @@
 import os
+import re
 import tomllib
 import uuid
 from pathlib import Path
@@ -88,6 +89,16 @@ class Settings(BaseSettings):
     def _blank_path_is_default(cls, v):
         # "" would become Path("."), i.e. the working directory, which startup cleanup then empties
         return None if isinstance(v, str) and not v.strip() else v
+
+    @field_validator("redact_extra_patterns", mode="after")
+    @classmethod
+    def _validate_regex_patterns(cls, v: list[str]) -> list[str]:
+        for p in v:
+            try:
+                re.compile(p)
+            except re.error as exc:
+                raise ValueError(f"invalid regex in redact_extra_patterns ({p!r}): {exc}") from exc
+        return v
 
     @model_validator(mode="after")
     def _check_llm(self) -> "Settings":

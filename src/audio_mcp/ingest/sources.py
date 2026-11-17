@@ -54,6 +54,7 @@ class MaterializedSource:
 
 _EXT_RE = re.compile(r"\.[A-Za-z0-9]{1,5}")
 _NAT64 = ipaddress.ip_network("64:ff9b::/96")
+_NAT64_LOCAL = ipaddress.ip_network("64:ff9b:1::/48")
 
 
 def _norm(p: Path) -> Path:
@@ -105,13 +106,15 @@ def _from_base64(src: Base64Source, settings: Settings) -> MaterializedSource:
 def _blocked(ip: str) -> bool:
     a = ipaddress.ip_address(ip.split("%")[0])
     if isinstance(a, ipaddress.IPv6Address):
-        # Unwrap embedded IPv4 (mapped, NAT64 64:ff9b::/96, 6to4 2002::/16) and re-check it.
+        # Unwrap embedded IPv4 (mapped, NAT64 64:ff9b::/96 & 64:ff9b:1::/48, 6to4 2002::/16, Teredo 2001::/32).
         if a.ipv4_mapped:
             return _blocked(str(a.ipv4_mapped))
-        if a in _NAT64:
+        if a in _NAT64 or a in _NAT64_LOCAL:
             return _blocked(str(ipaddress.IPv4Address(int(a) & 0xFFFFFFFF)))
         if a.sixtofour:
             return _blocked(str(a.sixtofour))
+        if a.teredo:
+            return _blocked(str(a.teredo[0])) or _blocked(str(a.teredo[1]))
     return not a.is_global or a.is_multicast
 
 
@@ -133,7 +136,11 @@ def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
     if parsed.scheme not in ("http", "https") or not parsed.hostname:
         raise AudioMCPError(ErrorCode.INVALID_INPUT, "only http(s) URLs are supported")
     try:
-        infos = socket.getaddrinfo(parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80))
+        port = parsed.port
+    except ValueError:
+        raise AudioMCPError(ErrorCode.INVALID_INPUT, "invalid URL port") from None
+    try:
+        infos = socket.getaddrinfo(parsed.hostname, port or (443 if parsed.scheme == "https" else 80))
     except (socket.gaierror, UnicodeError, ValueError):
         raise AudioMCPError(ErrorCode.URL_FETCH_FAILED, "could not resolve host", retryable=True) from None
     if any(_blocked(i[4][0]) for i in infos):
@@ -142,7 +149,7 @@ def _from_url(src: UrlSource, settings: Settings) -> MaterializedSource:
     # Host header and TLS SNI/certificate check keep using the original hostname
     ips = list(dict.fromkeys(i[4][0].split("%")[0] for i in infos))  # all vetted; tried in order like a normal connect
     host = parsed.hostname.encode("idna").decode("ascii")  # Host header and SNI are ASCII (IDNA) names
-    host_header = (f"[{host}]" if ":" in host else host) + (f":{parsed.port}" if parsed.port else "")
+    host_header = (f"[{host}]" if ":" in host else host) + (f":{port}" if port else "")
     ext = Path(parsed.path).suffix
     ext = ext if _EXT_RE.fullmatch(ext) else ".bin"
     out = settings.process_temp_dir / f"{uuid.uuid4().hex}{ext}"

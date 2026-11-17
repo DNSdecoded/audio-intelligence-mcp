@@ -1,5 +1,6 @@
 """Rule-based, evidence-grounded question answering over cached analysis results."""
 import re
+import unicodedata
 
 import numpy as np
 
@@ -39,10 +40,12 @@ def classify_intent(q: str) -> tuple[str, dict]:
 
 def _tokens(text: str) -> set[str]:
     out = set()
-    for w in re.findall(r"[a-z0-9']+", text.lower()):
+    cleaned = "".join(" " if unicodedata.category(c)[0] in "PSZ" and c != "'" else c for c in text.lower())
+    for w in cleaned.split():
+        w = w.strip("'")
         if w in _STOP or len(w) < 2:
             continue
-        out.add(re.sub(r"(ing|ed|es|s)$", "", w) if len(w) > 4 else w)
+        out.add(re.sub(r"(ing|ed|es|s)$", "", w) if (w.isascii() and len(w) > 4) else w)
     return out
 
 

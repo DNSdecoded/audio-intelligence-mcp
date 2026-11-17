@@ -27,6 +27,7 @@ from audio_mcp.tools.schemas import (
 _app: AppContext | None = None
 _refs = 0  # live lifespan entries; HTTP runs one per MCP session plus one for the whole server, stdio just one
 _stop_app = None
+_lifespan_lock = threading.Lock()
 
 
 def _start_app() -> None:
@@ -36,9 +37,14 @@ def _start_app() -> None:
     # the stdio transport already holds the real stdout; stray library prints (panns_inference prints on load)
     # must not reach the JSON-RPC stream
     real_stdout, sys.stdout = sys.stdout, sys.stderr
-    _app = build_app_context(settings)
-    log = logging.getLogger("audio_mcp")
-    log.info("server started; temp files removed: %d; sweep: %s", cleanup_temp(settings), sweep(_app))
+    try:
+        _app = build_app_context(settings)
+        log = logging.getLogger("audio_mcp")
+        log.info("server started; temp files removed: %d; sweep: %s", cleanup_temp(settings), sweep(_app))
+    except Exception:
+        sys.stdout = real_stdout
+        _app = None
+        raise
 
     stop = threading.Event()
 
@@ -63,15 +69,17 @@ def _start_app() -> None:
 @asynccontextmanager
 async def lifespan(_server):
     global _refs
-    if _refs == 0:
-        _start_app()
-    _refs += 1
+    with _lifespan_lock:
+        if _refs == 0:
+            _start_app()
+        _refs += 1
     try:
         yield
     finally:
-        _refs -= 1
-        if _refs == 0:
-            _stop_app()
+        with _lifespan_lock:
+            _refs -= 1
+            if _refs == 0 and _stop_app is not None:
+                _stop_app()
 
 
 INSTRUCTIONS = """\
@@ -118,9 +126,11 @@ async def _run(handler, model, params: dict) -> dict[str, Any]:
     progress = _progress_reporter()
 
     def call():
-        if progress is not None:  # the runner reads this, as it does for async jobs
-            JOB_CONTEXT.set((None, progress))
-        return handler(_app, req)
+        tok = JOB_CONTEXT.set((None, progress) if progress is not None else None)
+        try:
+            return handler(_app, req)
+        finally:
+            JOB_CONTEXT.reset(tok)
 
     return await anyio.to_thread.run_sync(call)
 
@@ -320,16 +330,19 @@ async def export_audio_analysis(
 
 
 class _BearerAuth:
-    """Pure ASGI middleware: every HTTP request needs `Authorization: Bearer <token>` (SSE streams stay unbuffered)."""
+    """Pure ASGI middleware: every HTTP/WebSocket request needs `Authorization: Bearer <token>` (SSE stays unbuffered)."""
 
     def __init__(self, app, token: str):
         self.app, self.expected = app, f"Bearer {token}".encode()
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] == "http":
+        if scope["type"] in ("http", "websocket"):
             given = dict(scope["headers"]).get(b"authorization", b"")
             if not hmac.compare_digest(given, self.expected):
-                await Response("unauthorized", 401, headers={"WWW-Authenticate": "Bearer"})(scope, receive, send)
+                if scope["type"] == "http":
+                    await Response("unauthorized", 401, headers={"WWW-Authenticate": "Bearer"})(scope, receive, send)
+                else:
+                    await send({"type": "websocket.close", "code": 4401})
                 return
         await self.app(scope, receive, send)
 

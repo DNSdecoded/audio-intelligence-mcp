@@ -21,10 +21,11 @@ def _hum_excess_db(m, sr):
 def _hum_db(m, sr):
     f, p = welch(m, fs=sr, nperseg=min(sr, len(m)))
     band = p[(f >= 30) & (f <= 120)]
-    if not band.size or np.median(band) <= 0:
+    if not band.size or not np.isfinite(p).all():
         return None
-    peak = max(p[np.argmin(np.abs(f - hz))] for hz in (50, 60))
-    db = 10 * np.log10(peak / np.median(band)) if peak > 0 else np.nan
+    ref = max(float(np.median(band)), float(p.max()) * 1e-7, 1e-12)
+    peak = max(float(p[np.argmin(np.abs(f - hz))]) for hz in (50, 60))
+    db = 10 * np.log10(peak / ref) if peak > 0 else np.nan
     return float(db) if np.isfinite(db) else None  # NaN/inf input (e.g. float files) must not leak out
 
 

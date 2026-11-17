@@ -99,12 +99,18 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors, tainted):
             skipped.append({"stage": stage.name, "reason": reason or "backend unavailable"})
             bad[stage.name] = "skipped"
             return
-    n_warn = len(ctx.warnings)
-    ctx.no_cache = False
+    # Run each stage against an isolated StageContext so an abandoned timed-out thread cannot mutate ctx
+    stage_ctx = StageContext(
+        app=ctx.app,
+        record=ctx.record,
+        audio=ctx.audio,
+        options=ctx.options,
+        results=dict(ctx.results),
+        cancel_event=ctx.cancel_event,
+    )
     try:
-        ctx.results[stage.name] = _call_with_timeout(stage.fn, ctx, app.settings.stage_timeout_seconds)
+        res = _call_with_timeout(stage.fn, stage_ctx, app.settings.stage_timeout_seconds)
     except AudioMCPError as e:
-        del ctx.warnings[n_warn:]
         if e.code != ErrorCode.MODEL_UNAVAILABLE:
             errors.append({**e.to_dict(), "stage": stage.name})
             bad[stage.name] = "failed"
@@ -116,8 +122,12 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors, tainted):
         errors.append({"code": ErrorCode.STAGE_FAILED.value, "stage": stage.name, "message": str(e),
                        "retryable": False})
         bad[stage.name] = "failed"
-        del ctx.warnings[n_warn:]
         return
+    stage_warnings = list(stage_ctx.warnings)
+    ctx.results[stage.name] = res
+    ctx.warnings.extend(stage_warnings)
+    ctx.models_used.extend(stage_ctx.models_used)
+    ctx.no_cache = stage_ctx.no_cache
     ran.append(stage.name)
     # never cache a result built around a failure/fallback: a retry must recompute it
     if (ctx.no_cache or any(d in bad or d in tainted for d in (*stage.deps, *stage.soft_deps))
@@ -125,12 +135,12 @@ def _run_stage(app, stage, ctx, bad, ran, skipped, hits, errors, tainted):
         tainted.add(stage.name)
         return
     app.cache.put(ctx.record.audio_id, stage.name, key,
-                  {"result": ctx.results[stage.name], "warnings": ctx.warnings[n_warn:]})
+                  {"result": ctx.results[stage.name], "warnings": stage_warnings})
 
 
 def _call_with_timeout(fn, ctx, timeout: float):
     # shortcut: a timed-out stage thread is abandoned, not killed (Python cannot kill threads); acceptable
-    # because stages are pure computations on in-memory audio.
+    # because stages are pure computations on in-memory audio and run with an isolated StageContext.
     pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="audio-mcp-stage")
     fut = pool.submit(fn, ctx)
     try:

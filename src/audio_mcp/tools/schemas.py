@@ -1,6 +1,6 @@
 from typing import Annotated, Literal, get_args
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from audio_mcp.analysis.events import EVENT_CATEGORIES
 from audio_mcp.dsp.features import FEATURE_GROUPS
@@ -45,9 +45,14 @@ class AnalyzeRequest(_Req):
     tasks: list[TaskName] | Literal["auto"] = "auto"
     goal: str | None = None
     budget: Literal["fast", "balanced", "thorough"] = "balanced"
-    options: AnalyzeOptions = AnalyzeOptions()
+    options: AnalyzeOptions = Field(default_factory=AnalyzeOptions)
     output_format: Literal["json"] = "json"
     async_mode: AsyncMode = "auto"
+
+    @field_validator("options", mode="before")
+    @classmethod
+    def _default_options(cls, v):
+        return AnalyzeOptions() if v is None else v
 
 
 class TranscribeRequest(_Req):
