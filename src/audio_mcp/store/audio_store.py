@@ -169,10 +169,10 @@ class AudioStore:
         vdir = self._dir(audio_id) / "variants"
         vdir.mkdir(parents=True, exist_ok=True)
         out = vdir / f"{name}.flac"
-        sf.write(str(out), np.asarray(native, dtype=np.float32).T, sr, format="FLAC")
-        (vdir / f"{name}.json").write_text(
-            json.dumps({"sample_rate_hz": sr, "transforms": transforms}), encoding="utf-8"
-        )
+        data = np.asarray(native, dtype=np.float32).T
+        _atomic_place(lambda t: sf.write(str(t), data, sr, format="FLAC"), out)
+        meta_json = json.dumps({"sample_rate_hz": sr, "transforms": transforms})
+        _atomic_place(lambda t: t.write_text(meta_json, encoding="utf-8"), vdir / f"{name}.json")
         return out
 
     def delete(self, audio_id: str) -> None:

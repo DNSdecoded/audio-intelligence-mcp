@@ -26,7 +26,6 @@ from audio_mcp.tools.schemas import (
 log = logging.getLogger("audio_mcp.tools")
 
 
-
 def invalid_input(e: ValidationError) -> dict:
     err = e.errors()[0]
     loc = ".".join(str(x) for x in err["loc"])
@@ -110,9 +109,9 @@ def analysis_payload(outcome, options: AnalyzeOptions) -> dict:
     if "language" in r:
         a["language"] = {k: r["language"][k] for k in ("primary", "confidence", "confidence_kind") if k in r["language"]}
     if "transcription" in r:
-        segs = r["speaker_assign"]["segments"] if "speaker_assign" in r else r["transcription"]["segments"]
+        segs = r["speaker_assign"]["segments"] if ("speaker_assign" in r and options.identify_speakers) else r["transcription"]["segments"]
         a["transcription"] = {"text": r["transcription"]["text"], "segments": segs}
-    if "diarization" in r:
+    if "diarization" in r and options.identify_speakers:
         a["speakers"] = {k: r["diarization"][k] for k in ("speakers", "turns", "overlaps", "overlap_supported")}
     if "events" in r:
         a["sound_events"] = r["events"]["events"]
@@ -130,10 +129,16 @@ def analysis_payload(outcome, options: AnalyzeOptions) -> dict:
         a["integrity"] = r["integrity"]
     if "speech" in r:
         a["speech_characteristics"] = r["speech"]
-    if not options.word_level_timestamps:
+    if not options.identify_speakers:
+        a = _strip(a, {"speaker_id", "per_speaker"})
+    if not options.word_level_timestamps or not options.timestamps:
         a = _strip(a, {"words"})
+    if not options.timestamps:
+        a = _strip(a, {"start", "end", "timestamp", "first_seen", "last_seen", "silence_intervals", "long_pauses"})
     if not options.include_confidence:
         a = _strip(a, {"confidence", "confidence_kind"})
+    if not options.include_evidence:
+        a = _strip(a, {"evidence_ids"})
     return a
 
 
@@ -161,22 +166,37 @@ _RECOVERABLE = {"LOW_LEVEL", "HIGH_NOISE", "HUM", "DC_OFFSET"}
 @tool_handler
 @async_capable("analyze_audio")
 def analyze_audio(app, req: AnalyzeRequest) -> dict:
+    o = req.options
     plan = None
     if req.tasks == "auto":
         record = app.store.ingest(req.source)
         plan = plan_auto(app, record, app.store.load(record.audio_id), goal=req.goal, budget=req.budget)
+        if not o.identify_speakers:
+            plan = [p for p in plan if p["task"] != "speaker_diarization"]
         tasks = [p["task"] for p in plan]
     else:
         tasks = req.tasks
     stages = ["metadata"]  # always report audio_metadata
+    req_stages = []
     for t in tasks:
-        stages += [s for s in TASK_TO_STAGES[t] if s not in stages]
+        for s in TASK_TO_STAGES[t]:
+            if s not in stages:
+                stages.append(s)
+            if s != "metadata" and s not in req_stages:
+                req_stages.append(s)
     if "transcription" not in stages and "speaker_assign" in stages:
         stages.remove("speaker_assign")  # labels transcript words: without a transcript it would force full ASR
-    o = req.options
+        if "speaker_assign" in req_stages:
+            req_stages.remove("speaker_assign")
     outcome = run_analysis(app, req.source, order_stages(stages), {
-        "language": o.language, "word_timestamps": o.word_level_timestamps, "num_speakers": o.num_speakers,
-        "diarize": "speaker_diarization" in tasks, "budget": req.budget})
+        "language": o.language, "word_timestamps": o.word_level_timestamps and o.timestamps,
+        "num_speakers": o.num_speakers, "diarize": "speaker_diarization" in tasks and o.identify_speakers,
+        "budget": req.budget})
+    if req.tasks != "auto" and req_stages and not any(s in outcome.results for s in req_stages) and not outcome.errors:
+        outcome.errors.extend(
+            {"code": ErrorCode.MODEL_UNAVAILABLE.value, "stage": sk["stage"], "message": sk["reason"], "retryable": False}
+            for sk in outcome.processing.stages_skipped if sk["stage"] in req_stages
+        )
     warns = [warning("UNSUPPORTED_FEATURE", "emotion detection is not implemented")] if o.detect_emotions else []
     if plan is not None:
         outcome.processing.plan = plan
@@ -514,14 +534,17 @@ def analyze_audio_stream(app, req: StreamRequest) -> dict:
     if req.action == "cancel":
         return build_response(result=ss.close(req.session_id))
     record, session = ss.finish_audio(req.session_id)
-    resp = analyze_audio(app, AnalyzeRequest(source=AudioIdSource(type="audio_id", audio_id=record.audio_id),
-                                             tasks=req.tasks, async_mode="never"))
-    if resp["status"] == "error":
-        return resp
-    result = {"analysis": resp.pop("analysis"), "session_id": session.id}
-    result["reconciliation"] = ss.reconcile(session, result["analysis"])
-    ss.close(req.session_id)
-    return {**resp, "result": result}
+    try:
+        # Use unwrapped analyze_audio so reconciliation compares unredacted text and outer @tool_handler redacts once
+        resp = analyze_audio.__wrapped__(app, AnalyzeRequest(source=AudioIdSource(type="audio_id", audio_id=record.audio_id),
+                                                             tasks=req.tasks, async_mode="never"))
+        if resp["status"] == "error":
+            return resp
+        result = {"analysis": resp.pop("analysis"), "session_id": session.id}
+        result["reconciliation"] = ss.reconcile(session, result["analysis"])
+        return {**resp, "result": result}
+    finally:
+        ss.close(req.session_id)
 
 
 _EXPORT_TASKS = {"srt": ["transcription", "speaker_diarization"], "vtt": ["transcription", "speaker_diarization"],
@@ -540,6 +563,16 @@ def export_audio_analysis(app, req: ExportRequest) -> dict:
                                                          tasks=tasks, async_mode="never"))
     if resp["status"] == "error":
         return resp
+    req_stage = "transcription" if req.format in ("srt", "vtt") else "diarization" if req.format == "rttm" else None
+    req_key = "transcription" if req.format in ("srt", "vtt") else "speakers" if req.format == "rttm" else None
+    if req_key and req_key not in resp["analysis"]:
+        errs = resp.get("errors") or [
+            {"code": ErrorCode.MODEL_UNAVAILABLE.value, "stage": sk["stage"], "message": sk["reason"], "retryable": False}
+            for sk in resp["processing"].get("stages_skipped", []) if sk["stage"] == req_stage
+        ]
+        if errs:
+            return build_response(result=None, audio_id=req.audio_id, warnings=resp["warnings"], errors=errs,
+                                  processing=ProcessingInfo(**resp["processing"]))
     s = app.settings
     info = export_analysis(req.audio_id, resp["analysis"], req.format, s.resolved_export_dir,
                            redact=req.redact or s.redact_outputs, extra_patterns=s.redact_extra_patterns)

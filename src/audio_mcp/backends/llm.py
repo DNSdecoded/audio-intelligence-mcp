@@ -13,13 +13,24 @@ _FALLBACK_MODELS = {"claude-fable-5-1", "claude-opus-5-5", "claude-opus-5", "cla
 _MAX_TOKENS = 4096
 
 
+def _is_loopback_ip(ip: str) -> bool:
+    a = ipaddress.ip_address(ip.split("%")[0])
+    if isinstance(a, ipaddress.IPv6Address) and a.ipv4_mapped:
+        return a.ipv4_mapped.is_loopback
+    return a.is_loopback
+
+
 def is_loopback(url: str) -> bool:
-    host = urlparse(url).hostname or ""
+    host = (urlparse(url).hostname or "").rstrip(".").lower()
     if host == "localhost":
         return True
     try:
+        return _is_loopback_ip(host)
+    except ValueError:
+        pass
+    try:
         addrs = {i[4][0].split("%")[0] for i in socket.getaddrinfo(host, None)}
-        return bool(addrs) and all(ipaddress.ip_address(a).is_loopback for a in addrs)
+        return bool(addrs) and all(_is_loopback_ip(a) for a in addrs)
     except (OSError, ValueError):
         return False
 

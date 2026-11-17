@@ -93,6 +93,8 @@ class StreamSessions:
                 raise AudioMCPError(ErrorCode.INVALID_INPUT, "chunk is not valid base64") from None
         if s.chunk_format == "pcm":
             raw = raw if data_b64 is not None else check_path_allowed(path, st.allowed_roots).read_bytes()
+            if not raw:
+                raise AudioMCPError(ErrorCode.EMPTY_AUDIO, "chunk is empty")
             dtype, scale = (np.int16, 32768.0) if s.sample_format == "s16le" else (np.float32, 1.0)
             if len(raw) % (np.dtype(dtype).itemsize * s.channels):
                 raise AudioMCPError(ErrorCode.INVALID_INPUT, "chunk is not a whole number of PCM frames")
@@ -103,7 +105,9 @@ class StreamSessions:
         info = probe(f, st)
         x = decode(f, info, st).native
         if s.sr is None:
-            s.sr, s.channels = info.sample_rate_hz, x.shape[0]
+            s.sr = info.sample_rate_hz
+        if s.channels is None:
+            s.channels = x.shape[0]
         if info.sample_rate_hz != s.sr:
             x = np.stack([resample(ch, info.sample_rate_hz, s.sr) for ch in x])
         if x.shape[0] != s.channels:
@@ -152,6 +156,11 @@ class StreamSessions:
         for seg in self.app.backends.asr.transcribe(mono).segments:
             d = seg.model_dump(exclude_none=True)
             d["start"], d["end"] = round(d["start"] + start, 3), round(d["end"] + start, 3)
+            if "words" in d:
+                d["words"] = [
+                    {**w, "start": round(w["start"] + start, 3), "end": round(w["end"] + start, 3)}
+                    for w in d["words"]
+                ]
             segs.append(d)
             if d["start"] >= s.words_until:  # only text not already reported by an earlier window
                 s.provisional_text.append(d["text"])

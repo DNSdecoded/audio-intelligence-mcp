@@ -21,10 +21,18 @@ def _windows(regions: list[Interval]) -> list[tuple[float, float]]:
     return out
 
 
+def _unit_embeddings(emb: np.ndarray) -> np.ndarray:
+    norms = np.linalg.norm(emb, axis=1, keepdims=True)
+    dim = max(1, emb.shape[1])
+    fallback = np.full_like(emb, 1.0 / np.sqrt(dim))
+    return np.where(norms > 1e-9, emb / np.maximum(norms, 1e-9), fallback)
+
+
 def _labels(emb: np.ndarray, threshold: float, num_speakers: int | None, max_speakers: int) -> np.ndarray:
     if len(emb) < 2:
         return np.ones(len(emb), dtype=int)
-    z = linkage(emb, "average", metric="cosine")
+    unit = _unit_embeddings(emb)
+    z = linkage(unit, "average", metric="cosine")
     if num_speakers:
         return fcluster(z, t=num_speakers, criterion="maxclust")
     lab = fcluster(z, t=threshold, criterion="distance")
@@ -42,7 +50,7 @@ def cluster_speakers(mono16k, regions, embedder, *, threshold, num_speakers, max
     if long.sum() >= 2 and not long.all():
         labels = np.zeros(len(wins), dtype=int)
         labels[long] = _labels(emb[long], threshold, num_speakers, max_speakers)
-        unit = emb / np.maximum(np.linalg.norm(emb, axis=1, keepdims=True), 1e-9)
+        unit = _unit_embeddings(emb)
         cents = {lab: unit[labels == lab].mean(axis=0) for lab in set(labels[long])}
         for i in np.flatnonzero(~long):
             labels[i] = max(cents, key=lambda lab: float(unit[i] @ cents[lab]))
