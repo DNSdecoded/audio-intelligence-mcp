@@ -31,13 +31,15 @@ def _lines(pack) -> str:
 
 
 def _parse(out: str) -> dict:
-    m = re.search(r"\{.*\}", out, re.DOTALL)
-    if not m:
-        raise ValueError("no JSON object in LLM output")
-    obj = json.loads(m.group(0))
-    if not isinstance(obj, dict):
-        raise ValueError("LLM output is not a JSON object")
-    return obj
+    decoder = json.JSONDecoder()
+    for m in re.finditer(r"\{", out):
+        try:
+            obj, _ = decoder.raw_decode(out, m.start())
+            if isinstance(obj, dict):
+                return obj
+        except ValueError:
+            continue
+    raise ValueError("no JSON object in LLM output")
 
 
 def _list(v) -> list:
@@ -91,7 +93,7 @@ def llm_summarize(results: dict, pack: list[Evidence], llm, length: str, focus: 
 
 def llm_interpret(measured_differences: dict, llm) -> list[dict]:
     prompt = (f"Measured differences between recording A and B:\n{json.dumps(measured_differences)}\n\n"
-              "Suggest at most 3 possible, clearly hedged interpretations. Reply as JSON: "
+    "Suggest at most 3 possible, clearly hedged interpretations. Reply as JSON: "
               '{"interpretations": [{"statement": str, "based_on": [str]}]}')
     obj = _parse(llm.complete(_SYSTEM, prompt))
     return [{"statement": i["statement"], "based_on": [b for b in _list(i.get("based_on")) if isinstance(b, str)],

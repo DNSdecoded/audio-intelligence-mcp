@@ -11,11 +11,16 @@ _STALE_SECONDS = 24 * 3600
 
 
 def _pid_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
     if os.name == "nt":  # os.kill(pid, 0) would send CTRL_C_EVENT on Windows
         import ctypes
 
         k32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        h = k32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+        try:
+            h = k32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+        except (ctypes.ArgumentError, OverflowError, ValueError):
+            return False
         if not h:
             return ctypes.get_last_error() == 5  # ERROR_ACCESS_DENIED: exists, owned by someone else
         code = ctypes.c_ulong()
@@ -59,7 +64,7 @@ def cleanup_temp(settings, *, own: bool = False) -> int:
             continue
         try:
             stale = not _pid_alive(int(parts[1])) or now - p.stat().st_mtime > _STALE_SECONDS
-        except (OSError, OverflowError):  # OverflowError: pid beyond the platform's range, so not ours
+        except (OSError, OverflowError, ValueError):  # OverflowError: pid beyond the platform's range, so not ours
             continue
         if stale:
             n += _remove(p)
