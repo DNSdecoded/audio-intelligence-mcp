@@ -109,7 +109,9 @@ def _blocked(ip: str) -> bool:
         # Unwrap embedded IPv4 (mapped, NAT64 64:ff9b::/96 & 64:ff9b:1::/48, 6to4 2002::/16, Teredo 2001::/32).
         if a.ipv4_mapped:
             return _blocked(str(a.ipv4_mapped))
-        if a in _NAT64 or a in _NAT64_LOCAL:
+        if a in _NAT64_LOCAL:  # RFC 8215 local-use: no standard embedded-IPv4 position, so never public
+            return True
+        if a in _NAT64:
             return _blocked(str(ipaddress.IPv4Address(int(a) & 0xFFFFFFFF)))
         if a.sixtofour:
             return _blocked(str(a.sixtofour))

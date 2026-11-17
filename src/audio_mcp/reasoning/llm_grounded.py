@@ -30,16 +30,18 @@ def _lines(pack) -> str:
     return "\n".join(rows)
 
 
-def _parse(out: str) -> dict:
+def _parse(out: str, keys: tuple[str, ...]) -> dict:
+    """First JSON object in the reply that has one of the expected response keys (skips prose braces and echoed
+    evidence objects)."""
     decoder = json.JSONDecoder()
     for m in re.finditer(r"\{", out):
         try:
             obj, _ = decoder.raw_decode(out, m.start())
-            if isinstance(obj, dict):
+            if isinstance(obj, dict) and any(k in obj for k in keys):
                 return obj
         except ValueError:
             continue
-    raise ValueError("no JSON object in LLM output")
+    raise ValueError("no expected JSON object in LLM output")
 
 
 def _list(v) -> list:
@@ -57,7 +59,7 @@ def llm_answer(question: str, pack: list[Evidence], llm) -> dict:
     prompt = (f"Evidence (JSON lines):\n{_lines(pack)}\n\nQuestion: {question}\n\nReply as JSON: "
               '{"answer": str, "claims": [{"text": str, "evidence_ids": [str], "kind": "detected"|"interpretation"}], '
               '"insufficient": bool}')
-    obj = _parse(llm.complete(_SYSTEM, prompt))
+    obj = _parse(llm.complete(_SYSTEM, prompt), ("answer", "claims", "insufficient"))
     by_id = {e.id: e for e in pack}
     claims = [c for c in _list(obj.get("claims")) if _cites(c, by_id)]
     cited = list(dict.fromkeys(i for c in claims for i in c["evidence_ids"]))
@@ -82,7 +84,7 @@ def llm_summarize(results: dict, pack: list[Evidence], llm, length: str, focus: 
     prompt = (f"Evidence (JSON lines):\n{_lines(pack)}\n\nWrite a {length} summary"
               + (f" focused on: {focus}" if focus else "") + ". Reply as JSON: "
               '{"sentences": [{"text": str, "evidence_ids": [str]}], "topics": [str]}')
-    obj = _parse(llm.complete(_SYSTEM, prompt))
+    obj = _parse(llm.complete(_SYSTEM, prompt), ("sentences", "topics"))
     ids = {e.id for e in pack}
     sentences = [{"text": s["text"], "evidence_ids": s["evidence_ids"]} for s in _list(obj.get("sentences"))
                  if _cites(s, ids) and isinstance(s.get("text"), str) and s["text"].strip()]
@@ -95,7 +97,7 @@ def llm_interpret(measured_differences: dict, llm) -> list[dict]:
     prompt = (f"Measured differences between recording A and B:\n{json.dumps(measured_differences)}\n\n"
     "Suggest at most 3 possible, clearly hedged interpretations. Reply as JSON: "
               '{"interpretations": [{"statement": str, "based_on": [str]}]}')
-    obj = _parse(llm.complete(_SYSTEM, prompt))
+    obj = _parse(llm.complete(_SYSTEM, prompt), ("interpretations",))
     return [{"statement": i["statement"], "based_on": [b for b in _list(i.get("based_on")) if isinstance(b, str)],
              "kind": "interpretation", "source": "llm"} for i in _list(obj.get("interpretations"))[:3]
             if isinstance(i, dict) and isinstance(i.get("statement"), str) and i["statement"].strip()]

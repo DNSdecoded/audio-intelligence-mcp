@@ -274,7 +274,7 @@ STAGES: dict[str, Stage] = {s.name: s for s in [
     Stage("audio_embedding", (), _audio_embedding, lambda a, o: {"tagger": _id(a.backends.tagger)}, "tagger"),
     Stage("translation", ("transcription",), _translation, lambda a, o: {**_asr_cfg(a, o), "target": "en"}, "asr"),
     Stage("integrity", ("metadata",), _integrity, lambda a, o: {"rules": 1}),
-    Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 2}),
+    Stage("quality", ("features", "vad"), _quality, lambda a, o: {**_features_cfg(a, o), "rules": 3}),
     Stage("transcription", ("vad",), _transcription, _asr_cfg, "asr"),
     Stage("language", ("transcription",), _language, _asr_cfg),
     Stage("events", (), _events,
