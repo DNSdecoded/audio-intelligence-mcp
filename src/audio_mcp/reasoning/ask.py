@@ -40,7 +40,7 @@ def classify_intent(q: str) -> tuple[str, dict]:
 
 def _tokens(text: str) -> set[str]:
     out = set()
-    text = unicodedata.normalize("NFC", text.lower())  # same form for query and segment text
+    text = unicodedata.normalize("NFC", text.lower()).replace("​", " ")  # NFC: same form for query and segment
     cleaned = "".join(" " if unicodedata.category(c)[0] in "PSZ" and c != "'" else c for c in text)
     for w in cleaned.split():
         w = w.strip("'")

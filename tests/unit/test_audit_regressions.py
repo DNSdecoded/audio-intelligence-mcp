@@ -1,7 +1,7 @@
 """Regression tests for confirmed audit findings (BUG-01 through BUG-11)."""
 import asyncio
 import base64
-import time
+import threading
 from pathlib import Path
 
 import anyio
@@ -118,14 +118,18 @@ def test_bug03_multilingual_tokens_and_fts_combining_marks(tmp_path):
 
 def test_bug04_abandoned_thread_cannot_poison_next_stage_cache(app, speech_en, monkeypatch):
     """BUG-04: An abandoned timed-out stage thread must not mutate StageContext of later stages."""
+    release, mutated = threading.Event(), threading.Event()
+
     def slow_leaky(ctx):
-        time.sleep(0.20)
+        release.wait(5)  # outlives its timeout, then mutates while the next stage is running
         ctx.warnings.append({"code": "GHOST_WARNING", "message": "from abandoned thread"})
         ctx.no_cache = True
+        mutated.set()
         return {"events": [], "threshold": 0.3}
 
     def next_stage(ctx):
-        time.sleep(0.20)
+        release.set()
+        assert mutated.wait(5), "abandoned thread never mutated its context"
         return {"units": {}, "values": {"rms": 0.1}}
 
     monkeypatch.setitem(STAGES, "events", Stage("events", (), slow_leaky, lambda a, o: {"k": 1}))
@@ -135,6 +139,7 @@ def test_bug04_abandoned_thread_cannot_poison_next_stage_cache(app, speech_en, m
                         lambda fn, ctx, timeout: real(fn, ctx, 0.08 if fn is slow_leaky else 2.0))
     src = FilePathSource(type="file_path", path=str(speech_en))
     o = run_analysis(app, src, ["events", "features"], {})
+    assert any(e["stage"] == "events" and e["code"] == "TIMEOUT" for e in o.errors)
     assert "features" in o.results
     assert all(w["code"] != "GHOST_WARNING" for w in o.warnings)
     o2 = run_analysis(app, src, ["features"], {})
