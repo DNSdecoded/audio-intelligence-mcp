@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.3 — 2026-11-18
+
+Bug-fix and hardening release.
+
+### Fixed
+- `diagnose_quality` no longer flags `HUM` on pure 440 Hz tones.
+- `analyze_audio` options (`identify_speakers`, `include_evidence`, `timestamps`) are honoured, and `options=None` is accepted.
+  An explicit `speaker_diarization` task no longer conflicts with `identify_speakers=False`.
+- Multilingual text: tokenisation and library full-text search keep non-Latin scripts and combining vowel marks
+  (NFC-normalised; single CJK characters count as words; zero-width spaces split words). An existing FTS index
+  built with the old tokenizer is rebuilt atomically.
+- A timed-out stage thread can no longer mutate the context or cache of later stages.
+- Diarization no longer crashes on all-zero speech windows.
+- Streaming: word offsets in the transcript window, empty chunks, partial file init, and redacted reconcile.
+- `export_audio_analysis` (srt/vtt/rttm) and `analyze_audio` with explicit tasks report an error / `partial`
+  when a required backend is unavailable instead of succeeding.
+- The quality cache key tracks quality rules, and the uncertainty key tracks quality when it ran.
+- `put_variant` can no longer report success with stale variant metadata.
+- Server worker threads no longer leak the job context between calls.
+- A non-JSON LLM reply with stray braces, or an echoed evidence object, is parsed strictly; invalid
+  `redact_extra_patterns` regexes are rejected at config load; `_pid_alive` handles 0, negative and overflowing pids.
+
+### Security
+- URL fetch: invalid ports are `INVALID_INPUT`; Teredo and NAT64 local-use prefixes embedding private/loopback
+  IPv4 addresses are blocked.
+- LLM loopback detection recognises `::ffff:127.0.0.1` and keeps a trailing dot when resolving the hostname.
+
 ## 0.1.2 — 2026-11-11
 
 ### Added
