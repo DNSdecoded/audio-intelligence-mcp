@@ -21,11 +21,11 @@ def _is_loopback_ip(ip: str) -> bool:
 
 
 def is_loopback(url: str) -> bool:
-    host = (urlparse(url).hostname or "").rstrip(".").lower()
-    if host == "localhost":
+    host = (urlparse(url).hostname or "").lower()  # keep a trailing dot: the request resolves the same absolute name
+    if host.rstrip(".") == "localhost":
         return True
     try:
-        return _is_loopback_ip(host)
+        return _is_loopback_ip(host.rstrip("."))
     except ValueError:
         pass
     try:
